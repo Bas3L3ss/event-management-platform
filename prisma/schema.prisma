@@ -1,0 +1,59 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Event {
+  id               String     @id @default(uuid())
+  clerkId          String
+  eventName        String
+  eventDescription String
+  dateEnd        DateTime
+  dateStart DateTime
+  status           EventStatus
+  rating           Int?
+  eventImg         String?
+  eventTicketPrice Float
+  eventTicketCurrency String
+  featured         Boolean     @default(false)
+  comments         Comment[]   @relation("EventComments")
+  hostName         String?
+
+  @@index([dateStart])
+}
+
+model Comment {
+  id          String   @id @default(uuid())
+  clerkId     String
+  authorName  String
+  authorImageUrl String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  eventId     String
+  event       Event    @relation("EventComments", fields: [eventId], references: [id])
+
+  @@index([createdAt])
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  clerkId   String
+  orderTotal Int      @default(0)
+  email     String
+  isPaid    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EventStatus {
+  NOT_CONFIRMED
+  UPCOMING
+  STARTED
+  ENDED
+}
