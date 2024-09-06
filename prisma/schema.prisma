@@ -17,6 +17,7 @@ model Event {
   dateEnd        DateTime
   dateStart DateTime
   status           EventStatus
+  type EventType
   rating           Int?
   eventImg         String?
   eventTicketPrice Float
@@ -56,4 +57,21 @@ enum EventStatus {
   UPCOMING
   STARTED
   ENDED
+}
+
+
+enum EventType {
+  CONFERENCE
+  SEMINARS_WORKSHOPS
+  SPORTS
+  WEDDINGS_CELEBRATION
+  FASHION
+  CONCERTS
+  MEETINGS
+  FESTIVALS
+  TRADE_SHOWS_EXPOS
+  FUNDRAISERS_CHARITY
+  NETWORKING
+  PRODUCT_LAUNCHES
+  CORPORATE_RETREATS
 }
