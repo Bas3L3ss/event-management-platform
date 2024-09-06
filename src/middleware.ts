@@ -1,4 +1,10 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import {
+  auth,
+  clerkMiddleware,
+  createRouteMatcher,
+} from "@clerk/nextjs/server";
+import { authenticateAndRedirect } from "./utils/actions/clerkFunc";
+import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
@@ -7,7 +13,16 @@ const isPublicRoute = createRouteMatcher([
   "/events",
 ]);
 
+const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+
 export default clerkMiddleware((auth, request) => {
+  const isAdminUser = auth().userId === process.env.CLERK_ADMIN_ID;
+  console.log(auth().userId, process.env.CLERK_ADMIN_ID);
+
+  if (isAdminRoute(request) && !isAdminUser) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   if (!isPublicRoute(request)) {
     auth().protect();
   }
