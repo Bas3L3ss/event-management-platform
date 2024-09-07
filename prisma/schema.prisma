@@ -11,7 +11,7 @@ generator client {
 
 model Event {
   id               String     @id @default(uuid())
-  clerkId          String
+  clerkId          String 
   eventName        String
   eventDescription String
   dateEnd        DateTime
@@ -26,12 +26,42 @@ model Event {
   comments         Comment[]   @relation("EventComments")
   hostName         String?
 
-  @@index([dateStart])
+@@index([dateStart, dateEnd])
+}
+
+model User {
+  id               String         @id @default(uuid())
+  clerkId          String         @unique
+  userName         String
+  userBiography    String
+  userAvatar       String
+  accountCreatedAt DateTime       @default(now())
+  isAuthorizedUser Boolean        @default(false)
+  followers        String[]       @default([])
+  followedByUsers  String[]       @default([])
+
+  notifications    Notification[] @relation("UserNotifications") // Back-relation
+
+  @@index([accountCreatedAt])
+}
+
+model Notification {
+  id                     String   @id @default(uuid())
+  clerkId                String
+  userAvatar             String
+  description            String
+  title                  String
+  notificationCreatedAt  DateTime @default(now())
+  seenStatus Boolean @default(false)
+  userId                 String
+  user                   User     @relation("UserNotifications", fields: [userId], references: [id])
+
+  @@index([notificationCreatedAt])
 }
 
 model Comment {
   id          String   @id @default(uuid())
-  clerkId     String
+  clerkId     String    
   authorName  String
   authorImageUrl String
   createdAt   DateTime @default(now())
