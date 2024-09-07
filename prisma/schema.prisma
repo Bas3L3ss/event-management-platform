@@ -36,6 +36,8 @@ model User {
   userBiography    String
   userAvatar       String
   accountCreatedAt DateTime       @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime 
   isAuthorizedUser Boolean        @default(false)
   followers        String[]       @default([])
   followedByUsers  String[]       @default([])
