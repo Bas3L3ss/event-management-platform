@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const payload: WebhookEvent = await request.json();
 
-    console.log(payload, "hiiiiiiiiiiii");
+    console.log(payload);
 
     if (payload.type === "user.created") {
       const userData = payload.data;

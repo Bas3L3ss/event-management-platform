@@ -11,6 +11,8 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/",
   "/events",
+  "/",
+  "/api/clerk",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
