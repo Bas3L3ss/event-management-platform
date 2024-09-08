@@ -14,12 +14,12 @@ model Event {
   clerkId          String 
   eventName        String
   eventDescription String
-  dateEnd        DateTime
+  dateEnd        DateTime 
   dateStart DateTime
   status           EventStatus
   type EventType
-  rating           Int?
-  eventImg         String?
+  rating           Int @default(0)
+  eventImg         String[] 
   eventTicketPrice Float
   eventTicketCurrency String
   featured         Boolean     @default(false)
