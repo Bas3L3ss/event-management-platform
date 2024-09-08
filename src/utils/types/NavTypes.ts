@@ -1,18 +1,20 @@
-type NavLink = {
+import { LucideIcon } from "lucide-react";
+
+export type Submenu = {
   href: string;
   label: string;
+  active: boolean;
 };
 
-export const links: NavLink[] = [
-  { href: "/", label: "home" },
-  { href: "/events", label: "events" },
-  { href: "/events/myevents", label: "myevents" },
-  { href: "/events/orders", label: "orders" },
-  { href: "/notifications", label: "notifications" },
-  { href: "/admin/orders", label: "dashboard" },
-];
+export type Menu = {
+  href: string;
+  label: string;
+  active: boolean;
+  icon: LucideIcon;
+  submenus: Submenu[];
+};
 
-export const adminLinks: NavLink[] = [
-  { href: "/admin/orders", label: "orders" },
-  { href: "/admin/events", label: "events" },
-];
+export type Group = {
+  groupLabel: string;
+  menus: Menu[];
+};
