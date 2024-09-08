@@ -6,7 +6,6 @@ import { auth } from "@clerk/nextjs/server";
 function NavLinks() {
   const userId = auth().userId;
   const isAdmin = userId === process.env.CLERK_ADMIN_ID;
-  console.log(isAdmin);
 
   return (
     <div className="flex">

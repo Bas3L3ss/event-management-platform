@@ -3,7 +3,6 @@ import {
   clerkMiddleware,
   createRouteMatcher,
 } from "@clerk/nextjs/server";
-import { authenticateAndRedirect } from "./utils/actions/clerkFunc";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
@@ -12,7 +11,6 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/events",
   "/",
-  "/api/clerk",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
