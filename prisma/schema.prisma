@@ -20,6 +20,8 @@ model Event {
   type EventType
   rating           Int @default(0)
   eventImg         String[] 
+  eventVideo String
+  eventImgOrVideoFirstDisplay String
   eventTicketPrice Float
   eventTicketCurrency String
   featured         Boolean     @default(false)
