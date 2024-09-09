@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut } from "lucide-react";
+import { Ellipsis, LogOut, SignpostIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -15,15 +15,19 @@ import {
 } from "@/components/ui/tooltip";
 import { getMenuList } from "@/utils/datas/menuList";
 import { CollapseMenuButton } from "./CollaspeMenuButton";
-import { SignOutButton } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, SignUpButton } from "@clerk/nextjs";
 
 interface MenuProps {
   isOpen: boolean | undefined;
+  userId: string | null;
 }
 
-function MobileNavBarLinks({ isOpen }: MenuProps) {
+function MobileNavBarLinks({ isOpen, userId }: MenuProps) {
   const pathname = usePathname();
+  console.log(userId);
+
   const menuList = getMenuList(pathname);
+
   return (
     <div>
       <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
@@ -99,35 +103,97 @@ function MobileNavBarLinks({ isOpen }: MenuProps) {
             )}
           </li>
         ))}
-        <li className="w-full grow flex items-end">
-          <TooltipProvider disableHoverableContent>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <SignOutButton>
-                  <Button
-                    onClick={() => {}}
-                    variant="outline"
-                    className="w-full justify-center h-10 mt-5"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
+        <li className="w-full grow flex items-end gap-3">
+          {userId && (
+            <TooltipProvider disableHoverableContent>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <SignOutButton>
+                    <Button
+                      onClick={() => {}}
+                      variant="outline"
+                      className="w-full justify-center h-10 mt-5"
                     >
-                      Log out
-                    </p>
-                  </Button>
-                </SignOutButton>
-              </TooltipTrigger>
-              {isOpen === false && (
-                <TooltipContent side="right">Log out</TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
+                      <span className={cn(isOpen === false ? "" : "mr-4")}>
+                        <LogOut size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          "whitespace-nowrap",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                        )}
+                      >
+                        Log out
+                      </p>
+                    </Button>
+                  </SignOutButton>
+                </TooltipTrigger>
+                {isOpen === false && (
+                  <TooltipContent side="right">Log Out</TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {!userId && (
+            <TooltipProvider disableHoverableContent>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <SignInButton>
+                    <Button
+                      onClick={() => {}}
+                      variant="outline"
+                      className="w-full justify-center h-10 mt-5"
+                    >
+                      <span className={cn(isOpen === false ? "" : "mr-4")}>
+                        <SignpostIcon size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          "whitespace-nowrap",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                        )}
+                      >
+                        Sign in
+                      </p>
+                    </Button>
+                  </SignInButton>
+                </TooltipTrigger>
+                {isOpen === false && (
+                  <TooltipContent side="right">Sign in</TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {!userId && (
+            <TooltipProvider disableHoverableContent>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <SignUpButton>
+                    <Button
+                      onClick={() => {}}
+                      variant="outline"
+                      className="w-full justify-center h-10 mt-5"
+                    >
+                      <span className={cn(isOpen === false ? "" : "mr-4")}>
+                        <SignpostIcon size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          "whitespace-nowrap",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                        )}
+                      >
+                        Sign up
+                      </p>
+                    </Button>
+                  </SignUpButton>
+                </TooltipTrigger>
+                {isOpen === false && (
+                  <TooltipContent side="right">Sign up</TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </li>
       </ul>
     </div>

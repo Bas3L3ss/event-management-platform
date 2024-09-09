@@ -42,6 +42,11 @@ const components: { title: string; href: string; description: string }[] = [
     description: "Check out for events and news from those who you followed.",
   },
   {
+    title: "About Us",
+    href: "/aboutus",
+    description: "Our visions and missions.",
+  },
+  {
     title: "Log out",
     href: "/",
     description: "Hope you'll comeback!",
@@ -65,75 +70,98 @@ export function NavLinks() {
   const userId = auth().userId;
   const isAdmin = userId === process.env.CLERK_ADMIN_ID;
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Events</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
-                <NavigationMenuLink asChild>
-                  <a
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/events"
-                  >
-                    <div className="mb-2 mt-4 text-lg font-medium">
-                      Events Search
-                    </div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                      Join events, have fun, and learn along the way!
-                    </p>
-                  </a>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href="/aboutus" title="What do we do?">
-                Our visions and missions.
-              </ListItem>
-              <ListItem href="/events/myevents" title="Your Events">
-                Your events lists.
-              </ListItem>
-
-              <ListItem href="/" title="Placeholder">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab
-                earum eos.
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>My Profile</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-              {components.map((component) => {
-                if (component.title === "Sign Up") {
-                  return (
-                    <SignUpAndSignInCheck
-                      title={component.title}
-                      href={component.href}
-                      key={component.title}
-                      description={component.description}
-                    />
-                  );
-                } else if (component.title === "Sign In") {
-                  return (
-                    <SignUpAndSignInCheck
-                      title={component.title}
-                      href={component.href}
-                      key={component.title}
-                      description={component.description}
-                    />
-                  );
-                } else if (component.title === "Log out") {
-                  return (
-                    <LogInCheck
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                      description={component.description}
-                    />
-                  );
-                } else
-                  return (
+    <div className="lg:translate-x-[-20%] translate-x-[-10%]">
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Events</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                <li className="h-full ">
+                  <NavigationMenuLink asChild>
+                    <a
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                      href="/events"
+                    >
+                      <div className="mb-2 mt-4 text-lg font-medium">
+                        Events Search
+                      </div>
+                      <p className="text-sm leading-tight text-muted-foreground">
+                        Find more events here.
+                      </p>
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+                <li className="h-full ">
+                  <NavigationMenuLink asChild>
+                    <a
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                      href="/events/myevents"
+                    >
+                      <div className="mb-2 mt-4 text-lg font-medium">
+                        My Events
+                      </div>
+                      <p className="text-sm leading-tight text-muted-foreground">
+                        Manage your events here.
+                      </p>
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>My Profile</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                {components.map((component) => {
+                  if (component.title === "Sign Up") {
+                    return (
+                      <SignUpAndSignInCheck
+                        title={component.title}
+                        href={component.href}
+                        key={component.title}
+                        description={component.description}
+                      />
+                    );
+                  } else if (component.title === "Sign In") {
+                    return (
+                      <SignUpAndSignInCheck
+                        title={component.title}
+                        href={component.href}
+                        key={component.title}
+                        description={component.description}
+                      />
+                    );
+                  } else if (component.title === "Log out") {
+                    return (
+                      <LogInCheck
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                        description={component.description}
+                      />
+                    );
+                  } else
+                    return (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    );
+                })}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          {isAdmin && (
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Admin DashBoard</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                  {adminComponents.map((component) => (
                     <ListItem
                       key={component.title}
                       title={component.title}
@@ -141,39 +169,22 @@ export function NavLinks() {
                     >
                       {component.description}
                     </ListItem>
-                  );
-              })}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        {isAdmin && (
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Admin DashBoard</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                {adminComponents.map((component) => (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                  >
-                    {component.description}
-                  </ListItem>
-                ))}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        )}
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          )}
 
-        <NavigationMenuItem>
-          <Link href="/events/orders" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Your Orders
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+          <NavigationMenuItem>
+            <Link href="/events/orders" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Your Orders
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
   );
 }
 

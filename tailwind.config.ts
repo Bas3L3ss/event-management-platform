@@ -19,6 +19,11 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        "hero-1": "url('/assets/hero1.jpg')",
+        "hero-2": "url('/assets/hero2.jpg')",
+        "hero-3": "url('/assets/hero3.jpg')",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

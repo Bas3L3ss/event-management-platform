@@ -9,27 +9,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Event {
-  id               String     @id @default(uuid())
-  clerkId          String 
-  eventName        String
-  eventDescription String
-  dateEnd        DateTime 
-  dateStart DateTime
-  status           EventStatus
-  type EventType
-  rating           Int @default(0)
-  eventImg         String[] 
-  eventVideo String
-  eventImgOrVideoFirstDisplay String
-  eventTicketPrice Float
-  eventTicketCurrency String
-  featured         Boolean     @default(false)
-  comments         Comment[]   @relation("EventComments")
-  hostName         String?
-
-@@index([dateStart, dateEnd])
-}
 
 model User {
   id               String         @id @default(uuid())
@@ -74,6 +53,29 @@ model Comment {
   event       Event    @relation("EventComments", fields: [eventId], references: [id])
 
   @@index([createdAt])
+}
+
+model Event {
+  id               String     @id @default(uuid())
+  clerkId          String 
+  eventName        String
+  eventDescription String
+  dateEnd        DateTime 
+  dateStart DateTime
+  status           EventStatus
+  type EventType
+  rating           Int @default(0)
+  eventImg         String[] @default([]) 
+  eventVideo String?
+  eventImgOrVideoFirstDisplay String?
+  eventTicketPrice Float
+  eventTicketCurrency String
+  eventLocation String 
+  featured         Boolean     @default(false)
+  comments         Comment[]   @relation("EventComments")
+  hostName         String?
+
+@@index([dateStart, dateEnd])
 }
 
 model Order {

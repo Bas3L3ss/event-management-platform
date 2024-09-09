@@ -7,8 +7,9 @@ import { Menu as MenuIcon } from "lucide-react";
 import Logo from "./Logo";
 import MobileNavBarLinks from "./MobileNavBarLinks";
 import { ModeToggle } from "./ThemeToggle";
+import { UserButton } from "@clerk/nextjs";
 
-export default function MobileNav() {
+export default function MobileNav({ userId }: { userId: string | null }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,10 +29,13 @@ export default function MobileNav() {
           >
             <Logo className=" underline px-4 pb-5  " />
           </button>
-          <MobileNavBarLinks isOpen={open} />
+          <MobileNavBarLinks userId={userId} isOpen={open} />
         </SheetContent>
       </Sheet>
-      <ModeToggle />
+      <span className="flex items-center justify-center gap-2">
+        <ModeToggle />
+        <UserButton />
+      </span>
     </div>
   );
 }
