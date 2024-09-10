@@ -10,7 +10,6 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/",
   "/events",
-  "/",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
@@ -26,6 +25,7 @@ export default clerkMiddleware((auth, request) => {
     auth().protect();
   }
 });
+
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
