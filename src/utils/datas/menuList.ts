@@ -8,11 +8,24 @@ import {
   ListFilter,
   HeartIcon,
   CheckCheckIcon,
+  Home,
 } from "lucide-react";
 import { Group } from "../types/NavTypes";
 
 export function getMenuList(pathname: string): Group[] {
   return [
+    {
+      groupLabel: "",
+      menus: [
+        {
+          href: "/",
+          label: "Home",
+          active: pathname === "/",
+          icon: Home,
+          submenus: [],
+        },
+      ],
+    },
     {
       groupLabel: "",
       menus: [
@@ -25,6 +38,7 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
+
     {
       groupLabel: "Contents",
       menus: [

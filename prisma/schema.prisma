@@ -50,6 +50,8 @@ model Comment {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   eventId     String
+  rating Float
+
   event       Event    @relation("EventComments", fields: [eventId], references: [id])
 
   @@index([createdAt])
@@ -64,13 +66,15 @@ model Event {
   dateStart DateTime
   status           EventStatus
   type EventType
-  rating           Int @default(0)
+  rating           Float @default(0)
   eventImg         String[] @default([]) 
   eventVideo String?
   eventImgOrVideoFirstDisplay String?
   eventTicketPrice Float
   eventTicketCurrency String
   eventLocation String 
+  reservationTicket String @default("")
+
   featured         Boolean     @default(false)
   comments         Comment[]   @relation("EventComments")
   hostName         String?

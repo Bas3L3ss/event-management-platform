@@ -70,9 +70,16 @@ export function NavLinks() {
   const userId = auth().userId;
   const isAdmin = userId === process.env.CLERK_ADMIN_ID;
   return (
-    <div className="lg:translate-x-[-20%] translate-x-[-10%]">
+    <div className=" ">
       <NavigationMenu>
         <NavigationMenuList>
+          <NavigationMenuItem>
+            <Link href="/ " legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Home
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuTrigger>Events</NavigationMenuTrigger>
             <NavigationMenuContent>
