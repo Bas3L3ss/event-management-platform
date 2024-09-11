@@ -43,19 +43,21 @@ model Notification {
 }
 
 model Comment {
-  id          String   @id @default(uuid())
-  clerkId     String    
-  authorName  String
-  authorImageUrl String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  eventId     String
-  rating Float
+  id              String   @id @default(uuid())
+  clerkId         String    
+  authorName      String
+  authorImageUrl  String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  commentText     String
+  rating          Float
 
-  event       Event    @relation("EventComments", fields: [eventId], references: [id])
+  event           Event    @relation("EventComments", fields: [eventId], references: [id], onDelete: Cascade)
+  eventId         String  
 
   @@index([createdAt])
 }
+
 
 model Event {
   id               String     @id @default(uuid())
