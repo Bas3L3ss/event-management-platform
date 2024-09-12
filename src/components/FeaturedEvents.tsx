@@ -89,7 +89,10 @@ export function CarouselFeatured({
                           )
                         )}
                       </span>
-                      - <span className="font-semibold">{el.rating} / 5</span>
+                      -{" "}
+                      <span className="font-semibold">
+                        {el.rating.toFixed(1)} / 5.0
+                      </span>
                     </p>
                     <p className="">{el.eventDescription}</p>
                   </CardContent>

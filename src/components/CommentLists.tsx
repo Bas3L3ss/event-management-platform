@@ -5,6 +5,32 @@ import { Card, CardDescription, CardTitle } from "./ui/card";
 import { star } from "./OneFeaturedEvent";
 import Link from "next/link";
 import { toastPrint } from "@/utils/toast action/action";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { CopyCheckIcon, Delete } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "./ui/toast";
+import { useEffect, useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 interface CommentsListProps {
   comments: Comment[];
@@ -45,56 +71,165 @@ const CommentsList: React.FC<CommentsListProps> = ({
 
   return (
     <div className="space-y-4">
-      {sortedComments.map((comment) => (
-        <Card key={comment.id} className="flex p-4 hover:shadow-md rounded-lg">
-          <Link href={`profile/`}>
-            <Image
-              src={``}
-              alt={comment.authorName}
-              className="w-12 h-12 rounded-full mr-4"
-            />
-          </Link>
-          <div className="flex-1">
-            <div className="flex justify-between items-center">
-              <CardTitle className="flex gap-1">
-                <Link href={`profile/`}>{comment.authorName}</Link>
-                {comment.clerkId === currentUserId && (
-                  <>
-                    <span>-</span>
-                    <button
-                      onClick={() => {
-                        handleDeleteComment(comment.id);
-                      }}
-                      className="font-normal  text-gray-600 hover:text-blue-400"
-                    >
-                      <span className="text-sx">audit</span>
-                    </button>
-                  </>
-                )}
-              </CardTitle>
-              <span className="text-sm   flex ">
-                <span className="mr-2 "> {comment.rating.toFixed(1)}</span>
-                {Array.from(
-                  { length: Math.floor(comment.rating) },
-                  (_, index) => (
-                    <span className="filter drop-shadow-custom  " key={index}>
-                      {star}
-                    </span>
-                  )
-                )}
-              </span>
-            </div>
-            <CardDescription className="mt-2 text-sm text-gray-600">
-              {comment.commentText}
-            </CardDescription>
-            <CardDescription className="text-xs  ">
-              {new Date(comment.createdAt).toLocaleString()}
-            </CardDescription>
-          </div>
-        </Card>
-      ))}
+      {sortedComments.map((comment) => {
+        return (
+          <CommentListItem
+            currentUserId={currentUserId}
+            handleDeleteComment={handleDeleteComment}
+            key={comment.id}
+            comment={comment}
+          />
+        );
+      })}
     </div>
   );
 };
 
 export default CommentsList;
+
+export function DropDownEdit({
+  isRightUser,
+  commentText,
+  commentId,
+  handleDeleteComment,
+}: {
+  commentText: string;
+  isRightUser: boolean;
+  commentId: string;
+  handleDeleteComment: (commentId: string) => Promise<void>;
+}) {
+  const router = useRouter();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <span className="font-normal  text-xs   hover:text-blue-400">
+          <DotsHorizontalIcon className="size-4" />
+        </span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48">
+        <DropdownMenuLabel>Options</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Copy info</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(commentText)}
+              >
+                Copy Text
+                <DropdownMenuShortcut>
+                  <CopyCheckIcon className="size-4" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(commentId)}
+              >
+                Copy Id
+                <DropdownMenuShortcut>
+                  <CopyCheckIcon className="size-4" />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        {isRightUser && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="bg-red-600 hover:!bg-red-700"
+              onClick={() => {
+                toast({
+                  variant: "destructive",
+                  title: "Warning",
+                  description: "Are you sure you want to delete this comment?",
+                  action: (
+                    <ToastAction
+                      onClick={() => {
+                        handleDeleteComment(commentId);
+                        router.refresh();
+                      }}
+                      altText="Confirm"
+                    >
+                      Confirm
+                    </ToastAction>
+                  ),
+                });
+              }}
+            >
+              Delete Comment
+              <DropdownMenuShortcut>
+                <Delete className="size-4" />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuGroup></DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function CommentListItem({
+  comment,
+  currentUserId,
+  handleDeleteComment,
+}: {
+  comment: Comment;
+  currentUserId: string;
+  handleDeleteComment: (commentId: string) => Promise<void>;
+}) {
+  const [date, setDate] = useState<string>();
+
+  useEffect(() => {
+    setDate(new Date(comment.createdAt).toLocaleString());
+  }, [comment.createdAt]);
+
+  return (
+    <Card className="flex p-4 hover:shadow-md rounded-lg">
+      <Link href={`/profile/`}>
+        <Image
+          src={``}
+          alt={comment.authorName}
+          className="w-12 h-12 rounded-full mr-4"
+        />
+      </Link>
+      <div className="flex-1">
+        <div className="flex justify-between items-center">
+          <CardTitle className="flex gap-2 items-center justify-center    ">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Link className="hover:!text-primary " href={`/profile/`}>
+                    {comment.authorName}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Review profile</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <DropDownEdit
+              commentText={comment.commentText}
+              commentId={comment.id}
+              isRightUser={comment.clerkId === currentUserId}
+              handleDeleteComment={handleDeleteComment}
+            />
+          </CardTitle>
+          <span className="text-sm   flex ">
+            <span className="mr-2 "> {comment.rating.toFixed(1)}</span>
+            {Array.from({ length: Math.floor(comment.rating) }, (_, index) => (
+              <span className="filter drop-shadow-custom  " key={index}>
+                {star}
+              </span>
+            ))}
+          </span>
+        </div>
+        <CardDescription className="mt-2 text-sm text-gray-600">
+          {comment.commentText}
+        </CardDescription>
+        <CardDescription className="text-xs  ">{date}</CardDescription>
+      </div>
+    </Card>
+  );
+}

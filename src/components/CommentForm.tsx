@@ -4,6 +4,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { toastPrint } from "@/utils/toast action/action";
 import Router from "next/router";
+import { useRouter } from "next/navigation";
 
 type CommentFormProps = {
   isAuthenticated: boolean;
@@ -15,24 +16,21 @@ const CommentForm = ({
   isAuthenticated,
   userId,
 }: CommentFormProps) => {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(1);
   const [commentText, setCommentText] = useState("");
   const [maxLength, setMaxLength] = useState<number>(500);
   const [pending, setPending] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!isAuthenticated) {
-      toastPrint(
-        "Login Required!",
-        "You need to be logged in to post a comment.",
-        "default"
-      );
+      toastPrint("", " ", "default", true);
       return;
     }
 
-    if (rating <= 0 || commentText.trim() === "") {
+    if (commentText.trim() === "") {
       toastPrint(
         "Fields Missing!",
         "Please fill in the rating and comment text.",
@@ -62,10 +60,11 @@ const CommentForm = ({
         throw new Error("Network response was not ok");
       }
 
-      const comment = await response.json();
+      await response.json();
       toastPrint("Review Sent!", "Your review has been posted.", "default");
       setCommentText("");
-      setRating(0);
+      setRating(1);
+      router.refresh();
     } catch (error) {
       console.error("Error creating comment:", error);
       toastPrint(

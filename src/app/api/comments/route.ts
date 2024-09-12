@@ -1,5 +1,6 @@
 // pages/api/comments.ts
 import { createComment } from "@/utils/actions/eventsActions";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 // For a POST request handler
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
       authorName,
       authorImageUrl,
     });
-
+    revalidatePath(`/events/${eventId}`);
     // Return the newly created comment
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {

@@ -85,8 +85,10 @@ function EventDisplay({
                   )}
                 </div>
                 <p className="mt-3 text-sm">
-                  <span className="font-bold">{oneEvent.rating}</span> /5 - from{" "}
-                  {commentsLength} reviews
+                  <span className="font-bold">
+                    {oneEvent.rating.toFixed(1)}
+                  </span>{" "}
+                  / 5.0 - from {commentsLength} reviews
                 </p>
               </div>
               {/* End Review */}

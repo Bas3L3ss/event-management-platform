@@ -13,7 +13,6 @@ export async function DELETE(
       { status: 400 }
     );
   }
-
   try {
     await deleteComment(commentId);
     return NextResponse.json(
