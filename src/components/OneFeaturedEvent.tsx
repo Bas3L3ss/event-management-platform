@@ -32,7 +32,7 @@ export default function OneFeaturedEvent({
             {/* Buttons */}
             <div className="mt-7 grid gap-3 w-full sm:inline-flex">
               <Button asChild size={"lg"}>
-                <Link href={`${featuredEvent.reservationTicket}`}>
+                <Link href={`${featuredEvent.reservationTicketLink}`}>
                   Book ticket
                 </Link>
               </Button>
