@@ -75,7 +75,7 @@ model Event {
   eventTicketPrice Float
   eventTicketCurrency String
   eventLocation String 
-  reservationTicket String @default("")
+  reservationTicketLink String @default("")
 
   featured         Boolean     @default(false)
   comments         Comment[]   @relation("EventComments")

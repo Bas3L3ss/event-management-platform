@@ -56,7 +56,9 @@ function EventDisplay({
             {/* Buttons */}
             <div className="mt-7 grid gap-3 w-full sm:inline-flex items-center ">
               <Button asChild size={"lg"}>
-                <Link href={`${oneEvent.reservationTicket}`}>Book ticket</Link>
+                <Link href={`${oneEvent.reservationTicketLink}`}>
+                  Book ticket
+                </Link>
               </Button>
               -
               <p
