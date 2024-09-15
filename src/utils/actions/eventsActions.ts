@@ -1,6 +1,6 @@
 // EventActions.ts
 
-import { Comment, Event, EventStatus } from "@prisma/client";
+import { Comment, Event, EventStatus, EventType } from "@prisma/client";
 import prisma from "../db";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
@@ -121,6 +121,55 @@ export async function getEventById(id: string): Promise<Event | null> {
     throw new Error("Unable to fetch event by ID");
   } finally {
     await prisma.$disconnect();
+  }
+}
+
+// actions/eventActions.ts (or any actions file)
+
+export async function searchAndFilterEvents(
+  searchTerm: string,
+  filters: {
+    eventType?: EventType;
+    status?: EventStatus;
+    isFeatured?: boolean;
+    minDate?: string;
+    maxDate?: string;
+    minRating?: number;
+  }
+) {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        eventName: {
+          contains: searchTerm, // Fuzzy search on event name
+          mode: "insensitive", // Case-insensitive search
+        },
+        type: filters.eventType ? filters.eventType : undefined,
+        status: filters.status ? filters.status : undefined,
+        featured: filters.isFeatured ? filters.isFeatured : undefined,
+        dateStart: filters.minDate
+          ? {
+              gte: new Date(filters.minDate),
+            }
+          : undefined,
+        dateEnd: filters.maxDate
+          ? {
+              lte: new Date(filters.maxDate),
+            }
+          : undefined,
+        rating: {
+          gte: filters.minRating || 0,
+        },
+      },
+      orderBy: {
+        dateStart: "asc", // Order by start date
+      },
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error searching and filtering events:", error);
+    throw new Error("Unable to fetch events");
   }
 }
 

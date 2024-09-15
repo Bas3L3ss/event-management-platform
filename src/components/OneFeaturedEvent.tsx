@@ -4,6 +4,7 @@ import { Event } from "@prisma/client";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 import Link from "next/link";
+import DatePrinter from "./DatePrinter";
 
 export default function OneFeaturedEvent({
   featuredEvent,
@@ -19,6 +20,12 @@ export default function OneFeaturedEvent({
         {/* Grid */}
         <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20  ">
           <div>
+            <p className="text-sm text-gray-600">
+              <DatePrinter
+                dateEnd={featuredEvent.dateEnd}
+                dateStart={featuredEvent.dateStart}
+              />
+            </p>
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
               {featuredEvent.eventName}
             </h1>

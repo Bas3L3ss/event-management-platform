@@ -9,6 +9,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 import { star } from "@/components/OneFeaturedEvent";
+import DatePrinter from "@/components/DatePrinter";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -43,6 +44,12 @@ function EventDisplay({
         {/* Grid */}
         <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20  ">
           <div>
+            <p className="text-sm text-gray-600">
+              <DatePrinter
+                dateEnd={oneEvent.dateEnd}
+                dateStart={oneEvent.dateStart}
+              />
+            </p>
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
               {oneEvent.eventName}
             </h1>
@@ -51,7 +58,9 @@ function EventDisplay({
               {oneEvent.type.toLowerCase()}
             </h1>
             <p className="mt-3 text-xl text-muted-foreground">
-              {oneEvent.eventDescription}
+              {oneEvent.eventDescription.split("\n").map((line, index) => (
+                <span key={index}>{line}</span>
+              ))}
             </p>
             {/* Buttons */}
             <div className="mt-7 grid gap-3 w-full sm:inline-flex items-center ">

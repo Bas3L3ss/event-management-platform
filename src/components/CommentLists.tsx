@@ -1,7 +1,7 @@
 "use client";
 import { Comment } from "@prisma/client";
 import Image from "next/image";
-import { Card, CardDescription, CardTitle } from "./ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { star } from "./OneFeaturedEvent";
 import Link from "next/link";
 import { toastPrint } from "@/utils/toast action/action";
@@ -24,7 +24,7 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { CopyCheckIcon, Delete } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "./ui/toast";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -180,6 +180,17 @@ export function CommentListItem({
 }) {
   const [date, setDate] = useState<string>();
 
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
+  const maxLength = 100;
+  const toggleText = () => {
+    setIsTextExpanded(!isTextExpanded);
+  };
+  const displayText = isTextExpanded
+    ? comment.commentText
+    : comment.commentText.length > maxLength
+    ? comment.commentText.substring(0, maxLength) + " ... "
+    : comment.commentText;
+
   useEffect(() => {
     setDate(new Date(comment.createdAt).toLocaleString());
   }, [comment.createdAt]);
@@ -193,7 +204,7 @@ export function CommentListItem({
           className="w-12 h-12 rounded-full mr-4"
         />
       </Link>
-      <div className="flex-1">
+      <div className="flex-1 w-1">
         <div className="flex justify-between items-center">
           <CardTitle className="flex gap-2 items-center justify-center    ">
             <TooltipProvider>
@@ -216,18 +227,36 @@ export function CommentListItem({
               handleDeleteComment={handleDeleteComment}
             />
           </CardTitle>
-          <span className="text-sm   flex ">
+          <div className="text-sm   flex ">
             <span className="mr-2 "> {comment.rating.toFixed(1)}</span>
             {Array.from({ length: Math.floor(comment.rating) }, (_, index) => (
               <span className="filter drop-shadow-custom  " key={index}>
                 {star}
               </span>
             ))}
-          </span>
+          </div>
         </div>
-        <CardDescription className="mt-2 text-sm text-gray-600">
-          {comment.commentText}
-        </CardDescription>
+        <p className="mt-2 w-[70%] break-words text-sm whitespace-pre-line">
+          {isTextExpanded
+            ? comment.commentText
+            : displayText.split("\n").map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < displayText.split("\n").length - 1 && <br />}
+                </React.Fragment>
+              ))}
+          {comment.commentText.length > maxLength && !isTextExpanded && (
+            <button onClick={toggleText} className="text-blue-500 ml-1">
+              Read more
+            </button>
+          )}
+          {isTextExpanded && (
+            <button onClick={toggleText} className="text-blue-500 ml-1">
+              Read less
+            </button>
+          )}
+        </p>
+        <br />
         <CardDescription className="text-xs  ">{date}</CardDescription>
       </div>
     </Card>

@@ -14,11 +14,12 @@ model User {
   id               String         @id @default(uuid())
   clerkId          String         @unique
   userName         String
-  userBiography    String
+  userEmail String @unique
+  userBiography    String   @default("")
   userAvatar       String
   accountCreatedAt DateTime       @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime 
+  // deletedAt DateTime @default()
   isAuthorizedUser Boolean        @default(false)
   followers        String[]       @default([])
   followedByUsers  String[]       @default([])

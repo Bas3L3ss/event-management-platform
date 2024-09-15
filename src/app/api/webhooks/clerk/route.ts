@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   console.log("Webhook triggered");
 
   // Ensure your webhook isn't entering a loop
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
     console.error("Missing WEBHOOK_SECRET");

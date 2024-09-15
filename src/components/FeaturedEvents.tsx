@@ -19,6 +19,7 @@ import Container from "./Container";
 import Title from "./Title";
 import Image from "next/image";
 import Link from "next/link";
+import DatePrinter from "./DatePrinter";
 
 export default async function FeaturedEventsPage() {
   // Fetch multiple featured events
@@ -54,6 +55,7 @@ export function CarouselFeatured({
 }: {
   featuredEvents: Event[];
 }) {
+  const maxLength = 100;
   return (
     <Carousel
       opts={{
@@ -68,6 +70,12 @@ export function CarouselFeatured({
               <Link href={`/events/${el.id}`}>
                 <Card>
                   <CardContent className="flex flex-col aspect-square justify-center-center  p-6">
+                    <p className="text-xs text-gray-600">
+                      <DatePrinter
+                        dateEnd={el.dateEnd}
+                        dateStart={el.dateStart}
+                      />
+                    </p>
                     <p className="mb-2 lg:text-2xl font-semibold text-lg">
                       {el.eventName}
                     </p>
@@ -94,7 +102,13 @@ export function CarouselFeatured({
                         {el.rating.toFixed(1)} / 5.0
                       </span>
                     </p>
-                    <p className="">{el.eventDescription}</p>
+                    {el.eventDescription.length > maxLength ? (
+                      <p className="">
+                        {el.eventDescription.substring(0, maxLength) + "..."}
+                      </p>
+                    ) : (
+                      <p className="">{el.eventDescription}</p>
+                    )}
                   </CardContent>
                 </Card>
               </Link>

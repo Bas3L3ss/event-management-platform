@@ -77,6 +77,14 @@ const CommentForm = ({
     }
   };
 
+  const handleKeyDownTextArea = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === "Enter") {
+      console.log("User pressed Enter");
+    }
+  };
+
   return (
     <Card className="w-full p-4 rounded-lg">
       <form onSubmit={handleSubmit}>
@@ -104,6 +112,7 @@ const CommentForm = ({
         </div>
         <div className="mb-2">
           <textarea
+            onKeyDown={handleKeyDownTextArea}
             value={commentText}
             onChange={(e) => {
               const inputEvent = e.nativeEvent as InputEvent;
