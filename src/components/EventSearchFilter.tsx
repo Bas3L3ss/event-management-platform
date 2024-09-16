@@ -101,7 +101,7 @@ const EventSearchFilter = ({
             />
           </div>
         </div>
-        <div className="ml-auto bg-black">
+        <div className="ml-auto mt-auto">
           <DropdownMenu>
             <DropdownMenuTrigger className="">
               <span className="font-normal  text-xs   hover:text-blue-400">

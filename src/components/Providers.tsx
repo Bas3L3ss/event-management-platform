@@ -5,10 +5,12 @@ import { ThemeProvider } from "./ThemeProvider";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <>
       <Toaster />
-      {children}
-    </ThemeProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {children}
+      </ThemeProvider>
+    </>
   );
 };
 export default Providers;
