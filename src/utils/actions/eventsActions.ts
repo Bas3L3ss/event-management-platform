@@ -173,6 +173,21 @@ export async function searchAndFilterEvents(
   }
 }
 
+export const getUserLengthByClerkId = async (clerkId: string) => {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        clerkId,
+      },
+    });
+
+    return events.length;
+  } catch (error) {
+    console.error("Error getting events:", error);
+    throw new Error("Unable to fetch events");
+  }
+};
+
 export async function getCommentsByEventId(
   eventId: string
 ): Promise<Comment[]> {

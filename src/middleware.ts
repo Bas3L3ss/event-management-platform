@@ -1,8 +1,4 @@
-import {
-  auth,
-  clerkMiddleware,
-  createRouteMatcher,
-} from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
@@ -16,6 +12,13 @@ const isPublicRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware((auth, request) => {
+  // Skip API routes from Clerk authentication to prevent issues
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api");
+
+  if (isApiRoute) {
+    return NextResponse.next();
+  }
+
   const isAdminUser = auth().userId === process.env.CLERK_ADMIN_ID;
 
   if (isAdminRoute(request) && !isAdminUser) {
@@ -29,9 +32,9 @@ export default clerkMiddleware((auth, request) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Skip Next.js internals and static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
+    // Always run for API routes, but ensure they bypass Clerk middleware
     "/(api|trpc)(.*)",
   ],
 };
