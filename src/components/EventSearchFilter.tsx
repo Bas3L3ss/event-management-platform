@@ -1,9 +1,8 @@
 // components/EventSearchFilter.tsx
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { defaultValue, FiltersType } from "./EventsDisplay";
 import { EventStatus, EventType } from "@prisma/client";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 import {
@@ -21,29 +20,34 @@ import {
 } from "./ui/dropdown-menu";
 import { FilterIcon, FilterXIcon } from "lucide-react";
 import { Label } from "./ui/label";
+import { redirect } from "next/navigation";
+import { deepEqual } from "@/utils/utils";
 
 type EventSearchFilterProps = {
-  onSearch: (searchTerm: string, filters: FiltersType) => Promise<void>;
   searchTerm: string;
   setSearchTerm: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<FiltersType>>;
   filters: FiltersType;
+  isDefValueAndFiltersEquals: boolean;
 };
 
 const EventSearchFilter = ({
-  onSearch,
   searchTerm,
   setSearchTerm,
   setFilters,
   filters,
+  isDefValueAndFiltersEquals,
 }: EventSearchFilterProps) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSearch(searchTerm, filters);
-  };
+  const [isResetable, setIsResetable] = useState(false);
+  useEffect(() => {
+    if (isResetable) {
+      setIsResetable(false);
 
+      redirect("/events");
+    }
+  }, [isResetable]);
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-5">
+    <form className="space-y-4 mt-5">
       <div className="flex gap-3">
         <Input
           type="search"
@@ -52,7 +56,6 @@ const EventSearchFilter = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="input-class"
         />
-        <Button type="submit">Search</Button>
       </div>
 
       <div className=" flex flex-wrap gap-3 justify-between">
@@ -105,7 +108,7 @@ const EventSearchFilter = ({
           <DropdownMenu>
             <DropdownMenuTrigger className="">
               <span className="font-normal  text-xs   hover:text-blue-400">
-                {defaultValue !== filters ? <FilterXIcon /> : <FilterIcon />}
+                {!isDefValueAndFiltersEquals ? <FilterXIcon /> : <FilterIcon />}
               </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48 ">
@@ -124,7 +127,9 @@ const EventSearchFilter = ({
                         }))
                       }
                     >
-                      <option value="">All Event Types</option>
+                      <option selected value="">
+                        All Event Types
+                      </option>
                       {Object.values(EventType).map((type) => (
                         <option className="capitalize" key={type} value={type}>
                           {type.toLowerCase().replace(/_/g, " ")}
@@ -150,7 +155,9 @@ const EventSearchFilter = ({
                         }))
                       }
                     >
-                      <option value="">All Statuses</option>
+                      <option selected value="">
+                        All Statuses
+                      </option>
                       {Object.values(EventStatus).map((status) => {
                         if (status == "NOT_CONFIRMED") return null;
                         return (
@@ -174,17 +181,20 @@ const EventSearchFilter = ({
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
+                  const isFeaturedCheck =
+                    filters.isFeatured === true ? undefined : true;
                   setFilters((prev) => ({
                     ...prev,
-                    isFeatured: !prev.isFeatured,
+                    isFeatured: isFeaturedCheck,
                   }));
+                  console.log(deepEqual(filters, defaultValue));
                 }}
               >
                 Featured
                 <DropdownMenuShortcut></DropdownMenuShortcut>
               </DropdownMenuItem>
 
-              {defaultValue != filters && (
+              {!isDefValueAndFiltersEquals && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -192,6 +202,7 @@ const EventSearchFilter = ({
                     onClick={(e) => {
                       e.preventDefault();
                       setFilters(defaultValue);
+                      setIsResetable(true);
                     }}
                   >
                     Clear all filters

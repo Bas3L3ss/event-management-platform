@@ -1,6 +1,6 @@
 // components/EventsPage.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EventSearchFilter from "./EventSearchFilter";
 import { Event, EventStatus, EventType } from "@prisma/client";
 import Link from "next/link";
@@ -10,10 +10,12 @@ import { star } from "./OneFeaturedEvent";
 import Title from "./Title";
 import { Button } from "./ui/button";
 import DatePrinter from "./DatePrinter";
+import { useFilters } from "@/hooks/useQueryParam";
+import { deepEqual } from "@/utils/utils";
 
 export type FiltersType = {
-  eventType?: EventType | undefined;
-  status?: EventStatus | undefined;
+  eventType?: EventType | undefined | string;
+  status?: EventStatus | undefined | string;
   isFeatured?: boolean | undefined;
   minDate?: string | undefined;
   maxDate?: string | undefined;
@@ -21,9 +23,9 @@ export type FiltersType = {
 };
 
 export const defaultValue = {
-  eventType: undefined,
-  status: undefined,
-  isFeatured: false,
+  eventType: "",
+  status: "",
+  isFeatured: undefined,
   minDate: "",
   maxDate: "",
   minRating: 0,
@@ -33,34 +35,67 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filters, setFilters] = useState<FiltersType>(defaultValue);
   const [events, setEvents] = useState<Event[]>([...eventsData]);
+  const [isDefValueAndFiltersEquals, setIsDefValueAndFiltersEquals] =
+    useState<boolean>(deepEqual(defaultValue, filters));
 
-  const handleSearch = async () => {
-    try {
-      const response = await fetch("/api/eventsHandler", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          searchTerm,
-          filters,
-        }),
-      });
-      const fetchedEvents = await response.json();
-      setEvents(fetchedEvents);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    }
-  };
+  const queryParam = useFilters();
 
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      ...queryParam,
+    }));
+  }, [queryParam, setFilters]);
+
+  useEffect(() => {
+    setIsDefValueAndFiltersEquals(deepEqual(defaultValue, filters));
+    console.log(filters);
+  }, [filters]);
+
+  useEffect(() => {
+    const searchEvents = async () => {
+      try {
+        const queryParams = new URLSearchParams({
+          searchTerm: searchTerm || "",
+          eventType: filters.eventType || "",
+          status: filters.status || "",
+          minDate: filters.minDate || "",
+          maxDate: filters.maxDate || "",
+          minRating: filters.minRating ? filters.minRating.toString() : "",
+          isFeatured: filters.isFeatured ? "true" : "",
+        });
+        for (const [key, value] of queryParams.entries()) {
+          if (!value) queryParams.delete(key);
+        }
+
+        const response = await fetch(
+          `/api/eventsHandler?${queryParams.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch events");
+        }
+        const fetchedEvents = await response.json();
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+    searchEvents();
+  }, [filters, searchTerm]);
   return (
     <div>
       <EventSearchFilter
-        onSearch={handleSearch}
         filters={filters}
         searchTerm={searchTerm}
         setFilters={setFilters}
         setSearchTerm={setSearchTerm}
+        isDefValueAndFiltersEquals={isDefValueAndFiltersEquals}
       />
 
       <Title

@@ -1,22 +1,28 @@
 "use client";
 import Container from "@/components/Container";
-import { useOrganization, useSession, useUser } from "@clerk/nextjs";
-import { User } from "@prisma/client";
+import { useSession, useUser } from "@clerk/nextjs";
+import { EventType, User } from "@prisma/client";
+import { Mail, Phone } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 function UserProfilePage({
   eventLength,
   userFromDataBase,
+  typeUserSubmitted,
 }: {
   eventLength: number;
   userFromDataBase: User;
+  typeUserSubmitted: string[];
 }) {
   const { user } = useUser();
   const { session } = useSession();
 
-  const { theme } = useTheme();
+  console.log(typeUserSubmitted);
+
+  // const { theme } = useTheme();
 
   if (!user || !session) return null;
 
@@ -31,7 +37,7 @@ function UserProfilePage({
             className="rounded-full"
             height={50}
           ></Image>
-          <p>{user.fullName}</p>
+          <p className="font-bold">{user.fullName}</p>
         </div>
         <article className="grid grid-cols-3 text-center mt-5">
           <div className="">
@@ -47,7 +53,59 @@ function UserProfilePage({
             <p className="text-slate-500 text-xs">Followed by</p>
           </div>
         </article>
+
+        <article className="mt-7">
+          <div className="flex gap-2 items-center">
+            <Mail className="p-1" />
+            <p className="text-xs">{user?.primaryEmailAddress?.emailAddress}</p>
+          </div>
+          {user.phoneNumbers[0] && (
+            <div className="flex gap-2 items-center">
+              <Phone className="p-1" />
+              <p className="text-xs">{user.phoneNumbers[0].phoneNumber}</p>
+            </div>
+          )}
+        </article>
       </div>
+      <article className="bg-secondary mt-5 rounded-md p-5">
+        <p className="font-bold text-base mb-2">Biography</p>
+        {userFromDataBase.userBiography == "" ? (
+          <p className="text-sm text-slate-500">not yet.</p>
+        ) : (
+          <p>{userFromDataBase.userBiography}</p>
+        )}
+      </article>
+      <article className="bg-secondary mt-5 rounded-md p-5">
+        <p className="font-bold text-base mb-2">Latest Activities</p>
+        {userFromDataBase.userBiography == "" ? (
+          <p className="text-sm text-slate-500">not yet.</p>
+        ) : (
+          <p>{userFromDataBase.userBiography}</p>
+        )}
+      </article>
+      <article className="bg-secondary mt-5 rounded-md p-5">
+        <p className="font-bold text-base mb-2">Posted Events Types</p>
+        {typeUserSubmitted.length > 0 ? (
+          <ul className="flex gap-2 flex-wrap">
+            {typeUserSubmitted.map((type) => {
+              return (
+                <li
+                  key={type}
+                  className=" bg-primary flex p-2 hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
+                >
+                  <Link href={`/events?eventtype=${type}`}>
+                    <span className="capitalize text-xs">
+                      {type.toLowerCase().replace("_", " ")}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-sm text-slate-500">No events yet.</p>
+        )}
+      </article>
     </Container>
   );
 }
