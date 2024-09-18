@@ -24,7 +24,6 @@ interface MenuProps {
 
 function MobileNavBarLinks({ isOpen, userId }: MenuProps) {
   const pathname = usePathname();
-  console.log(userId);
 
   const menuList = getMenuList(pathname);
 

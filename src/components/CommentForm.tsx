@@ -81,7 +81,6 @@ const CommentForm = ({
     e: React.KeyboardEvent<HTMLTextAreaElement>
   ) => {
     if (e.key === "Enter") {
-      console.log("User pressed Enter");
     }
   };
 

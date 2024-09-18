@@ -5,12 +5,13 @@ import {
   getUniqueEventTypes,
   getUserFromDataBase,
 } from "@/utils/actions/usersActions";
-import { toastPrint } from "@/utils/toast action/action";
 import { redirect } from "next/navigation";
 import React from "react";
 
 async function ProfilePage() {
   const userClerkId = authenticateAndRedirect();
+  console.log(userClerkId);
+
   const eventLength = await getUserLengthByClerkId(userClerkId);
   const userFromDataBase = await getUserFromDataBase(userClerkId);
   const typeUserSubmitted = await getUniqueEventTypes(userClerkId);

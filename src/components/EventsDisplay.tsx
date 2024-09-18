@@ -33,7 +33,7 @@ export const defaultValue = {
 
 const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filters, setFilters] = useState<FiltersType>(defaultValue);
+  const [filters, setFilters] = useState<FiltersType | null>(null);
   const [events, setEvents] = useState<Event[]>([...eventsData]);
   const [isDefValueAndFiltersEquals, setIsDefValueAndFiltersEquals] =
     useState<boolean>(deepEqual(defaultValue, filters));
@@ -41,19 +41,21 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
   const queryParam = useFilters();
 
   useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      ...queryParam,
-    }));
-  }, [queryParam, setFilters]);
+    if (!filters && Object.keys(queryParam).length > 0) {
+      setFilters({
+        ...defaultValue,
+        ...queryParam,
+      });
+    }
+  }, [queryParam, filters]);
 
   useEffect(() => {
     setIsDefValueAndFiltersEquals(deepEqual(defaultValue, filters));
-    console.log(filters);
   }, [filters]);
 
   useEffect(() => {
     const searchEvents = async () => {
+      if (!filters) return;
       try {
         const queryParams = new URLSearchParams({
           searchTerm: searchTerm || "",
@@ -87,6 +89,10 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
       }
     };
     searchEvents();
+
+    const intervalId = setInterval(searchEvents, 5000);
+
+    return () => clearInterval(intervalId);
   }, [filters, searchTerm]);
   return (
     <div>

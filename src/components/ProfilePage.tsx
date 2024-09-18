@@ -2,7 +2,7 @@
 import Container from "@/components/Container";
 import { useSession, useUser } from "@clerk/nextjs";
 import { EventType, User } from "@prisma/client";
-import { Mail, Phone } from "lucide-react";
+import { Edit, Edit2Icon, Mail, Phone } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,15 +20,18 @@ function UserProfilePage({
   const { user } = useUser();
   const { session } = useSession();
 
-  console.log(typeUserSubmitted);
-
   // const { theme } = useTheme();
 
   if (!user || !session) return null;
 
   return (
     <Container>
-      <div className="bg-secondary mt-5 rounded-md p-5">
+      <div className="relative bg-secondary mt-5 rounded-md p-5">
+        <Link href={"/profile/profileedit"}>
+          <span className="absolute right-10 top-5 hover:!text-primary cursor-pointer ">
+            <Edit />
+          </span>
+        </Link>
         <div className="flex flex-col items-center">
           <Image
             alt={`${user.fullName}`}
@@ -37,7 +40,7 @@ function UserProfilePage({
             className="rounded-full"
             height={50}
           ></Image>
-          <p className="font-bold">{user.fullName}</p>
+          <p className="font-bold">{user.username}</p>
         </div>
         <article className="grid grid-cols-3 text-center mt-5">
           <div className="">
@@ -55,14 +58,21 @@ function UserProfilePage({
         </article>
 
         <article className="mt-7">
-          <div className="flex gap-2 items-center">
-            <Mail className="p-1" />
-            <p className="text-xs">{user?.primaryEmailAddress?.emailAddress}</p>
-          </div>
-          {user.phoneNumbers[0] && (
+          {userFromDataBase.userEmail && (
+            <div className="flex gap-2 items-center">
+              <Mail className="p-1" />
+              <p className="text-xs">{userFromDataBase.userEmail}</p>
+            </div>
+          )}
+          {userFromDataBase.userPhone && (
             <div className="flex gap-2 items-center">
               <Phone className="p-1" />
-              <p className="text-xs">{user.phoneNumbers[0].phoneNumber}</p>
+              <a
+                href={`tel:+${userFromDataBase.userPhone}`}
+                className="text-xs"
+              >
+                {userFromDataBase.userPhone}
+              </a>
             </div>
           )}
         </article>

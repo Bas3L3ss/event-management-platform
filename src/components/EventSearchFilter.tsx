@@ -22,12 +22,13 @@ import { FilterIcon, FilterXIcon } from "lucide-react";
 import { Label } from "./ui/label";
 import { redirect } from "next/navigation";
 import { deepEqual } from "@/utils/utils";
+import SkeletonLoading from "./SkeletonLoading";
 
 type EventSearchFilterProps = {
   searchTerm: string;
   setSearchTerm: Dispatch<SetStateAction<string>>;
-  setFilters: Dispatch<SetStateAction<FiltersType>>;
-  filters: FiltersType;
+  setFilters: Dispatch<SetStateAction<FiltersType | null>>;
+  filters: FiltersType | null;
   isDefValueAndFiltersEquals: boolean;
 };
 
@@ -46,6 +47,12 @@ const EventSearchFilter = ({
       redirect("/events");
     }
   }, [isResetable]);
+  if (!filters)
+    return (
+      <div>
+        <SkeletonLoading />
+      </div>
+    );
   return (
     <form className="space-y-4 mt-5">
       <div className="flex gap-3">
@@ -187,7 +194,6 @@ const EventSearchFilter = ({
                     ...prev,
                     isFeatured: isFeaturedCheck,
                   }));
-                  console.log(deepEqual(filters, defaultValue));
                 }}
               >
                 Featured

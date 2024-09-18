@@ -6,12 +6,14 @@ export async function createUser({
   userEmail,
   userAvatar = "",
   userBiography = "",
+  userPhone = "",
 }: {
   clerkId: string;
   userName: string;
   userEmail: string;
   userAvatar?: string;
   userBiography?: string;
+  userPhone?: string;
 }) {
   try {
     const newUser = await prisma.user.create({
@@ -22,6 +24,7 @@ export async function createUser({
         userAvatar,
         userBiography,
         isAuthorizedUser: false,
+        userPhone,
       },
     });
 
@@ -29,6 +32,55 @@ export async function createUser({
   } catch (error) {
     console.error("Error creating user:", error);
     throw new Error("Could not create user.");
+  }
+}
+
+export async function updateUser({
+  clerkId,
+  userName,
+  userEmail,
+  userAvatar = "",
+  userPhone = "",
+  userBiography = "",
+}: {
+  clerkId: string;
+  userName?: string;
+  userEmail?: string;
+  userAvatar?: string;
+  userBiography?: string;
+  userPhone?: string;
+}) {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { clerkId },
+      data: {
+        userName,
+        userEmail,
+        userAvatar,
+        userBiography,
+        userPhone,
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw new Error("Could not update user.");
+  }
+}
+export async function SoftDeleteUser(clerkId: string) {
+  try {
+    const deletedUser = await prisma.user.update({
+      where: { clerkId },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return deletedUser;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw new Error("Could not deleting user.");
   }
 }
 

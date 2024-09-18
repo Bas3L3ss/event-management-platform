@@ -1,7 +1,13 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { createUser } from "@/utils/actions/usersActions"; // Import the createUser action
+import {
+  createUser,
+  SoftDeleteUser,
+  updateUser,
+} from "@/utils/actions/usersActions"; // Import the createUser action
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -60,15 +66,58 @@ export async function POST(req: Request) {
       await createUser({
         clerkId: user.id,
         userName: user.username || user.first_name || "Anonymous", // Fallback for name
-        userEmail: user.email_addresses[0].email_address, // First verified email
+        userEmail: user.email_addresses[0]?.email_address, // First verified email
         userAvatar: user.image_url || "", // Default to empty string
+        userPhone: user.phone_numbers[0]?.phone_number || "",
         userBiography: "", // Default to empty string
       });
 
-      console.log(`User with Clerk ID: ${user.id} created successfully.`);
+      console.log("created user");
     } catch (error) {
       console.error("Error creating user in database:", error);
       return new Response("Error occurred while creating user", {
+        status: 500,
+      });
+    }
+  }
+  if (eventType === "user.updated") {
+    const user = evt.data; // Get the user data from the webhook event
+
+    try {
+      // Call the createUser action with the relevant user details from the Clerk webhook
+      await updateUser({
+        clerkId: user.id,
+        userName: user.username || user.first_name || "Anonymous", // Fallback for name
+        userEmail: user.email_addresses[0]?.email_address, // First verified email
+        userAvatar: user.image_url || "", // Default to empty string
+        userPhone: user.phone_numbers[0]?.phone_number || "",
+
+        userBiography: "", // Default to empty string
+      });
+      console.log("updated user");
+      revalidatePath(`/profile`);
+    } catch (error) {
+      console.error("Error updating user in database:", error);
+      return new Response("Error occurred while updating user", {
+        status: 500,
+      });
+    }
+  }
+  if (eventType === "user.deleted") {
+    const user = evt.data; // Get the user data from the webhook event
+    if (!user.id) {
+      console.error("No user id found");
+      return new Response("Error occurred while deleting user", {
+        status: 500,
+      });
+    }
+    try {
+      // Call the createUser action with the relevant user details from the Clerk webhook
+      await SoftDeleteUser(user.id);
+      console.log("deleted user");
+    } catch (error) {
+      console.error("Error deleting user in database:", error);
+      return new Response("Error occurred while deleting user", {
         status: 500,
       });
     }
