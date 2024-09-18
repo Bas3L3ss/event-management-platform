@@ -8,7 +8,7 @@ import Container from "./Container";
 
 export function SiteFooter() {
   return (
-    <footer className="relative bg-blueGray-200 border-t pt-6 border-b  my-6 mt-20 pb-6">
+    <footer className="relative bg-blueGray-200 border-t pt-6 border-b     mt-20 pb-6">
       <Container>
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap text-left lg:text-left">

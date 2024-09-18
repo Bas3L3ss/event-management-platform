@@ -79,12 +79,20 @@ function UserProfilePage({
       </div>
       <article className="bg-secondary mt-5 rounded-md p-5">
         <p className="font-bold text-base mb-2">Biography</p>
-        {userFromDataBase.userBiography == "" ? (
+        {userFromDataBase.userBiography === "" ? (
           <p className="text-sm text-slate-500">not yet.</p>
         ) : (
-          <p>{userFromDataBase.userBiography}</p>
+          <p>
+            {userFromDataBase.userBiography.split("\n").map((line, index) => (
+              <React.Fragment key={index}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </p>
         )}
       </article>
+
       <article className="bg-secondary mt-5 rounded-md p-5">
         <p className="font-bold text-base mb-2">Latest Activities</p>
         {userFromDataBase.userBiography == "" ? (

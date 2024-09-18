@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import Container from "@/components/Container";
+import { dark } from "@clerk/themes";
 import NavBar from "@/components/NavBar";
 import Providers from "@/components/Providers";
 import { SiteFooter } from "@/components/Footer";
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
-        variables: { colorPrimary: "#000000" },
+        variables: { colorPrimary: "#00a9f1" },
         elements: {
           formButtonPrimary:
             "bg-black border border-black border-solid hover:bg-white hover:text-black",
@@ -32,8 +32,8 @@ export default function RootLayout({
             "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black",
           membersPageInviteButton:
             "bg-black border border-black border-solid hover:bg-white hover:text-black",
-          card: "bg-[#fafafa]",
         },
+        baseTheme: dark,
       }}
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
