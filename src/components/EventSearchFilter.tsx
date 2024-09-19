@@ -18,11 +18,18 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { FilterIcon, FilterXIcon } from "lucide-react";
+import { FilterIcon, FilterXIcon, PlusIcon } from "lucide-react";
 import { Label } from "./ui/label";
 import { redirect } from "next/navigation";
 import { deepEqual } from "@/utils/utils";
 import SkeletonLoading from "./SkeletonLoading";
+import Link from "next/link";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 type EventSearchFilterProps = {
   searchTerm: string;
@@ -111,7 +118,22 @@ const EventSearchFilter = ({
             />
           </div>
         </div>
-        <div className="ml-auto mt-auto">
+        <div className="ml-auto mt-auto gap-2 flex">
+          <TooltipProvider disableHoverableContent>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <Link
+                  className=" hover:text-blue-400"
+                  href={"/events/myevents/addevents"}
+                >
+                  <PlusIcon />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" align="start" alignOffset={2}>
+                Add new event.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger className="">
               <span className="font-normal  text-xs   hover:text-blue-400">

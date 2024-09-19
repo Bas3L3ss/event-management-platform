@@ -64,18 +64,18 @@ model Comment {
 model Event {
   id               String     @id @default(uuid())
   clerkId          String 
-  eventName        String
+  eventName        String @unique
   eventDescription String
   dateEnd        DateTime 
   dateStart DateTime
-  status           EventStatus
+  status           EventStatus @default(NOT_CONFIRMED)
   type EventType
   rating           Float @default(0)
   eventImg         String[] @default([]) 
   eventVideo String?
   eventImgOrVideoFirstDisplay String?
   eventTicketPrice Float
-  eventTicketCurrency String
+ 
   eventLocation String 
   reservationTicketLink String @default("")
 

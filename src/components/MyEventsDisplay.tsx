@@ -31,7 +31,13 @@ export const defaultValue = {
   minRating: 0,
 };
 
-const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
+const MyEventsDisplay = ({
+  eventsData,
+  clerkID,
+}: {
+  eventsData: Event[];
+  clerkID: string;
+}) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filters, setFilters] = useState<FiltersType | null>(null);
   const [events, setEvents] = useState<Event[]>([...eventsData]);
@@ -65,13 +71,14 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
           maxDate: filters.maxDate || "",
           minRating: filters.minRating ? filters.minRating.toString() : "",
           isFeatured: filters.isFeatured ? "true" : "",
+          clerkID: clerkID,
         });
         for (const [key, value] of queryParams.entries()) {
           if (!value) queryParams.delete(key);
         }
 
         const response = await fetch(
-          `/api/eventsHandler?${queryParams.toString()}`,
+          `/api/eventsHandler/myevents?${queryParams.toString()}`,
           {
             method: "GET",
             headers: {
@@ -93,7 +100,7 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
     const intervalId = setInterval(searchEvents, 5000);
 
     return () => clearInterval(intervalId);
-  }, [filters, searchTerm]);
+  }, [filters, searchTerm, clerkID]);
   return (
     <div>
       <EventSearchFilter
@@ -108,11 +115,14 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
         title={`Events - ${events.length} event(s) `}
         className="mb-2 md:mb-5 mt-5"
       />
+
       <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-1 ">
         {events.length > 0 ? (
           events.map((event) => <IndividualEvent el={event} key={event.id} />)
         ) : (
-          <p>No events found</p>
+          <Link href={"/events/myevents/addevents"}>
+            You don&apos;t have any event
+          </Link>
         )}
       </div>
     </div>
@@ -171,7 +181,7 @@ const IndividualEvent = ({ el }: { el: Event }) => {
 
           <div className="mt-10 flex gap-2">
             <Button asChild size={"lg"}>
-              <Link href={`${el.reservationTicketLink}`}>Book ticket</Link>
+              <Link href={`/events/myevents/edit/${el.id}`}>Edit Events</Link>
             </Button>
             <Button variant={"outline"} size={"lg"}>
               <Link href={`/events/${el.id}`}>Review Event</Link>
@@ -182,4 +192,4 @@ const IndividualEvent = ({ el }: { el: Event }) => {
     </div>
   );
 };
-export default EventsDisplay;
+export default MyEventsDisplay;

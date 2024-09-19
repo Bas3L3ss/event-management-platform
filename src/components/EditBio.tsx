@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { toastPrint } from "@/utils/toast action/action";
 import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 function EditBio({
   bioDataFromDB,
@@ -61,7 +62,7 @@ function EditBio({
     <>
       <form onSubmit={handleSubmit} className="mb-10">
         <Label htmlFor="bio">Modify bio:</Label>
-        <textarea
+        <Textarea
           name="bio"
           className="w-full p-2 mt-2"
           id="bio"

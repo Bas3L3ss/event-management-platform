@@ -1,7 +1,10 @@
-// EventActions.ts
+"use server";
 
 import { Comment, Event, EventStatus, EventType } from "@prisma/client";
 import prisma from "../db";
+import { authenticateAndRedirect } from "./clerkFunc";
+import { eventSchema, filesSchema, validateWithZodSchema } from "../schema";
+import { uploadImages, uploadVideo } from "../supabase";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -124,8 +127,6 @@ export async function getEventById(id: string): Promise<Event | null> {
   }
 }
 
-// actions/eventActions.ts (or any actions file)
-
 export async function searchAndFilterEvents(
   searchTerm: string,
   filters: {
@@ -172,6 +173,54 @@ export async function searchAndFilterEvents(
     throw new Error("Unable to fetch events");
   }
 }
+export async function searchAndFilterUserSpecificEvents(
+  clerkId: string,
+  searchTerm: string,
+  filters: {
+    eventType?: EventType;
+    status?: EventStatus;
+    isFeatured?: boolean;
+    minDate?: string;
+    maxDate?: string;
+    minRating?: number;
+  }
+) {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        clerkId,
+        eventName: {
+          contains: searchTerm, // Fuzzy search on event name
+          mode: "insensitive", // Case-insensitive search
+        },
+        type: filters.eventType ? filters.eventType : undefined,
+        status: filters.status ? filters.status : undefined,
+        featured: filters.isFeatured ? filters.isFeatured : undefined,
+        dateStart: filters.minDate
+          ? {
+              gte: new Date(filters.minDate),
+            }
+          : undefined,
+        dateEnd: filters.maxDate
+          ? {
+              lte: new Date(filters.maxDate),
+            }
+          : undefined,
+        rating: {
+          gte: filters.minRating || 0,
+        },
+      },
+      orderBy: {
+        dateStart: "asc", // Order by start date
+      },
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error searching and filtering events:", error);
+    throw new Error("Unable to fetch events");
+  }
+}
 
 export const getUserLengthByClerkId = async (clerkId: string) => {
   try {
@@ -182,6 +231,20 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
     });
 
     return events.length;
+  } catch (error) {
+    console.error("Error getting events:", error);
+    throw new Error("Unable to fetch events");
+  }
+};
+export const getEventFromClerkId = async (clerkId: string) => {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        clerkId,
+      },
+    });
+
+    return events;
   } catch (error) {
     console.error("Error getting events:", error);
     throw new Error("Unable to fetch events");
@@ -282,3 +345,61 @@ export async function deleteComment(commentId: string): Promise<void> {
     await prisma.$disconnect();
   }
 }
+
+//helper
+const renderError = (error: unknown): { message: string } => {
+  console.log(error);
+  return {
+    message: error instanceof Error ? error.message : "An error occurred",
+  };
+};
+
+export const createEventAction = async (
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> => {
+  const clerkId = await authenticateAndRedirect();
+
+  try {
+    const rawData = Object.fromEntries(formData);
+    const images = formData.getAll("image") as File[];
+
+    const video = formData.get("video") as File;
+    const validatedFields = validateWithZodSchema(eventSchema, rawData);
+    const validatedFiles = validateWithZodSchema(filesSchema, {
+      image: images,
+      video: video,
+    });
+
+    const imageUrls = await uploadImages(images);
+
+    // Upload video and get URL
+    const videoUrl = await uploadVideo(video);
+
+    const newEvent = await prisma.event.create({
+      data: {
+        clerkId,
+        dateEnd: validatedFields.dateEnd as Date,
+        dateStart: validatedFields.dateStart as Date,
+        eventDescription: validatedFields.description,
+        eventLocation: validatedFields.eventLocation,
+        eventName: validatedFields.eventName,
+        eventTicketPrice: validatedFields.price,
+        type: validatedFields.eventType,
+        eventImg: imageUrls,
+        eventVideo: videoUrl,
+        hostName: validatedFields.host,
+        reservationTicketLink: validatedFields.reservationTicketLink,
+        eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
+          ? videoUrl
+          : imageUrls[0],
+      },
+    });
+
+    return { message: "product created" };
+  } catch (error) {
+    return renderError(error);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
