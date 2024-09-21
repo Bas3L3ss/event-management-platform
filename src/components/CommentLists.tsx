@@ -199,7 +199,9 @@ export function CommentListItem({
     <Card className="flex p-4 hover:shadow-md rounded-lg">
       <Link href={`/profile/`}>
         <Image
-          src={``}
+          src={comment.authorImageUrl}
+          width={200}
+          height={200}
           alt={comment.authorName}
           className="w-12 h-12 rounded-full mr-4"
         />
@@ -210,7 +212,10 @@ export function CommentListItem({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Link className="hover:!text-primary " href={`/profile/`}>
+                  <Link
+                    className="hover:!text-primary "
+                    href={`/profile/${comment.clerkId}`}
+                  >
                     {comment.authorName}
                   </Link>
                 </TooltipTrigger>

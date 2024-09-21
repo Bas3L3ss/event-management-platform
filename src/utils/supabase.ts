@@ -46,8 +46,6 @@ export const deleteVideo = async (filePath: string) => {
 
   const { data, error } = await supabase.storage.from(bucket).remove([file]);
 
-  console.log(data);
-
   if (error) {
     console.error("Error deleting files:", error.message);
     throw new Error("File deletion failed");

@@ -23,13 +23,14 @@ import DatePrinter from "./DatePrinter";
 
 export default async function FeaturedEventsPage() {
   // Fetch multiple featured events
-  const featuredEvents: Event[] = await getLatestFeaturedEvent(5);
+  const featuredEvents: Event[] = await getLatestFeaturedEvent(8);
+  console.log(featuredEvents);
 
   if (!featuredEvents || featuredEvents.length === 0) return null;
 
   // Fetch the most up-to-date featured event
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
-  if (!oneFeaturedEvent) return <p>No latest featured event available.</p>;
+  if (!oneFeaturedEvent) return null;
 
   const oneEventsCommentsLength = getCommentsLength(oneFeaturedEvent.id);
 
@@ -84,8 +85,10 @@ export function CarouselFeatured({
                       {el.type.toLowerCase()}
                     </p>
                     <Image
-                      src={""}
-                      // src={`${el.eventImg}`}
+                      width={500}
+                      className="w-full"
+                      height={500}
+                      src={`${el.eventImgOrVideoFirstDisplay}`}
                       alt={`${el.eventName}`}
                     />
                     <p className="mt-3 text-sm gap-2 flex">

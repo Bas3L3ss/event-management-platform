@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { toastPrint } from "@/utils/toast action/action";
 import Router from "next/router";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 type CommentFormProps = {
   isAuthenticated: boolean;
@@ -16,6 +17,9 @@ const CommentForm = ({
   isAuthenticated,
   userId,
 }: CommentFormProps) => {
+  const { user } = useUser();
+  console.log(user);
+
   const [rating, setRating] = useState(1);
   const [commentText, setCommentText] = useState("");
   const [maxLength, setMaxLength] = useState<number>(500);
@@ -47,12 +51,12 @@ const CommentForm = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          authorImageUrl: "", // Replace with actual data
+          authorImageUrl: user?.imageUrl, // Replace with actual data
           clerkId: userId, // Replace with actual data
           commentText,
           rating,
           eventId: eventId, // Replace with actual data
-          authorName: "author-name", // Replace with actual data
+          authorName: user?.username, // Replace with actual data
         }),
       });
 

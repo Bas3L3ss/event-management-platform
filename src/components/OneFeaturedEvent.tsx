@@ -77,10 +77,9 @@ export default function OneFeaturedEvent({
           <div className="relative ms-4">
             <Image
               className="w-full rounded-md"
-              // src={`${featuredEvent.eventImgOrVideoFirstDisplay}`}
-              src={""}
-              width={100}
-              height={100}
+              src={`${featuredEvent.eventImgOrVideoFirstDisplay}`}
+              width={700}
+              height={700}
               alt="Image Description"
             />
           </div>

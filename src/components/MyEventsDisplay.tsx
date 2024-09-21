@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import DatePrinter from "./DatePrinter";
 import { useFilters } from "@/hooks/useQueryParam";
 import { deepEqual } from "@/utils/utils";
+import MediaRenderer from "./MediaFileRender";
 
 export type FiltersType = {
   eventType?: EventType | undefined | string;
@@ -150,10 +151,10 @@ const IndividualEvent = ({ el }: { el: Event }) => {
           <p className="mb-2 lg:text-base font-light text-gray-500 text-sm">
             Host: {el.hostName} - genre: {el.type.toLowerCase()}
           </p>
-          <Image
-            src={""}
-            // src={`${el.eventImg}`}
-            alt={`${el.eventName}`}
+
+          <MediaRenderer
+            alt={el.eventName}
+            url={el.eventImgOrVideoFirstDisplay!}
           />
           <p className="mt-3 text-sm gap-2 flex">
             <span className="flex">

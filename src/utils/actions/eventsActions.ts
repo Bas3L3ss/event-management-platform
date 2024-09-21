@@ -11,6 +11,8 @@ import {
 } from "../schema";
 import { deleteVideo, uploadImages, uploadVideo } from "../supabase";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import Router from "next/router";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -27,7 +29,7 @@ export async function getLatestFeaturedEvent(amount: number = 2) {
         dateStart: "asc", // Fetch the event with the earliest start date
       },
       take: amount,
-      skip: 1,
+      // skip: 1,
     });
 
     return latestEvent;
@@ -453,7 +455,9 @@ export const updateEventAction = async (
 
     if (validatedFiles.video != undefined) {
       const videoUrl = await uploadVideo(video);
-      await deleteVideo(videoWillBeSentToDB as string);
+      const data = await deleteVideo(videoWillBeSentToDB as string);
+      console.log(data);
+
       videoWillBeSentToDB = videoUrl;
     }
 

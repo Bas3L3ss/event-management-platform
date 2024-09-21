@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-function UserProfilePage({
+function OtherProfilePage({
   eventLength,
   userFromDataBase,
   typeUserSubmitted,
@@ -16,30 +16,18 @@ function UserProfilePage({
   userFromDataBase: User;
   typeUserSubmitted: string[];
 }) {
-  const { user } = useUser();
-  const { session } = useSession();
-
-  // const { theme } = useTheme();
-
-  if (!user || !session) return null;
-
   return (
     <Container>
       <div className="relative bg-secondary mt-5 rounded-md p-5">
-        <Link href={"/profile/profileedit"}>
-          <span className="absolute right-10 top-5 hover:!text-primary cursor-pointer ">
-            <Edit />
-          </span>
-        </Link>
         <div className="flex flex-col items-center">
           <Image
-            alt={`${user.fullName}`}
-            src={`${user.imageUrl} `}
+            alt={`${userFromDataBase.userName}`}
+            src={`${userFromDataBase.userAvatar} `}
             width={50}
             className="rounded-full"
             height={50}
           ></Image>
-          <p className="font-bold">{user.username}</p>
+          <p className="font-bold">{userFromDataBase.userName}</p>
         </div>
         <article className="grid grid-cols-3 text-center mt-5">
           <div className="">
@@ -127,4 +115,4 @@ function UserProfilePage({
   );
 }
 
-export default UserProfilePage;
+export default OtherProfilePage;

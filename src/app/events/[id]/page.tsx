@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import DatePrinter from "@/components/DatePrinter";
 import { starBad, starGood } from "@/components/OneFeaturedEvent";
+import MediaRenderer from "@/components/MediaFileRender";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -113,13 +114,9 @@ function EventDisplay({
           </div>
           {/* Col */}
           <div className="relative ms-4">
-            <Image
-              className="w-full rounded-md"
-              // src={`${oneEvent.eventImgOrVideoFirstDisplay}`}
-              src={""}
-              width={100}
-              height={100}
-              alt="Image Description"
+            <MediaRenderer
+              alt={oneEvent.eventName}
+              url={oneEvent.eventImgOrVideoFirstDisplay!}
             />
           </div>
           {/* End Col */}

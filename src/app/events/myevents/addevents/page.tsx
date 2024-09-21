@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createEventAction } from "@/utils/actions/eventsActions";
 import { faker } from "@faker-js/faker";
-import { EventStatus, EventType } from "@prisma/client";
+import { EventType } from "@prisma/client";
 
 async function AddEventsPage() {
   const name = faker.commerce.productName();
