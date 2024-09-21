@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Button } from "./ui/button";
+import Link from "next/link";
 export default function Hero() {
   return (
     <>
@@ -31,6 +33,14 @@ export default function Hero() {
                   people, and discover a world of knowledge and enjoyment
                   waiting for you!&quot;
                 </p>
+              </div>
+              <div className="mt-8 gap-3 flex justify-center  z-10">
+                <Button asChild size={"lg"}>
+                  <Link href={"/events"}>Browse events</Link>
+                </Button>
+                <Button asChild size={"lg"} variant={"outline"}>
+                  <Link href={"/events/myevents"}>Post your own events</Link>
+                </Button>
               </div>
             </div>
           </div>

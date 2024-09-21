@@ -3,8 +3,14 @@
 import { Comment, Event, EventStatus, EventType } from "@prisma/client";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
-import { eventSchema, filesSchema, validateWithZodSchema } from "../schema";
-import { uploadImages, uploadVideo } from "../supabase";
+import {
+  eventSchema,
+  filesEditSchema,
+  filesSchema,
+  validateWithZodSchema,
+} from "../schema";
+import { deleteVideo, uploadImages, uploadVideo } from "../supabase";
+import { revalidatePath } from "next/cache";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -347,9 +353,10 @@ export async function deleteComment(commentId: string): Promise<void> {
 }
 
 //helper
-const renderError = (error: unknown): { message: string } => {
+const renderError = (error: unknown): { message: string; isError: boolean } => {
   console.log(error);
   return {
+    isError: true,
     message: error instanceof Error ? error.message : "An error occurred",
   };
 };
@@ -357,7 +364,7 @@ const renderError = (error: unknown): { message: string } => {
 export const createEventAction = async (
   prevState: any,
   formData: FormData
-): Promise<{ message: string }> => {
+): Promise<{ message: string; isError: boolean }> => {
   const clerkId = await authenticateAndRedirect();
 
   try {
@@ -396,7 +403,82 @@ export const createEventAction = async (
       },
     });
 
-    return { message: "product created" };
+    return { message: "product created", isError: false };
+  } catch (error) {
+    return renderError(error);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateEventAction = async (
+  prevState: unknown,
+  formData: FormData
+): Promise<{ message: string; isError: boolean }> => {
+  const clerkId = await authenticateAndRedirect();
+
+  try {
+    const rawData = Object.fromEntries(formData);
+    const images = formData.getAll("image") as File[];
+    const video = formData.get("video") as File;
+    const eventId = formData.get("id") as string;
+    const imagesFiltered = images.filter(
+      (file) => file.size > 0 && file.name !== "undefined"
+    );
+    const validFile =
+      video && video.size > 0 && video.name !== "undefined" ? video : undefined;
+
+    // Validate the fields using Zod
+    const validatedFields = validateWithZodSchema(eventSchema, rawData);
+    const validatedFiles = validateWithZodSchema(filesEditSchema, {
+      image: imagesFiltered,
+      video: validFile,
+    });
+
+    const eventFileFromDB = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { eventImg: true, eventVideo: true }, // Select only the images field
+    });
+
+    if (!eventFileFromDB) {
+      throw new Error("invalid edit");
+    }
+    let imagesWillBeSentToDB = eventFileFromDB?.eventImg;
+    let videoWillBeSentToDB = eventFileFromDB?.eventVideo;
+
+    if (validatedFiles.image != undefined && validatedFiles.image.length > 0) {
+      const imageUrls = await uploadImages(images);
+      imagesWillBeSentToDB = imagesWillBeSentToDB.concat(imageUrls);
+    }
+
+    if (validatedFiles.video != undefined) {
+      const videoUrl = await uploadVideo(video);
+      await deleteVideo(videoWillBeSentToDB as string);
+      videoWillBeSentToDB = videoUrl;
+    }
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: eventId },
+      data: {
+        clerkId,
+        dateEnd: validatedFields.dateEnd as Date,
+        dateStart: validatedFields.dateStart as Date,
+        eventDescription: validatedFields.description,
+        eventLocation: validatedFields.eventLocation,
+        eventName: validatedFields.eventName,
+        eventTicketPrice: validatedFields.price,
+        type: validatedFields.eventType,
+        eventImg: imagesWillBeSentToDB,
+        eventVideo: videoWillBeSentToDB,
+        hostName: validatedFields.host,
+        reservationTicketLink: validatedFields.reservationTicketLink,
+        eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
+          ? videoWillBeSentToDB
+          : imagesWillBeSentToDB[0],
+      },
+    });
+
+    return { message: "Event updated successfully", isError: false };
   } catch (error) {
     return renderError(error);
   } finally {

@@ -14,7 +14,7 @@ import {
   getOneLatestFeaturedEvent,
 } from "@/utils/actions/eventsActions";
 import { Event } from "@prisma/client";
-import OneFeaturedEvent, { star } from "./OneFeaturedEvent";
+import OneFeaturedEvent, { starBad, starGood } from "./OneFeaturedEvent";
 import Container from "./Container";
 import Title from "./Title";
 import Image from "next/image";
@@ -25,8 +25,7 @@ export default async function FeaturedEventsPage() {
   // Fetch multiple featured events
   const featuredEvents: Event[] = await getLatestFeaturedEvent(5);
 
-  if (!featuredEvents || featuredEvents.length === 0)
-    return <p>No featured events available.</p>;
+  if (!featuredEvents || featuredEvents.length === 0) return null;
 
   // Fetch the most up-to-date featured event
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
@@ -94,7 +93,13 @@ export function CarouselFeatured({
                         {Array.from(
                           { length: Math.floor(el.rating) },
                           (_, index) => (
-                            <span key={index}>{star}</span>
+                            <span key={index}>{starGood}</span>
+                          )
+                        )}
+                        {Array.from(
+                          { length: 5 - Math.floor(el.rating) },
+                          (_, index) => (
+                            <span key={index}>{starBad}</span>
                           )
                         )}
                       </span>

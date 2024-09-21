@@ -71,7 +71,6 @@ export function validateWithZodSchema<T>(
   data: unknown
 ): T {
   const result = schema.safeParse(data);
-  console.log(data);
 
   if (!result.success) {
     const errors = result.error.errors.map((error) => error.message);
@@ -115,6 +114,48 @@ function validateVideoFile() {
         !file || acceptedFileTypes.some((type) => file.type.startsWith(type)),
       "File must be a video"
     );
+}
+
+export const filesEditSchema = z.object({
+  image: validateImageEditFiles(),
+  video: validateVideoEditFile(),
+});
+function validateImageEditFiles() {
+  const maxUploadSize = 5 * 1024 * 1024; // 5 MB
+  const acceptedFileTypes = ["image/"];
+
+  return z
+    .array(z.instanceof(File))
+    .refine(
+      (files) => files.every((file) => file.size <= maxUploadSize),
+      `Each file size must be less than 5 MB`
+    )
+    .refine(
+      (files) =>
+        files.every((file) =>
+          acceptedFileTypes.some((type) => file.type.startsWith(type))
+        ),
+      "All files must be images"
+    )
+    .optional();
+}
+
+function validateVideoEditFile() {
+  const maxUploadSize = 50 * 1024 * 1024; // 50 MB
+  const acceptedFileTypes = ["video/"];
+
+  return z
+    .instanceof(File)
+    .refine(
+      (file) => !file || file.size <= maxUploadSize,
+      `File size must be less than 50 MB`
+    )
+    .refine(
+      (file) =>
+        !file || acceptedFileTypes.some((type) => file.type.startsWith(type)),
+      "File must be a video"
+    )
+    .optional();
 }
 
 export const filesSchema = z.object({

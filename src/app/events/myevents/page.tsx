@@ -8,7 +8,6 @@ import React from "react";
 async function MyEventsPage() {
   const clerkID = authenticateAndRedirect();
   const events = await getEventFromClerkId(clerkID);
-  console.log(events);
 
   return (
     <Container>

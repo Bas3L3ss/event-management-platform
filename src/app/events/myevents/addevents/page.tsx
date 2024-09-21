@@ -13,7 +13,7 @@ import { createEventAction } from "@/utils/actions/eventsActions";
 import { faker } from "@faker-js/faker";
 import { EventStatus, EventType } from "@prisma/client";
 
-function AddEventsPage() {
+async function AddEventsPage() {
   const name = faker.commerce.productName();
   const host = faker.company.name();
   const location =
@@ -27,7 +27,7 @@ function AddEventsPage() {
 
   return (
     <Container className="mt-10">
-      <h1 className="text-2xl font-semibold mb-8 capitalize">create product</h1>
+      <h1 className="text-2xl font-semibold mb-8 capitalize">add event</h1>
       <div className="border p-8 rounded-md">
         <FormContainer action={createEventAction}>
           <div className="grid gap-4 md:grid-cols-2 my-4">
@@ -101,7 +101,7 @@ function AddEventsPage() {
               label="Video Display First"
             />
           </div>
-          <SubmitButton text="Create Product" className="mt-8" />
+          <SubmitButton text="Create event" className="mt-8" />
         </FormContainer>
       </div>
     </Container>

@@ -37,6 +37,7 @@ type EventSearchFilterProps = {
   setFilters: Dispatch<SetStateAction<FiltersType | null>>;
   filters: FiltersType | null;
   isDefValueAndFiltersEquals: boolean;
+  isEditPage?: boolean;
 };
 
 const EventSearchFilter = ({
@@ -44,6 +45,7 @@ const EventSearchFilter = ({
   setSearchTerm,
   setFilters,
   filters,
+  isEditPage = false,
   isDefValueAndFiltersEquals,
 }: EventSearchFilterProps) => {
   const [isResetable, setIsResetable] = useState(false);
@@ -119,21 +121,23 @@ const EventSearchFilter = ({
           </div>
         </div>
         <div className="ml-auto mt-auto gap-2 flex">
-          <TooltipProvider disableHoverableContent>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Link
-                  className=" hover:text-blue-400"
-                  href={"/events/myevents/addevents"}
-                >
-                  <PlusIcon />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" align="start" alignOffset={2}>
-                Add new event.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {isEditPage && (
+            <TooltipProvider disableHoverableContent>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Link
+                    className=" hover:text-blue-400"
+                    href={"/events/myevents/addevents"}
+                  >
+                    <PlusIcon />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" align="start" alignOffset={2}>
+                  Add new event.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger className="">
               <span className="font-normal  text-xs   hover:text-blue-400">

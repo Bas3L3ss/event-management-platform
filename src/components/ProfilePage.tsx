@@ -109,7 +109,7 @@ function UserProfilePage({
               return (
                 <li
                   key={type}
-                  className=" bg-primary flex p-2 hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
+                  className=" bg-primary flex justify-center items-center   hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
                 >
                   <Link href={`/events?eventtype=${type}`}>
                     <span className="capitalize text-xs">

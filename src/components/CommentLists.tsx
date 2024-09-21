@@ -2,7 +2,6 @@
 import { Comment } from "@prisma/client";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
-import { star } from "./OneFeaturedEvent";
 import Link from "next/link";
 import { toastPrint } from "@/utils/toast action/action";
 import { useRouter } from "next/navigation";
@@ -31,6 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { starGood } from "./OneFeaturedEvent";
 
 interface CommentsListProps {
   comments: Comment[];
@@ -231,7 +231,7 @@ export function CommentListItem({
             <span className="mr-2 "> {comment.rating.toFixed(1)}</span>
             {Array.from({ length: Math.floor(comment.rating) }, (_, index) => (
               <span className="filter drop-shadow-custom  " key={index}>
-                {star}
+                {starGood}
               </span>
             ))}
           </div>

@@ -7,11 +7,8 @@ export async function POST(req: Request) {
     const payload = await req.json();
 
     const { clerkID, bioData } = payload;
-    console.log(clerkID, bioData, payload);
 
     if (!clerkID || !bioData) {
-      console.log("missing data");
-
       return NextResponse.json(
         { error: "Missing clerkID or bioData" },
         { status: 400 }

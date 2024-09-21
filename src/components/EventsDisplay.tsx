@@ -6,7 +6,7 @@ import { Event, EventStatus, EventType } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardContent } from "./ui/card";
 import Image from "next/image";
-import { star } from "./OneFeaturedEvent";
+import { starBad, starGood } from "./OneFeaturedEvent";
 import Title from "./Title";
 import { Button } from "./ui/button";
 import DatePrinter from "./DatePrinter";
@@ -147,7 +147,10 @@ const IndividualEvent = ({ el }: { el: Event }) => {
           <p className="mt-3 text-sm gap-2 flex">
             <span className="flex">
               {Array.from({ length: Math.floor(el.rating) }, (_, index) => (
-                <span key={index}>{star}</span>
+                <span key={index}>{starGood}</span>
+              ))}
+              {Array.from({ length: 5 - Math.floor(el.rating) }, (_, index) => (
+                <span key={index}>{starBad}</span>
               ))}
             </span>
             -{" "}

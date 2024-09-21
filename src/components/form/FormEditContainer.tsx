@@ -16,7 +16,7 @@ const initialState = {
   isError: false,
 };
 
-function FormContainer({
+function FormEditContainer({
   action,
   children,
 }: {
@@ -27,9 +27,9 @@ function FormContainer({
   const { toast } = useToast();
   useEffect(() => {
     if (state.message) {
-      if (state.isError === true) {
+      if (state.isError == true) {
         toast({
-          title: "warning",
+          title: "Warning",
           variant: "destructive",
           description: state.message,
         });
@@ -46,4 +46,4 @@ function FormContainer({
   }, [state, toast]);
   return <form action={formAction}>{children}</form>;
 }
-export default FormContainer;
+export default FormEditContainer;

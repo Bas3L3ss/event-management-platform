@@ -38,8 +38,15 @@ export const uploadVideo = async (video: File) => {
   return await uploadFile(video, "videos"); // Save in 'videos' folder in the bucket
 };
 
-export const deleteFiles = async (filePaths: string[]) => {
-  const { data, error } = await supabase.storage.from(bucket).remove(filePaths);
+export const deleteVideo = async (filePath: string) => {
+  const file = "videos/" + filePath.split("/").pop();
+  console.log(file);
+
+  if (!file) throw new Error("Invalid URL");
+
+  const { data, error } = await supabase.storage.from(bucket).remove([file]);
+
+  console.log(data);
 
   if (error) {
     console.error("Error deleting files:", error.message);

@@ -10,7 +10,6 @@ import React from "react";
 
 async function ProfilePage() {
   const userClerkId = authenticateAndRedirect();
-  console.log(userClerkId);
 
   const eventLength = await getUserLengthByClerkId(userClerkId);
   const userFromDataBase = await getUserFromDataBase(userClerkId);
