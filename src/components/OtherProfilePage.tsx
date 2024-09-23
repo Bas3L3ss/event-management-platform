@@ -1,13 +1,15 @@
-"use client";
 import Container from "@/components/Container";
-import { useSession, useUser } from "@clerk/nextjs";
 import { User } from "@prisma/client";
-import { Edit, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Button } from "./ui/button";
+import FollowButton from "./FollowButton";
+import { auth } from "@clerk/nextjs/server";
+import { isFollowable } from "@/utils/actions/usersActions";
 
-function OtherProfilePage({
+async function OtherProfilePage({
   eventLength,
   userFromDataBase,
   typeUserSubmitted,
@@ -16,6 +18,12 @@ function OtherProfilePage({
   userFromDataBase: User;
   typeUserSubmitted: string[];
 }) {
+  const currentClerkId = auth().userId;
+  const isFollowAble = await isFollowable(
+    userFromDataBase.clerkId,
+    currentClerkId as string
+  );
+
   return (
     <Container>
       <div className="relative bg-secondary mt-5 rounded-md p-5">
@@ -28,6 +36,14 @@ function OtherProfilePage({
             height={50}
           ></Image>
           <p className="font-bold">{userFromDataBase.userName}</p>
+          <div className="flex mt-2">
+            <FollowButton
+              apiRoute={"/api/profile/"}
+              isFollowable={isFollowAble}
+              userFromDataBase={userFromDataBase}
+              currentClerkId={currentClerkId}
+            />
+          </div>
         </div>
         <article className="grid grid-cols-3 text-center mt-5">
           <div className="">
@@ -35,12 +51,23 @@ function OtherProfilePage({
             <p className="text-slate-500 text-xs">Events Posted</p>
           </div>
           <div className="border-r-[1.5px] border-l-[1.5px] border-x-muted-foreground">
-            <p>{userFromDataBase.followers.length}</p>
-            <p className="text-slate-500 text-xs">Followers</p>
+            <p>{userFromDataBase.followedByUsers.length}</p>
+
+            <Link
+              href={`/profile/followers/${userFromDataBase.clerkId}`}
+              className="text-slate-500 text-xs"
+            >
+              Followers
+            </Link>
           </div>
           <div>
-            <p>{userFromDataBase.followedByUsers.length}</p>
-            <p className="text-slate-500 text-xs">Followed by</p>
+            <p>{userFromDataBase.followers.length}</p>
+            <Link
+              href={`/profile/following/${userFromDataBase.clerkId}`}
+              className="text-slate-500 text-xs"
+            >
+              Following
+            </Link>
           </div>
         </article>
 

@@ -42,6 +42,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 export default function OrderTable({
   ordersFromDB,
@@ -92,14 +93,14 @@ export default function OrderTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">Order ID</TableHead>
+            <TableHead className="w-[170px]">Order ID</TableHead>
             <TableHead>Event Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead className="text-right">Order Total</TableHead>
             <TableHead className="text-right">Tax</TableHead>
             <TableHead>Is Paid</TableHead>
             <TableHead className="text-right">Created At</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead className="text-right">Paid At</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -113,6 +114,7 @@ export default function OrderTable({
 }
 const IndividualOrder = ({ order }: { order: Order }) => {
   const [date, setDate] = useState<string>();
+  const [datePaid, setDatePaid] = useState<string>();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyToClipboard = (id: string) => {
@@ -128,7 +130,12 @@ const IndividualOrder = ({ order }: { order: Order }) => {
 
   useEffect(() => {
     setDate(new Date(order.createdAt).toLocaleString());
-  }, [order.createdAt]);
+    if (order.PaidAt) {
+      setDatePaid(new Date(order.PaidAt).toLocaleString());
+    } else {
+      setDatePaid(" ");
+    }
+  }, [order.createdAt, order.PaidAt]);
   return (
     <TableRow className="cursor-pointer">
       <TableCell className="font-light text-xs ">{order.id}</TableCell>
@@ -142,12 +149,11 @@ const IndividualOrder = ({ order }: { order: Order }) => {
         {order.isPaid ? "Yes" : "No"}
       </TableCell>
       <TableCell className="text-right">{date}</TableCell>
+      <TableCell className="text-right">{datePaid}</TableCell>
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              <ChevronDownIcon className="size-3" />
-            </Button>
+            <DotsVerticalIcon className="size-3 hover:text-blue-500" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem

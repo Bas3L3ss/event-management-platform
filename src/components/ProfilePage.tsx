@@ -19,8 +19,6 @@ function UserProfilePage({
   const { user } = useUser();
   const { session } = useSession();
 
-  // const { theme } = useTheme();
-
   if (!user || !session) return null;
 
   return (
@@ -47,12 +45,12 @@ function UserProfilePage({
             <p className="text-slate-500 text-xs">Events Posted</p>
           </div>
           <div className="border-r-[1.5px] border-l-[1.5px] border-x-muted-foreground">
-            <p>{userFromDataBase.followers.length}</p>
+            <p>{userFromDataBase.followedByUsers.length}</p>
             <p className="text-slate-500 text-xs">Followers</p>
           </div>
           <div>
-            <p>{userFromDataBase.followedByUsers.length}</p>
-            <p className="text-slate-500 text-xs">Followed by</p>
+            <p>{userFromDataBase.followers.length}</p>
+            <p className="text-slate-500 text-xs">Following</p>
           </div>
         </article>
 

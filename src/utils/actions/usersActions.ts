@@ -1,4 +1,6 @@
+import { revalidatePath } from "next/cache";
 import prisma from "../db";
+import { redirect } from "next/dist/server/api-utils";
 
 export async function createUser({
   clerkId,
@@ -111,5 +113,165 @@ export async function getUniqueEventTypes(clerkId: string): Promise<string[]> {
   } catch (error) {
     console.error("Error fetching unique event types:", error);
     throw new Error("Failed to fetch unique event types");
+  }
+}
+
+export async function followUser(followerId: string, followedId: string) {
+  try {
+    if (followedId === followerId) {
+      return console.log("cant follow yourself");
+    }
+    const followerExists = await prisma.user.findUnique({
+      where: { clerkId: followerId },
+    });
+
+    const followedExists = await prisma.user.findUnique({
+      where: { clerkId: followedId },
+    });
+    console.log(followedExists, followerExists);
+
+    if (!followerExists || !followedExists) {
+      throw new Error("One of the users does not exist");
+    }
+
+    if (
+      followerExists.followedByUsers.includes(followedId) ||
+      followedExists.followers.includes(followerId)
+    ) {
+      return console.log("cant follow twice");
+    }
+    await prisma.user.update({
+      where: { clerkId: followerId },
+      data: {
+        followedByUsers: {
+          push: followedId,
+        },
+      },
+    });
+
+    await prisma.user.update({
+      where: { clerkId: followedId },
+      data: {
+        followers: {
+          push: followerId,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error following user:", error);
+  }
+}
+export async function unFollowUser(followerId: string, followedId: string) {
+  try {
+    if (followedId === followerId) {
+      return "You cannot unfollow yourself.";
+    }
+
+    const followerExists = await prisma.user.findUnique({
+      where: { clerkId: followerId },
+    });
+
+    const followedExists = await prisma.user.findUnique({
+      where: { clerkId: followedId },
+    });
+
+    if (!followerExists || !followedExists) {
+      return "One of the users does not exist.";
+    }
+
+    if (
+      !followerExists.followedByUsers.includes(followedId) ||
+      !followedExists.followers.includes(followerId)
+    ) {
+      return console.log("You cannot unfollow a user you are not following.");
+    }
+
+    await prisma.user.update({
+      where: { clerkId: followerId },
+      data: {
+        followedByUsers: {
+          set: followerExists.followedByUsers.filter((id) => id !== followedId),
+        },
+      },
+    });
+
+    await prisma.user.update({
+      where: { clerkId: followedId },
+      data: {
+        followers: {
+          set: followedExists.followers.filter((id) => id !== followerId),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error unfollowing user:", error);
+  }
+}
+
+export async function isFollowable(
+  followerId: string,
+  followedId: string
+): Promise<boolean> {
+  try {
+    // User cannot follow themselves
+    if (followerId === followedId) {
+      return true;
+    }
+
+    // Check if both users exist
+    const followerExists = await prisma.user.findUnique({
+      where: { clerkId: followerId },
+    });
+
+    const followedExists = await prisma.user.findUnique({
+      where: { clerkId: followedId },
+    });
+
+    if (!followerExists || !followedExists) {
+      return false;
+    }
+
+    // Check if the follower is already following the user
+    const isAlreadyFollowing =
+      followerExists.followedByUsers.includes(followedId);
+
+    // If they are already following, they cannot follow again
+    return !isAlreadyFollowing;
+  } catch (error) {
+    console.error("Error checking if user is followable:", error);
+    return false;
+  }
+}
+
+export async function getUsersWhoFollow(followedByUsers: string[]) {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        clerkId: {
+          in: followedByUsers, // This checks if any users match the given clerkIds in the array
+        },
+      },
+    });
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users who follow:", error);
+    throw error;
+  }
+}
+export async function getUsersIsBeingFollowed(followers: string[]) {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        clerkId: {
+          in: followers, // This checks if any users match the given clerkIds in the array
+        },
+      },
+    });
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users who follow:", error);
+    throw error;
   }
 }

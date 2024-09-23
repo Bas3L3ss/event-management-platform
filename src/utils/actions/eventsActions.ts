@@ -57,9 +57,6 @@ export async function getOneLatestFeaturedEvent() {
           },
         },
       },
-      orderBy: {
-        dateStart: "asc", // Fetch the event with the earliest start date
-      },
     });
 
     return latestEvent;

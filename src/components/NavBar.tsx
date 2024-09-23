@@ -9,7 +9,7 @@ function NavBar() {
   const authUser = auth().userId;
 
   return (
-    <nav className="border-b  py-4 ">
+    <nav className="border-b  py-4 sticky w-full  isolate z-[100] bg-inherit top-0 left-0">
       <Container className="mx-auto">
         <PcNavBar />
         <MobileNav userId={authUser} />

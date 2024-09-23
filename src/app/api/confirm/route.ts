@@ -22,6 +22,7 @@ export const GET = async (req: NextRequest) => {
         },
         data: {
           isPaid: true,
+          PaidAt: new Date(),
         },
       });
     }
