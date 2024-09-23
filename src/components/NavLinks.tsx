@@ -80,7 +80,7 @@ export function NavLinks() {
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          <NavigationMenuItem className="z-10">
             <NavigationMenuTrigger>Events</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
@@ -117,9 +117,9 @@ export function NavLinks() {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          <NavigationMenuItem className="!z-10">
             <NavigationMenuTrigger>My Profile</NavigationMenuTrigger>
-            <NavigationMenuContent>
+            <NavigationMenuContent className="!z-10">
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                 {components.map((component) => {
                   if (component.title === "Sign Up") {

@@ -9,10 +9,16 @@ import {
   filesSchema,
   validateWithZodSchema,
 } from "../schema";
-import { deleteVideo, uploadImages, uploadVideo } from "../supabase";
+import {
+  deleteImages,
+  deleteVideo,
+  uploadImages,
+  uploadVideo,
+} from "../supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Router from "next/router";
+import { createOrderAction } from "./ordersActions";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -82,6 +88,13 @@ export async function getCommentsLength(eventId: string): Promise<number> {
 export async function getAllEvents(): Promise<Event[]> {
   try {
     const events = await prisma.event.findMany({
+      where: {
+        NOT: {
+          status: {
+            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+          },
+        },
+      },
       orderBy: {
         dateStart: "asc", // Optionally, order by start date or any other field
       },
@@ -150,11 +163,18 @@ export async function searchAndFilterEvents(
     const events = await prisma.event.findMany({
       where: {
         eventName: {
-          contains: searchTerm, // Fuzzy search on event name
-          mode: "insensitive", // Case-insensitive search
+          contains: searchTerm,
+          mode: "insensitive",
         },
+        NOT: {
+          status: {
+            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+          },
+        },
+
         type: filters.eventType ? filters.eventType : undefined,
         status: filters.status ? filters.status : undefined,
+
         featured: filters.isFeatured ? filters.isFeatured : undefined,
         dateStart: filters.minDate
           ? {
@@ -355,7 +375,9 @@ export async function deleteComment(commentId: string): Promise<void> {
 }
 
 //helper
-const renderError = (error: unknown): { message: string; isError: boolean } => {
+export const renderError = (
+  error: unknown
+): { message: string; isError: boolean } => {
   console.log(error);
   return {
     isError: true,
@@ -405,6 +427,8 @@ export const createEventAction = async (
       },
     });
 
+    await createOrderAction(clerkId, newEvent);
+
     return { message: "product created", isError: false };
   } catch (error) {
     return renderError(error);
@@ -420,6 +444,13 @@ export const updateEventAction = async (
   const clerkId = await authenticateAndRedirect();
 
   try {
+    const imagesUrl: string[] = [];
+    for (let [key, value] of formData.entries()) {
+      if (key.startsWith("imagesCheckBox-")) {
+        imagesUrl.push(value as string);
+      }
+    }
+
     const rawData = Object.fromEntries(formData);
     const images = formData.getAll("image") as File[];
     const video = formData.get("video") as File;
@@ -456,9 +487,16 @@ export const updateEventAction = async (
     if (validatedFiles.video != undefined) {
       const videoUrl = await uploadVideo(video);
       const data = await deleteVideo(videoWillBeSentToDB as string);
-      console.log(data);
 
       videoWillBeSentToDB = videoUrl;
+    }
+
+    if (imagesUrl.length > 0) {
+      imagesWillBeSentToDB = eventFileFromDB.eventImg.filter(
+        (item) => !imagesUrl.includes(item)
+      );
+
+      await deleteImages(imagesUrl);
     }
 
     const updatedEvent = await prisma.event.update({
@@ -481,7 +519,7 @@ export const updateEventAction = async (
           : imagesWillBeSentToDB[0],
       },
     });
-
+    revalidatePath(`/events/myevents/${eventId}`);
     return { message: "Event updated successfully", isError: false };
   } catch (error) {
     return renderError(error);

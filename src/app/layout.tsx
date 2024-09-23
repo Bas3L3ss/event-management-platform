@@ -7,6 +7,7 @@ import NavBar from "@/components/NavBar";
 import Providers from "@/components/Providers";
 import { SiteFooter } from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Event Management platform",
@@ -38,10 +39,13 @@ export default function RootLayout({
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <html lang="en">
-        <body className={inter.className} suppressHydrationWarning>
+        <body
+          className={cn(inter.className, "min-h-full")}
+          suppressHydrationWarning
+        >
           <Providers>
             <NavBar />
-            {children}
+            <main className="min-h-[100vh] ">{children}</main>
             <SiteFooter />
           </Providers>
         </body>

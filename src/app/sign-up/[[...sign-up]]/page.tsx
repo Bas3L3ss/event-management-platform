@@ -1,4 +1,6 @@
-import { SignUp } from "@clerk/nextjs";
+"use client";
+import { SignUp, useUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default function Page() {
   return (

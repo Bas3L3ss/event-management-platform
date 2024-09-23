@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <>
       {/* Hero */}
-      <div className="relative overflow-hidden py-24 lg:py-32 z-[-100]">
+      <div className="relative overflow-hidden py-24 lg:py-32 isolate ">
         {/* Gradients */}
         <div
           aria-hidden="true"

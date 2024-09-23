@@ -5,6 +5,7 @@ import {
   getUniqueEventTypes,
   getUserFromDataBase,
 } from "@/utils/actions/usersActions";
+import { EventType } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -14,6 +15,10 @@ async function ProfilePage() {
   const eventLength = await getUserLengthByClerkId(userClerkId);
   const userFromDataBase = await getUserFromDataBase(userClerkId);
   const typeUserSubmitted = await getUniqueEventTypes(userClerkId);
+  let typeUserSubmittedArr: EventType[] = [];
+  const typeUserSubmittedSet = new Set(typeUserSubmitted).forEach((el) =>
+    typeUserSubmittedArr.push(el as EventType)
+  );
 
   if (!userFromDataBase) {
     redirect("/");
@@ -22,7 +27,7 @@ async function ProfilePage() {
   return (
     <>
       <UserProfilePage
-        typeUserSubmitted={typeUserSubmitted}
+        typeUserSubmitted={typeUserSubmittedArr}
         userFromDataBase={userFromDataBase}
         eventLength={eventLength}
       />

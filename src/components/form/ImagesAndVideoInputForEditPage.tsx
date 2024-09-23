@@ -2,6 +2,10 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
+import { toastPrint } from "@/utils/toast action/action";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
 
 interface ImagesAndVideoInputForEditPageProps {
   existingImages: string[]; // Array of existing image URLs
@@ -11,60 +15,94 @@ interface ImagesAndVideoInputForEditPageProps {
 const ImagesAndVideoInputForEditPage: React.FC<
   ImagesAndVideoInputForEditPageProps
 > = ({ existingImages, existingVideo }) => {
-  const [images, setImages] = useState<File[]>([]);
-  const [video, setVideo] = useState<File | null>(null);
+  const [countImagesRemaining, setCountImagesRemaining] = useState<number>(
+    existingImages.length
+  );
+  const [itemSelected, setItemSelected] = useState<string[]>([]);
 
   useEffect(() => {
-    // Set existing files in state
-    setImages(existingImages.map((url) => new File([], url))); // Placeholder for File object
-    setVideo(existingVideo ? new File([], existingVideo) : null); // Placeholder for File object
-  }, [existingImages, existingVideo]);
+    // Initialize checked count based on existing images
+    setCountImagesRemaining(existingImages.length);
+  }, [existingImages]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setImages(Array.from(files));
-    }
-  };
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isChecked: boolean,
+    index: number
+  ) => {
+    const newCheckedCount = isChecked
+      ? countImagesRemaining - 1
+      : countImagesRemaining + 1;
 
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setVideo(files[0]);
+    if (newCheckedCount > 0) {
+      setCountImagesRemaining(newCheckedCount);
+      setItemSelected(
+        isChecked
+          ? [...itemSelected, `checkBoxImg-${index}`]
+          : itemSelected.filter((el) => {
+              return el !== `checkBoxImg-${index}`;
+            })
+      );
+    } else {
+      e.preventDefault();
+      e.target.checked = false;
+      return toastPrint(
+        "Warning!",
+        "You can't leave the image field empty",
+        "destructive"
+      );
     }
   };
 
   return (
     <>
       <div className="mb-5">
+        <Label>Select images to remove them (can&apos;t remove all)</Label>
         <Input
           className="mb-2"
           type="file"
           name="image"
           multiple
           accept="image/*"
-          onChange={handleImageChange}
         />
         <div className="flex gap-4 flex-wrap">
           {existingImages.map((img, index) => (
-            <Image
-              width={250}
-              height={250}
+            <div
+              className={`${
+                itemSelected.includes(`checkBoxImg-${index}`)
+                  ? "border-2 border-red-600"
+                  : "border-2 border-transparent "
+              } relative  `}
               key={index}
-              src={img}
-              alt={`Existing Image ${index + 1}`}
-            />
+            >
+              <Image
+                width={250}
+                height={250}
+                key={index}
+                src={img}
+                alt={`Existing Image ${index + 1}`}
+              />
+              <Label
+                htmlFor={`checkBoxImg-${index}`}
+                className="  absolute top-0 left-0 w-full h-full"
+              >
+                <Input
+                  name={`imagesCheckBox-${index}`}
+                  value={img}
+                  id={`checkBoxImg-${index}`}
+                  type="checkbox"
+                  onChange={(e) =>
+                    handleCheckboxChange(e, e.target.checked, index)
+                  }
+                  className="absolute top-2 left-2 sr-only"
+                />
+              </Label>
+            </div>
           ))}
         </div>
       </div>
 
-      <Input
-        name="video"
-        className="mb-2"
-        type="file"
-        onChange={handleVideoChange}
-        accept="video/*"
-      />
+      <Input name="video" className="mb-2" type="file" accept="video/*" />
       {existingVideo && (
         <video width={250} height={250} src={existingVideo} controls />
       )}

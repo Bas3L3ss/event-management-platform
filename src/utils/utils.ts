@@ -7,3 +7,21 @@ export const deepEqual = (obj1: any, obj2: any): boolean => {
   }
   return true;
 };
+
+export function calculateEventPrice(dateStart: Date, dateEnd: Date): number {
+  const dayRate = 2; // $2 per day
+
+  // Calculate the number of days between the two dates
+  const timeDifference = dateEnd.getTime() - dateStart.getTime();
+  const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+  // Calculate the price
+  const totalPrice = dayDifference * dayRate;
+
+  return totalPrice * 100;
+}
+export function limitWords(inputString: string, maxWords: number): string {
+  const wordsArray = inputString.split(" ");
+  const limitedWords = wordsArray.slice(0, maxWords);
+  return limitedWords.join(" ");
+}

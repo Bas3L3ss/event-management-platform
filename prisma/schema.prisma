@@ -82,6 +82,8 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  activationTotal Int @default(0)
+
   featured         Boolean     @default(false)
   comments         Comment[]   @relation("EventComments")
   hostName         String?
@@ -92,8 +94,11 @@ model Event {
 model Order {
   id        String   @id @default(uuid())
   clerkId   String
+  eventId String
+  eventName String
   orderTotal Int      @default(0)
   email     String
+  tax Int @default(0)
   isPaid    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
