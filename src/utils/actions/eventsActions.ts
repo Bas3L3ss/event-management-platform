@@ -524,3 +524,16 @@ export const updateEventAction = async (
     await prisma.$disconnect();
   }
 };
+export async function getRandomEvents() {
+  try {
+    const randomEvents = await prisma.$queryRaw`
+      SELECT * FROM "Event"
+      ORDER BY RANDOM()
+      LIMIT 10;
+    `;
+    return randomEvents;
+  } catch (error) {
+    console.error("Error fetching random events:", error);
+    throw new Error("Failed to fetch random events");
+  }
+}

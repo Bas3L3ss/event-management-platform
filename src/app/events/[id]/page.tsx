@@ -12,6 +12,7 @@ import DatePrinter from "@/components/DatePrinter";
 import { starBad, starGood } from "@/components/OneFeaturedEvent";
 import MediaRenderer from "@/components/MediaFileRender";
 import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
+import ReviewsStarDisplay from "@/components/ReviewsStarDisplay";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -89,18 +90,7 @@ function EventDisplay({
               {/* Review */}
               <div className="">
                 <div className="flex space-x-1">
-                  {Array.from(
-                    { length: Math.floor(oneEvent.rating) },
-                    (_, index) => (
-                      <span key={index}>{starGood}</span>
-                    )
-                  )}
-                  {Array.from(
-                    { length: 5 - Math.floor(oneEvent.rating) },
-                    (_, index) => (
-                      <span key={index}>{starBad}</span>
-                    )
-                  )}
+                  <ReviewsStarDisplay rating={oneEvent.rating} />
                 </div>
                 <p className="mt-3 text-sm">
                   <span className="font-bold">

@@ -38,7 +38,7 @@ async function EditMyProfilePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{user.userName}</BreadcrumbPage>
+              <BreadcrumbPage>Edit profile</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

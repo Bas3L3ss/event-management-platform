@@ -1,6 +1,6 @@
 import Container from "@/components/Container";
 import { User } from "@prisma/client";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, MapPin, Calendar, User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -18,8 +18,9 @@ import {
 } from "./ui/breadcrumb";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-async function OtherProfilePage({
+export default async function OtherProfilePage({
   eventLength,
   userFromDataBase,
   typeUserSubmitted,
@@ -35,7 +36,7 @@ async function OtherProfilePage({
   );
 
   return (
-    <Container className="mt-10 flex flex-col gap-2">
+    <Container className="mt-10 space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -51,126 +52,156 @@ async function OtherProfilePage({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="relative bg-secondary mt-5 rounded-md p-5">
-        <div className="flex flex-col items-center">
-          <Avatar>
-            <AvatarImage
-              src={userFromDataBase.userAvatar}
-              alt={userFromDataBase.userName}
-            />
-            <AvatarFallback>
-              {userFromDataBase.userName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <p className="font-bold">{userFromDataBase.userName}</p>
-          <div className="flex mt-2">
-            <FollowButton
-              apiRoute={"/api/profile/"}
-              isFollowable={isFollowAble}
-              userFromDataBase={userFromDataBase}
-              currentClerkId={currentClerkId}
-            />
-          </div>
-        </div>
-        <article className="grid grid-cols-3 text-center mt-5">
-          <div className="">
-            <p>{eventLength}</p>
-            <p className="text-slate-500 text-xs">Events Posted</p>
-          </div>
-          <div className="border-r-[1.5px] border-l-[1.5px] border-x-muted-foreground">
-            <p>{userFromDataBase.followedByUsers.length}</p>
 
-            <Link
-              href={`/profile/followers/${userFromDataBase.clerkId}`}
-              className="text-slate-500 text-xs"
-            >
-              Followers
-            </Link>
+      <Card className="overflow-hidden">
+        <div className="h-32 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+        <CardContent className="relative pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
+            <Avatar className="w-32 h-32 border-4 border-background">
+              <AvatarImage
+                src={userFromDataBase.userAvatar}
+                alt={userFromDataBase.userName}
+              />
+              <AvatarFallback className="text-2xl">
+                {userFromDataBase.userName.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
           </div>
-          <div>
-            <p>{userFromDataBase.followers.length}</p>
-            <Link
-              href={`/profile/following/${userFromDataBase.clerkId}`}
-              className="text-slate-500 text-xs"
-            >
-              Following
-            </Link>
-          </div>
-        </article>
-
-        <article className="mt-7">
-          {userFromDataBase.userEmail && (
-            <div className="flex gap-2 items-center">
-              <Mail className="p-1" />
-              <p className="text-xs">{userFromDataBase.userEmail}</p>
+          <div className="text-center mt-4">
+            <h2 className="text-2xl font-bold">{userFromDataBase.userName}</h2>
+            <div className="mt-4">
+              <FollowButton
+                apiRoute={"/api/profile/"}
+                isFollowable={isFollowAble}
+                userFromDataBase={userFromDataBase}
+                currentClerkId={currentClerkId}
+              />
             </div>
-          )}
-          {userFromDataBase.userPhone && (
-            <div className="flex gap-2 items-center">
-              <Phone className="p-1" />
-              <a
-                href={`tel:+${userFromDataBase.userPhone}`}
-                className="text-xs"
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-8 text-center">
+            <div>
+              <p className="text-2xl font-semibold">{eventLength}</p>
+              <p className="text-sm text-muted-foreground">Events Posted</p>
+            </div>
+            <div className="border-x border-border px-4">
+              <p className="text-2xl font-semibold">
+                {userFromDataBase.followedByUsers.length}
+              </p>
+              <Link
+                href={`/profile/followers/${userFromDataBase.clerkId}`}
+                className="text-sm text-muted-foreground hover:underline"
               >
-                {userFromDataBase.userPhone}
-              </a>
+                Followers
+              </Link>
             </div>
-          )}
-        </article>
-      </div>
-      <article className="bg-secondary mt-5 rounded-md p-5">
-        <p className="font-bold text-base mb-2">Biography</p>
-        {userFromDataBase.userBiography === "" ? (
-          <p className="text-sm text-slate-500">not yet.</p>
-        ) : (
-          <p>
-            {userFromDataBase.userBiography.split("\n").map((line, index) => (
-              <React.Fragment key={index}>
-                {line}
-                <br />
-              </React.Fragment>
-            ))}
-          </p>
-        )}
-      </article>
+            <div>
+              <p className="text-2xl font-semibold">
+                {userFromDataBase.followers.length}
+              </p>
+              <Link
+                href={`/profile/following/${userFromDataBase.clerkId}`}
+                className="text-sm text-muted-foreground hover:underline"
+              >
+                Following
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <article className="bg-secondary mt-5 rounded-md p-5">
-        <p className="font-bold text-base mb-2">Latest Activities</p>
-        {userFromDataBase.userBiography == "" ? (
-          <p className="text-sm text-slate-500">not yet.</p>
-        ) : (
-          <p>{userFromDataBase.userBiography}</p>
-        )}
-      </article>
-      <article className="bg-secondary mt-5 rounded-md p-5">
-        <p className="font-bold text-base mb-2">Posted Events Types</p>
-        {typeUserSubmitted.length > 0 ? (
-          <ul className="flex gap-2 flex-wrap">
-            {typeUserSubmitted.map((type) => {
-              return (
-                <li
-                  key={type}
-                  className=" bg-primary flex justify-center items-center   hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Contact Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {userFromDataBase.userEmail && (
+              <div className="flex items-center space-x-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{userFromDataBase.userEmail}</span>
+              </div>
+            )}
+            {userFromDataBase.userPhone && (
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <a
+                  href={`tel:+${userFromDataBase.userPhone}`}
+                  className="text-sm hover:underline"
                 >
-                  <Badge key={type}>
-                    <li className="  ">
-                      <Link href={`/events?eventtype=${type}`}>
-                        <span className="capitalize text-xs">
-                          {type.toLowerCase().replace("_", " ")}
-                        </span>
-                      </Link>
-                    </li>
-                  </Badge>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="text-sm text-slate-500">No events yet.</p>
-        )}
-      </article>
+                  {userFromDataBase.userPhone}
+                </a>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Biography</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {userFromDataBase.userBiography ? (
+              <p className="text-sm">
+                {userFromDataBase.userBiography
+                  .split("\n")
+                  .map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}
+                      <br />
+                    </React.Fragment>
+                  ))}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No biography available.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Latest Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {userFromDataBase.userBiography ? (
+              <p className="text-sm">{userFromDataBase.userBiography}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No recent activities.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Posted Event Types</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {typeUserSubmitted.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {typeUserSubmitted.map((type) => (
+                  <Link key={type} href={`/events?eventtype=${type}`}>
+                    <Badge
+                      variant="secondary"
+                      className="cursor-pointer hover:bg-secondary-hover"
+                    >
+                      <span className="capitalize text-xs">
+                        {type.toLowerCase().replace("_", " ")}
+                      </span>
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No events posted yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </Container>
   );
 }
-
-export default OtherProfilePage;

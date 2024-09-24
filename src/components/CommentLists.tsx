@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { starGood } from "./OneFeaturedEvent";
+import ReviewsStarDisplay from "./ReviewsStarDisplay";
 
 interface CommentsListProps {
   comments: Comment[];
@@ -232,14 +233,7 @@ export function CommentListItem({
               handleDeleteComment={handleDeleteComment}
             />
           </CardTitle>
-          <div className="text-sm   flex ">
-            <span className="mr-2 "> {comment.rating.toFixed(1)}</span>
-            {Array.from({ length: Math.floor(comment.rating) }, (_, index) => (
-              <span className="filter drop-shadow-custom  " key={index}>
-                {starGood}
-              </span>
-            ))}
-          </div>
+          <ReviewsStarDisplay rating={comment.rating} />
         </div>
         <p className="mt-2 w-[70%] break-words text-sm whitespace-pre-line">
           {isTextExpanded

@@ -18,7 +18,7 @@ import Link from "next/link";
 
 type UserFollowerOrFollowingDisplayProps = {
   UserData: User[];
-  username: string;
+  username?: string;
   isFollowerPage?: boolean;
 };
 
