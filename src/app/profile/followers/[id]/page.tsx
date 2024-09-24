@@ -1,3 +1,13 @@
+import Container from "@/components/Container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import UserFollowerOrFollowingDisplay from "@/components/UserFollowerOrFollowingDisplay";
 import {
   getUserFromDataBase,
   getUsersWhoFollow,
@@ -14,13 +24,38 @@ async function FollowersPageOfOther({
 }) {
   const userFromDb: User | null = await getUserFromDataBase(id);
   if (!userFromDb) {
-    toastPrint("Notice", "This user is not in the database");
     redirect("/");
   }
-  const followersUser = await getUsersWhoFollow(userFromDb.followedByUsers);
-  console.log(followersUser);
+  const followersUsers = await getUsersWhoFollow(userFromDb.followedByUsers);
 
-  return <div></div>;
+  return (
+    <Container className="mt-10 flex flex-col gap-2">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/profile">Profile</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/profile/followers">Followers</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{userFromDb.userName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <UserFollowerOrFollowingDisplay
+        isFollowerPage
+        username={userFromDb.userName}
+        UserData={followersUsers}
+      />
+    </Container>
+  );
 }
 
 export default FollowersPageOfOther;

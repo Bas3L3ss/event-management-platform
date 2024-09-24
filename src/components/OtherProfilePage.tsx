@@ -8,6 +8,16 @@ import { Button } from "./ui/button";
 import FollowButton from "./FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { isFollowable } from "@/utils/actions/usersActions";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "./ui/breadcrumb";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 
 async function OtherProfilePage({
   eventLength,
@@ -25,16 +35,33 @@ async function OtherProfilePage({
   );
 
   return (
-    <Container>
+    <Container className="mt-10 flex flex-col gap-2">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/profile">Profile</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{userFromDataBase.userName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="relative bg-secondary mt-5 rounded-md p-5">
         <div className="flex flex-col items-center">
-          <Image
-            alt={`${userFromDataBase.userName}`}
-            src={`${userFromDataBase.userAvatar} `}
-            width={50}
-            className="rounded-full"
-            height={50}
-          ></Image>
+          <Avatar>
+            <AvatarImage
+              src={userFromDataBase.userAvatar}
+              alt={userFromDataBase.userName}
+            />
+            <AvatarFallback>
+              {userFromDataBase.userName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <p className="font-bold">{userFromDataBase.userName}</p>
           <div className="flex mt-2">
             <FollowButton
@@ -125,11 +152,15 @@ async function OtherProfilePage({
                   key={type}
                   className=" bg-primary flex justify-center items-center   hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
                 >
-                  <Link href={`/events?eventtype=${type}`}>
-                    <span className="capitalize text-xs">
-                      {type.toLowerCase().replace("_", " ")}
-                    </span>
-                  </Link>
+                  <Badge key={type}>
+                    <li className="  ">
+                      <Link href={`/events?eventtype=${type}`}>
+                        <span className="capitalize text-xs">
+                          {type.toLowerCase().replace("_", " ")}
+                        </span>
+                      </Link>
+                    </li>
+                  </Badge>
                 </li>
               );
             })}

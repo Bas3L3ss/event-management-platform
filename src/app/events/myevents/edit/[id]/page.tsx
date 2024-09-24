@@ -7,6 +7,14 @@ import FormInput from "@/components/form/FormInput";
 import ImagesAndVideoInputForEditPage from "@/components/form/ImagesAndVideoInputForEditPage";
 import PriceInput from "@/components/form/PriceInput";
 import TextAreaInput from "@/components/form/TextAreaInput";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getEventById, updateEventAction } from "@/utils/actions/eventsActions";
@@ -37,7 +45,27 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
   const formattedEndDate = dateEndObject.toISOString().split("T")[0];
 
   return (
-    <Container className="mt-10">
+    <Container className="mt-10 flex flex-col gap-2">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/events">Events</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/events/myevents">My Events</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Edit Event</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <h1 className="text-2xl font-semibold mb-8 capitalize">edit event</h1>
       <div className="border p-8 rounded-md">
         <FormEditContainer action={updateEventAction}>

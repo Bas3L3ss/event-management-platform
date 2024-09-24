@@ -1,11 +1,13 @@
 "use client";
-import Container from "@/components/Container";
+
 import { useSession, useUser } from "@clerk/nextjs";
 import { User } from "@prisma/client";
 import { Edit, Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 
 function UserProfilePage({
   eventLength,
@@ -22,7 +24,7 @@ function UserProfilePage({
   if (!user || !session) return null;
 
   return (
-    <Container>
+    <>
       <div className="relative bg-secondary mt-5 rounded-md p-5">
         <Link href={"/profile/profileedit"}>
           <span className="absolute right-10 top-5 hover:!text-primary cursor-pointer ">
@@ -30,13 +32,12 @@ function UserProfilePage({
           </span>
         </Link>
         <div className="flex flex-col items-center">
-          <Image
-            alt={`${user.fullName}`}
-            src={`${user.imageUrl} `}
-            width={50}
-            className="rounded-full"
-            height={50}
-          ></Image>
+          <Avatar>
+            <AvatarImage src={user.imageUrl} alt={userFromDataBase.userName} />
+            <AvatarFallback>
+              {userFromDataBase.userName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <p className="font-bold">{user.username}</p>
         </div>
         <article className="grid grid-cols-3 text-center mt-5">
@@ -104,16 +105,15 @@ function UserProfilePage({
           <ul className="flex gap-2 flex-wrap">
             {typeUserSubmitted.map((type) => {
               return (
-                <li
-                  key={type}
-                  className=" bg-primary flex justify-center items-center   hover:!bg-blue-600 cursor-pointer px-3 rounded-3xl"
-                >
-                  <Link href={`/events?eventtype=${type}`}>
-                    <span className="capitalize text-xs">
-                      {type.toLowerCase().replace("_", " ")}
-                    </span>
-                  </Link>
-                </li>
+                <Badge key={type}>
+                  <li className="  ">
+                    <Link href={`/events?eventtype=${type}`}>
+                      <span className="capitalize text-xs">
+                        {type.toLowerCase().replace("_", " ")}
+                      </span>
+                    </Link>
+                  </li>
+                </Badge>
               );
             })}
           </ul>
@@ -121,7 +121,7 @@ function UserProfilePage({
           <p className="text-sm text-slate-500">No events yet.</p>
         )}
       </article>
-    </Container>
+    </>
   );
 }
 

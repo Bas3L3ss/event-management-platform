@@ -11,6 +11,7 @@ import React from "react";
 import DatePrinter from "@/components/DatePrinter";
 import { starBad, starGood } from "@/components/OneFeaturedEvent";
 import MediaRenderer from "@/components/MediaFileRender";
+import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -18,7 +19,7 @@ async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEventsCommentsLength = getCommentsLength(oneEvent.id);
 
   return (
-    <Container className="mt-20">
+    <Container className="mt-10 flex flex-col gap-2">
       <EventDisplay
         commentsLength={oneEventsCommentsLength}
         oneEvent={oneEvent}
@@ -40,9 +41,8 @@ function EventDisplay({
 }) {
   return (
     <>
-      {/* Hero */}
+      <BreadCrumbsOfEvent eventName={oneEvent.eventName} />
       <div className="container  px-0">
-        {/* Grid */}
         <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20  ">
           <div>
             <p className="text-sm text-gray-600">

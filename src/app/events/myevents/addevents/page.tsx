@@ -7,6 +7,14 @@ import ImageInput from "@/components/form/ImageInput";
 import PriceInput from "@/components/form/PriceInput";
 import TextAreaInput from "@/components/form/TextAreaInput";
 import VideoInput from "@/components/form/VideoInput";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createEventAction } from "@/utils/actions/eventsActions";
@@ -26,7 +34,26 @@ async function AddEventsPage() {
   const eventTicketLink = faker.internet.url();
 
   return (
-    <Container className="mt-10">
+    <Container className="mt-10 flex flex-col gap-2">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/events">Events</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/events/myevents">My Events</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Add Event</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <h1 className="text-2xl font-semibold mb-8 capitalize">add event</h1>
       <div className="border p-8 rounded-md">
         <FormContainer action={createEventAction}>
