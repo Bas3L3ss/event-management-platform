@@ -1,30 +1,25 @@
 "use client";
 
 import { useSession, useUser } from "@clerk/nextjs";
-import { User } from "@prisma/client";
-import {
-  Edit,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  User as UserIcon,
-} from "lucide-react";
-import Image from "next/image";
+import { Event, User } from "@prisma/client";
+import { Edit, Mail, Phone, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import TimeLineEvents from "./timeline/Timeline-v2";
 
 function UserProfilePage({
   eventLength,
   userFromDataBase,
+  eventUserSubmitted,
   typeUserSubmitted,
 }: {
   eventLength: number;
   userFromDataBase: User;
+  eventUserSubmitted: Event[];
   typeUserSubmitted: string[];
 }) {
   const { user } = useUser();
@@ -134,21 +129,6 @@ function UserProfilePage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Latest Activities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {userFromDataBase.userBiography ? (
-              <p className="text-sm">{userFromDataBase.userBiography}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No recent activities.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader>
             <CardTitle>Posted Event Types</CardTitle>
           </CardHeader>
           <CardContent>
@@ -170,6 +150,22 @@ function UserProfilePage({
             ) : (
               <p className="text-sm text-muted-foreground">
                 No events posted yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Latest Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {eventUserSubmitted.length > 0 ? (
+              <div>
+                <TimeLineEvents events={eventUserSubmitted} />
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No recent activities.
               </p>
             )}
           </CardContent>

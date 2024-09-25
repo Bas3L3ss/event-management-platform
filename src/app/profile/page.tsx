@@ -9,7 +9,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { authenticateAndRedirect } from "@/utils/actions/clerkFunc";
-import { getUserLengthByClerkId } from "@/utils/actions/eventsActions";
+import {
+  getEventByClerkId,
+  getUserLengthByClerkId,
+} from "@/utils/actions/eventsActions";
 import {
   getUniqueEventTypes,
   getUserFromDataBase,
@@ -32,6 +35,7 @@ async function ProfilePage() {
   if (!userFromDataBase) {
     redirect("/");
   }
+  const eventUserSubmitted = await getEventByClerkId(userClerkId);
 
   return (
     <Container className="mt-10 flex flex-col gap-2">
@@ -50,6 +54,7 @@ async function ProfilePage() {
         typeUserSubmitted={typeUserSubmittedArr}
         userFromDataBase={userFromDataBase}
         eventLength={eventLength}
+        eventUserSubmitted={eventUserSubmitted}
       />
     </Container>
   );

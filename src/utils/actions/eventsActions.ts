@@ -551,3 +551,26 @@ export async function getRandomEvents(eventId?: string) {
     throw new Error("Failed to fetch random events");
   }
 }
+
+export async function getEventByClerkId(clerkId: string) {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        clerkId,
+        NOT: {
+          status: {
+            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+    });
+    return events;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to fetch events");
+  }
+}
