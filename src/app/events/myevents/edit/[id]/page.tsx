@@ -66,21 +66,21 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h1 className="text-2xl font-semibold mb-8 capitalize">edit event</h1>
-      <div className="border p-8 rounded-md">
+      <h1 className="text-3xl font-bold mb-8 ">Edit Event</h1>
+      <div className="border border-border p-8 rounded-lg shadow-sm bg-card">
         <FormEditContainer action={updateEventAction}>
-          <div className="grid gap-4 md:grid-cols-2 my-4">
+          <div className="grid gap-6 md:grid-cols-2 my-4">
             <input type="hidden" className="sr-only" name="id" value={id} />
             <FormInput
               type="text"
               name="eventName"
-              label="Event name"
+              label="Event Name"
               defaultValue={eventName}
             />
             <FormInput
               type="text"
               name="host"
-              label="host"
+              label="Host"
               defaultValue={hostName as string | undefined}
             />
             <FormInput
@@ -96,53 +96,69 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
               defaultValue={reservationTicketLink}
             />
             <PriceInput defaultValue={eventTicketPrice} />
-            <div className="w-full h-full ">
-              <Label htmlFor="eventType">event types</Label>
+            <div className="w-full">
+              <Label
+                htmlFor="eventType"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                Event Type
+              </Label>
               <select
                 name="eventType"
                 id="eventType"
-                className=" w-full p-2 mt-auto"
+                className="w-full p-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-primary"
                 defaultValue={type}
               >
-                <option value="">Choose Events Type</option>
-                {Object.values(EventType).map((status) => {
-                  return (
-                    <option className="capitalize" key={status} value={status}>
-                      {status.toLowerCase().replace(/_/g, " ")}
-                    </option>
-                  );
-                })}
+                <option value="">Choose Event Type</option>
+                {Object.values(EventType).map((status) => (
+                  <option className="capitalize" key={status} value={status}>
+                    {status.toLowerCase().replace(/_/g, " ")}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
-          <TextAreaInput
-            name="description"
-            labelText="product description"
-            defaultValue={eventDescription}
-          />
-
-          <div className="mt-6 w-full  flex gap-5">
-            <div className="flex-1">
-              <Label htmlFor="dateStart">Date Start</Label>
+          <div className="mt-6">
+            <TextAreaInput
+              name="description"
+              labelText="Event Description"
+              defaultValue={eventDescription}
+            />
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label
+                htmlFor="dateStart"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                Start Date
+              </Label>
               <Input
                 defaultValue={formattedStartDate}
                 id="dateStart"
                 type="date"
                 name="dateStart"
+                className="w-full"
               />
             </div>
-            <div className="flex-1">
-              <Label htmlFor="dateEnd">Date End</Label>
-
+            <div>
+              <Label
+                htmlFor="dateEnd"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                End Date
+              </Label>
               <Input
                 defaultValue={formattedEndDate}
                 id="dateEnd"
                 type="date"
                 name="dateEnd"
+                className="w-full"
               />
             </div>
           </div>
-          <div className="mt-6">
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold mb-4 text-primary">Media</h3>
             <ImagesAndVideoInputForEditPage
               existingImages={eventImg}
               existingVideo={eventVideo}
@@ -151,13 +167,14 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
           <div className="mt-6">
             <CheckboxInput
               name="isVideoFirstDisplay"
-              label="Video Display First"
+              label="Display Video First"
             />
           </div>
-          <SubmitButton text="Edit event" className="mt-8" />
+          <SubmitButton text="Update Event" className="mt-8 w-full" />
         </FormEditContainer>
       </div>
     </Container>
   );
 }
+
 export default EditEventsPage;

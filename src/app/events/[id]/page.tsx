@@ -12,6 +12,7 @@ import MediaRenderer from "@/components/MediaFileRender";
 import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
 import ReviewsStarDisplay from "@/components/ReviewsStarDisplay";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
+import { CalendarDays, MapPin, User } from "lucide-react";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -19,17 +20,19 @@ async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEventsCommentsLength = getCommentsLength(oneEvent.id);
 
   return (
-    <Container className="mt-10  ">
-      <div className="flex gap-5 flex-col">
+    <Container className="py-10 space-y-12">
+      <div className="space-y-10">
         <EventDisplay
           commentsLength={oneEventsCommentsLength}
           oneEvent={oneEvent}
         />
-        <Title title="Comments Section:" className=" md:mb-5 mb-3 mt-2" />
-        <CommentSection eventId={oneEvent.id} />
+        <div className="space-y-4">
+          <Title title="Comments" className="text-2xl font-bold text-primary" />
+          <CommentSection eventId={oneEvent.id} />
+        </div>
       </div>
 
-      <RecommendationCarousel className="mt-28" id={oneEvent.id} />
+      <RecommendationCarousel className="mt-16" id={oneEvent.id} />
     </Container>
   );
 }
@@ -44,74 +47,77 @@ function EventDisplay({
   commentsLength: Promise<number>;
 }) {
   return (
-    <>
+    <div className="space-y-6">
       <BreadCrumbsOfEvent eventName={oneEvent.eventName} />
-      <div className="container  px-0">
-        <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20  ">
-          <div>
-            <p className="text-sm text-gray-600">
+      <div className="grid md:grid-cols-2 gap-8 xl:gap-12">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground flex items-center">
+              <CalendarDays className="mr-2 h-4 w-4" />
               <DatePrinter
                 dateEnd={oneEvent.dateEnd}
                 dateStart={oneEvent.dateStart}
               />
             </p>
-            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-primary">
               {oneEvent.eventName}
             </h1>
-            <h1 className="text-md mt-2 text-gray-500 capitalize  font-light  lg:text-lg">
-              Host: {oneEvent.hostName} - genre:
-              {oneEvent.type.toLowerCase()}
-            </h1>
-            <p className="mt-3 text-xl text-muted-foreground">
-              {oneEvent.eventDescription.split("\n").map((line, index) => (
-                <span key={index}>{line}</span>
-              ))}
-            </p>
-            {/* Buttons */}
-            <div className="mt-7 grid gap-3 w-full sm:inline-flex items-center ">
-              <Button asChild size={"lg"}>
-                <Link href={`${oneEvent.reservationTicketLink}`}>
-                  Book ticket
-                </Link>
-              </Button>
-              -
-              <p
-                className={`${
-                  (oneEvent.status == EventStatus.NOT_CONFIRMED &&
-                    "text-slate-600") ||
-                  (oneEvent.status == EventStatus.ENDED && "text-red-600") ||
-                  (oneEvent.status == EventStatus.STARTED &&
-                    "text-green-600") ||
-                  (oneEvent.status == EventStatus.UPCOMING && "text-blue-700")
-                } font-bold`}
-              >
-                {oneEvent.status}
-              </p>
-            </div>
-
-            <div className="mt-6 lg:mt-10 grid grid-cols-2 gap-x-5">
-              <div className="">
-                <div className="flex space-x-1">
-                  <ReviewsStarDisplay rating={oneEvent.rating} />
-                </div>
-                <p className="mt-3 text-sm">
-                  <span className="font-bold">
-                    {oneEvent.rating.toFixed(1)}
-                  </span>{" "}
-                  / 5.0 - from {commentsLength} reviews
-                </p>
-              </div>
+            <div className="flex items-center space-x-2 text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                Host: {oneEvent.hostName}
+              </span>
+              <span>•</span>
+              <span className="text-sm font-medium capitalize">
+                {oneEvent.type.toLowerCase()}
+              </span>
             </div>
           </div>
-
-          <div className="relative ms-4">
-            <MediaRenderer
-              alt={oneEvent.eventName}
-              url={oneEvent.eventImgOrVideoFirstDisplay!}
-            />
+          <p className="text-lg leading-7 text-muted-foreground">
+            {oneEvent.eventDescription.split("\n").map((line, index) => (
+              <React.Fragment key={index}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </p>
+          <div className="flex items-center space-x-4">
+            <Button asChild size="lg">
+              <Link href={`${oneEvent.reservationTicketLink}`}>
+                Book ticket
+              </Link>
+            </Button>
+            <span
+              className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                (oneEvent.status === EventStatus.NOT_CONFIRMED &&
+                  "bg-slate-200 text-slate-800") ||
+                (oneEvent.status === EventStatus.ENDED &&
+                  "bg-red-200 text-red-800") ||
+                (oneEvent.status === EventStatus.STARTED &&
+                  "bg-green-200 text-green-800") ||
+                (oneEvent.status === EventStatus.UPCOMING &&
+                  "bg-blue-200 text-blue-800")
+              }`}
+            >
+              {oneEvent.status}
+            </span>
+          </div>
+          <div className="flex items-center  space-x-4">
+            <div className="flex items-center">
+              <ReviewsStarDisplay rating={oneEvent.rating} />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              from: {commentsLength} reviews
+            </div>
           </div>
         </div>
+        <div className="relative rounded-lg overflow-hidden shadow-lg">
+          <MediaRenderer
+            alt={oneEvent.eventName}
+            url={oneEvent.eventImgOrVideoFirstDisplay!}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }

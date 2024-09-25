@@ -34,7 +34,7 @@ async function AddEventsPage() {
   const eventTicketLink = faker.internet.url();
 
   return (
-    <Container className="mt-10 flex flex-col gap-2">
+    <Container className="mt-10 flex flex-col gap-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -54,20 +54,20 @@ async function AddEventsPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-2xl font-semibold mb-8 capitalize">add event</h1>
-      <div className="border p-8 rounded-md">
+      <h1 className="text-3xl font-bold  ">Add Event</h1>
+      <div className="border border-border p-8 rounded-lg shadow-sm bg-card">
         <FormContainer action={createEventAction}>
-          <div className="grid gap-4 md:grid-cols-2 my-4">
+          <div className="grid gap-6 md:grid-cols-2 mb-6">
             <FormInput
               type="text"
               name="eventName"
-              label="Event name"
+              label="Event Name"
               defaultValue={name}
             />
             <FormInput
               type="text"
               name="host"
-              label="host"
+              label="Host"
               defaultValue={host}
             />
             <FormInput
@@ -83,55 +83,89 @@ async function AddEventsPage() {
               defaultValue={eventTicketLink}
             />
             <PriceInput />
-            <div className="w-full h-full ">
-              <Label htmlFor="eventType">event types</Label>
+            <div className="w-full">
+              <Label
+                htmlFor="eventType"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                Event Type
+              </Label>
               <select
                 name="eventType"
                 id="eventType"
-                className=" w-full p-2 mt-auto"
+                className="w-full p-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-primary"
               >
-                <option value="">Choose Events Type</option>
-                {Object.values(EventType).map((status) => {
-                  return (
-                    <option className="capitalize" key={status} value={status}>
-                      {status.toLowerCase().replace(/_/g, " ")}
-                    </option>
-                  );
-                })}
+                <option value="">Choose Event Type</option>
+                {Object.values(EventType).map((status) => (
+                  <option className="capitalize" key={status} value={status}>
+                    {status.toLowerCase().replace(/_/g, " ")}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
-          <TextAreaInput
-            name="description"
-            labelText="product description"
-            defaultValue={description}
-          />
-
-          <div className="mt-6 w-full  flex gap-5">
-            <div className="flex-1">
-              <Label htmlFor="dateStart">Date Start</Label>
-              <Input id="dateStart" type="date" name="dateStart" />
-            </div>
-            <div className="flex-1">
-              <Label htmlFor="dateEnd">Date End</Label>
-
-              <Input id="dateEnd" type="date" name="dateEnd" />
-            </div>
-          </div>
-          <div className="mt-6">
-            <ImageInput />
-            <VideoInput />
-          </div>
-          <div className="mt-6">
-            <CheckboxInput
-              name="isVideoFirstDisplay"
-              label="Video Display First"
+          <div className="mb-6">
+            <TextAreaInput
+              name="description"
+              labelText="Event Description"
+              defaultValue={description}
             />
           </div>
-          <SubmitButton text="Create event" className="mt-8" />
+          <div className="grid gap-6 sm:grid-cols-2 mb-6">
+            <div>
+              <Label
+                htmlFor="dateStart"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                Start Date
+              </Label>
+              <Input
+                id="dateStart"
+                type="date"
+                name="dateStart"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="dateEnd"
+                className="mb-2 block text-sm font-medium text-foreground"
+              >
+                End Date
+              </Label>
+              <Input
+                id="dateEnd"
+                type="date"
+                name="dateEnd"
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="space-y-6 mb-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-primary">
+                Event Image
+              </h3>
+              <ImageInput />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-primary">
+                Event Video
+              </h3>
+              <VideoInput />
+            </div>
+          </div>
+          <div className="mb-6">
+            <CheckboxInput
+              name="isVideoFirstDisplay"
+              label="Display Video First"
+            />
+          </div>
+          <SubmitButton text="Create Event" className="w-full" />
         </FormContainer>
       </div>
     </Container>
   );
 }
+
 export default AddEventsPage;

@@ -534,7 +534,6 @@ export async function getRandomEvents(eventId?: string) {
       WHERE 1=1
     `;
 
-    // If an eventId is provided, add a condition to exclude it
     if (eventId) {
       query += ` AND "id" != $1`; // Use parameterized query
     }
@@ -545,7 +544,12 @@ export async function getRandomEvents(eventId?: string) {
     `;
 
     // Execute the query with the parameter
-    const randomEvents: Event[] = await prisma.$queryRawUnsafe(query, eventId);
+    let randomEvents: Event[];
+    if (eventId) {
+      randomEvents = await prisma.$queryRawUnsafe(query, eventId);
+    } else {
+      randomEvents = await prisma.$queryRawUnsafe(query);
+    }
 
     return randomEvents;
   } catch (error) {

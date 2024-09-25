@@ -5,7 +5,6 @@ import EventSearchFilter from "./EventSearchFilter";
 import { Event, EventStatus, EventType } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardContent } from "./ui/card";
-import Image from "next/image";
 import { starBad, starGood } from "./OneFeaturedEvent";
 import Title from "./Title";
 import { Button } from "./ui/button";
@@ -13,6 +12,7 @@ import DatePrinter from "./DatePrinter";
 import { useFilters } from "@/hooks/useQueryParam";
 import { deepEqual } from "@/utils/utils";
 import MediaRenderer from "./MediaFileRender";
+import ReviewsStarDisplay from "./ReviewsStarDisplay";
 
 export type FiltersType = {
   eventType?: EventType | undefined | string;
@@ -114,13 +114,17 @@ const MyEventsDisplay = ({
       />
 
       <Title
-        title={`Events - ${events.length} event(s) `}
-        className="mb-2 md:mb-5 mt-5"
+        title={`Events - ${events.length} event${
+          events.length !== 1 ? "s" : ""
+        }`}
+        className="my-6 text-2xl font-bold"
       />
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-1 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  ">
         {events.length > 0 ? (
-          events.map((event) => <IndividualEvent el={event} key={event.id} />)
+          events.map((event) => (
+            <IndividualEvent event={event} key={event.id} />
+          ))
         ) : (
           <Link href={"/events/myevents/addevents"}>
             You don&apos;t have any event
@@ -131,70 +135,57 @@ const MyEventsDisplay = ({
   );
 };
 
-const IndividualEvent = ({ el }: { el: Event }) => {
+const IndividualEvent = ({ event }: { event: Event }) => {
   const [isTextExpanded, setIsTextExpanded] = useState(false);
-  const maxLength = 40;
-  const toggleText = () => {
-    setIsTextExpanded(!isTextExpanded);
-  };
+  const maxLength = 100;
+
+  const toggleText = () => setIsTextExpanded(!isTextExpanded);
 
   return (
-    <div>
-      <Card className="">
-        <CardContent className="flex flex-col  justify-center-center  p-6">
-          <p className="text-xs text-gray-600">
-            <DatePrinter dateEnd={el.dateEnd} dateStart={el.dateStart} />
+    <Card className="h-full flex flex-col">
+      <CardContent className="flex flex-col h-full p-6">
+        <div className="mb-4">
+          <p className="text-sm text-gray-500 mb-2">
+            <DatePrinter dateEnd={event.dateEnd} dateStart={event.dateStart} />
           </p>
-          <p className="mb-2 lg:text-2xl font-semibold text-lg">
-            {el.eventName}
+          <h3 className="text-xl font-semibold mb-2">{event.eventName}</h3>
+          <p className="text-sm text-gray-600">
+            Host: {event.hostName} - Genre: {event.type.toLowerCase()}
           </p>
-          <p className="mb-2 lg:text-base font-light text-gray-500 text-sm">
-            Host: {el.hostName} - genre: {el.type.toLowerCase()}
-          </p>
+        </div>
 
+        <div className="mb-4 flex-grow">
           <MediaRenderer
-            alt={el.eventName}
-            url={el.eventImgOrVideoFirstDisplay!}
+            alt={event.eventName}
+            url={event.eventImgOrVideoFirstDisplay!}
           />
-          <p className="mt-3 text-sm gap-2 flex">
-            <span className="flex">
-              {Array.from({ length: Math.floor(el.rating) }, (_, index) => (
-                <span key={index}>{starGood}</span>
-              ))}
-              {Array.from({ length: 5 - Math.floor(el.rating) }, (_, index) => (
-                <span key={index}>{starBad}</span>
-              ))}
-            </span>
-            -{" "}
-            <span className="font-semibold">{el.rating.toFixed(1)} / 5.0</span>
+        </div>
+
+        <ReviewsStarDisplay rating={event.rating} />
+
+        <div className="mb-4">
+          <p className="text-sm">
+            {isTextExpanded || event.eventDescription.length <= maxLength
+              ? event.eventDescription
+              : `${event.eventDescription.substring(0, maxLength)}...`}
           </p>
-          {el.eventDescription.length <= maxLength ? (
-            <p>{el.eventDescription}</p>
-          ) : (
-            <div>
-              <p>
-                {isTextExpanded
-                  ? el.eventDescription
-                  : el.eventDescription.substring(0, maxLength) + "..."}
-              </p>
-
-              <button onClick={toggleText} className="text-blue-500">
-                {isTextExpanded ? "See Less" : "See More"}
-              </button>
-            </div>
+          {event.eventDescription.length > maxLength && (
+            <button onClick={toggleText} className="text-blue-500 text-sm mt-1">
+              {isTextExpanded ? "See Less" : "See More"}
+            </button>
           )}
+        </div>
 
-          <div className="mt-10 flex gap-2">
-            <Button asChild size={"lg"}>
-              <Link href={`/events/myevents/edit/${el.id}`}>Edit Event</Link>
-            </Button>
-            <Button variant={"outline"} size={"lg"}>
-              <Link href={`/events/${el.id}`}>Review Event</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <div className="flex gap-2 mt-auto">
+          <Button asChild className="flex-1">
+            <Link href={`/events/myevents/edit/${event.id}`}>Edit Event</Link>
+          </Button>
+          <Button variant="outline" asChild className="flex-1">
+            <Link href={`/events/${event.id}`}>Review Event</Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 export default MyEventsDisplay;

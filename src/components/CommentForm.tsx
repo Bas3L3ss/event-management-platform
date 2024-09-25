@@ -1,27 +1,28 @@
 "use client";
 import { useState } from "react";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { toastPrint } from "@/utils/toast action/action";
-import Router from "next/router";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { Textarea } from "./ui/textarea";
+import { Star } from "lucide-react";
 
 type CommentFormProps = {
   isAuthenticated: boolean;
   userId: string | null;
   eventId: string;
 };
+
 const CommentForm = ({
   eventId,
   isAuthenticated,
   userId,
 }: CommentFormProps) => {
   const { user } = useUser();
-
-  const [rating, setRating] = useState(1);
+  const [rating, setRating] = useState(0);
   const [commentText, setCommentText] = useState("");
-  const [maxLength, setMaxLength] = useState<number>(500);
+  const [maxLength] = useState<number>(500);
   const [pending, setPending] = useState<boolean>(false);
   const router = useRouter();
 
@@ -29,14 +30,19 @@ const CommentForm = ({
     e.preventDefault();
 
     if (!isAuthenticated) {
-      toastPrint("", " ", "default", true);
+      toastPrint(
+        "Authentication Required",
+        "Please log in to leave a review.",
+        "default",
+        true
+      );
       return;
     }
 
-    if (commentText.trim() === "") {
+    if (rating === 0 || commentText.trim() === "") {
       toastPrint(
         "Fields Missing!",
-        "Please fill in the rating and comment text.",
+        "Please provide both a rating and a comment.",
         "destructive"
       );
       return;
@@ -50,12 +56,12 @@ const CommentForm = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          authorImageUrl: user?.imageUrl, // Replace with actual data
-          clerkId: userId, // Replace with actual data
+          authorImageUrl: user?.imageUrl,
+          clerkId: userId,
           commentText,
           rating,
-          eventId: eventId, // Replace with actual data
-          authorName: user?.username, // Replace with actual data
+          eventId: eventId,
+          authorName: user?.username,
         }),
       });
 
@@ -66,7 +72,7 @@ const CommentForm = ({
       await response.json();
       toastPrint("Review Sent!", "Your review has been posted.", "default");
       setCommentText("");
-      setRating(1);
+      setRating(0);
       router.refresh();
     } catch (error) {
       console.error("Error creating comment:", error);
@@ -80,77 +86,74 @@ const CommentForm = ({
     }
   };
 
-  const handleKeyDownTextArea = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
-    if (e.key === "Enter") {
-    }
-  };
-
   return (
-    <Card className="w-full p-4 rounded-lg">
-      <form onSubmit={handleSubmit}>
-        <div className="mb-2">
-          <label htmlFor="rating" className="block text-sm font-medium">
-            Rating (1-5):
-          </label>
-          <input
-            type="number"
-            id="rating"
-            value={rating.toFixed(1)}
-            onChange={(e) => {
-              const value = Math.floor(parseInt(e.target.value));
-              if (value > 5 || value < 1) {
-                return toastPrint(
-                  "Invalid Rating",
-                  "Please choose a rating between 1 and 5.",
-                  "destructive"
-                );
-              }
-              setRating(value);
-            }}
-            className="mt-1 p-2 block w-full rounded-md border border-black shadow-sm"
-          />
-        </div>
-        <div className="mb-2">
-          <textarea
-            onKeyDown={handleKeyDownTextArea}
-            value={commentText}
-            onChange={(e) => {
-              const inputEvent = e.nativeEvent as InputEvent;
-              if (
-                commentText.length === maxLength &&
-                inputEvent.inputType !== "deleteContentBackward"
-              ) {
-                return toastPrint(
-                  "Comment Length Exceeded",
-                  `Comments cannot exceed ${maxLength} characters.`,
-                  "destructive"
-                );
-              }
-              setCommentText(e.target.value);
-            }}
-            placeholder="Write your comment..."
-            className="mt-1 p-2 w-full h-20 rounded-md border border-black shadow-sm"
-          />
-          <p
-            className={`${
-              commentText.length === maxLength
-                ? "text-red-600"
-                : "text-gray-600"
-            } text-sm`}
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Leave a Review</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="rating" className="block text-sm font-medium mb-1">
+              Rating:
+            </label>
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Button
+                  key={star}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className={`p-0 ${
+                    star <= rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                  onClick={() => setRating(star)}
+                >
+                  <Star className="h-6 w-6 fill-current" />
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label htmlFor="comment" className="block text-sm font-medium mb-1">
+              Your Review:
+            </label>
+            <Textarea
+              id="comment"
+              value={commentText}
+              onChange={(e) => {
+                if (e.target.value.length <= maxLength) {
+                  setCommentText(e.target.value);
+                } else {
+                  toastPrint(
+                    "Comment Length Exceeded",
+                    `Comments cannot exceed ${maxLength} characters.`,
+                    "destructive"
+                  );
+                }
+              }}
+              placeholder="Write your review here..."
+              className="min-h-[100px]"
+            />
+            <p
+              className={`text-sm mt-1 ${
+                commentText.length === maxLength
+                  ? "text-red-600"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {commentText.length} / {maxLength}
+            </p>
+          </div>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={pending || !isAuthenticated}
           >
-            {commentText.length} / {maxLength}
-          </p>
-        </div>
-        <Button
-          type="submit"
-          className="text-white py-2 px-4 rounded-md"
-          disabled={pending}
-        >
-          {pending ? "Sending..." : "Submit"}
-        </Button>
-      </form>
+            {pending ? "Sending..." : "Submit Review"}
+          </Button>
+        </form>
+      </CardContent>
     </Card>
   );
 };

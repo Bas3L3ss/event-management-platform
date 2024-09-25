@@ -11,7 +11,6 @@ import MediaRenderer from "./MediaFileRender";
 import DatePrinter from "./DatePrinter";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { Star } from "lucide-react";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import RecommendationCarousel from "./RecomendationCarousel";
 
