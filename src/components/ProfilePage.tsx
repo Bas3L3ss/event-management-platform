@@ -138,7 +138,7 @@ function UserProfilePage({
                   <Link key={type} href={`/events?eventtype=${type}`}>
                     <Badge
                       variant="secondary"
-                      className="cursor-pointer hover:bg-secondary-hover"
+                      className="cursor-pointer hover:!bg-primary"
                     >
                       <span className="capitalize text-xs">
                         {type.toLowerCase().replace("_", " ")}

@@ -358,11 +358,13 @@ export async function createComment({
 
 export async function deleteComment(commentId: string): Promise<void> {
   try {
-    await prisma.comment.delete({
+    const comment = await prisma.comment.delete({
       where: {
         id: commentId,
       },
     });
+    console.log(comment);
+    await updateEventRating(comment.eventId);
   } catch (error) {
     console.error("Error deleting comment:", error);
     throw new Error("Unable to delete comment");

@@ -26,7 +26,7 @@ export default function TimeLineEvents({ events }: { events: Event[] }) {
   return (
     <div className="w-full  ">
       <CardHeader>
-        <CardTitle>Company Timeline</CardTitle>
+        <CardTitle>Posting history (5 most recent posted events)</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative flex flex-col items-start gap-8">
@@ -53,7 +53,7 @@ export default function TimeLineEvents({ events }: { events: Event[] }) {
               </div>
               <div className="flex-1">
                 <div className="text-sm font-medium">
-                  {event.createdAt.toDateString()}
+                  Created at: {event.createdAt.toDateString()}
                 </div>
                 <div className="text-base font-semibold">{event.eventName}</div>
                 <div className="text-base font-semibold capitalize">

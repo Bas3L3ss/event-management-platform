@@ -1,5 +1,5 @@
 import Container from "@/components/Container";
-import { User } from "@prisma/client";
+import { Event, User } from "@prisma/client";
 import { Mail, Phone, MapPin, Calendar, User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,14 +19,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import TimeLineEvents from "./timeline/Timeline-v2";
 
 export default async function OtherProfilePage({
   eventLength,
   userFromDataBase,
   typeUserSubmitted,
+  eventUserSubmitted,
 }: {
   eventLength: number;
   userFromDataBase: User;
+  eventUserSubmitted: Event[];
   typeUserSubmitted: string[];
 }) {
   const currentClerkId = auth().userId;
@@ -110,7 +113,7 @@ export default async function OtherProfilePage({
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Contact Information</CardTitle>
           </CardHeader>
@@ -161,21 +164,6 @@ export default async function OtherProfilePage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Latest Activities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {userFromDataBase.userBiography ? (
-              <p className="text-sm">{userFromDataBase.userBiography}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No recent activities.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
             <CardTitle>Posted Event Types</CardTitle>
           </CardHeader>
           <CardContent>
@@ -185,7 +173,7 @@ export default async function OtherProfilePage({
                   <Link key={type} href={`/events?eventtype=${type}`}>
                     <Badge
                       variant="secondary"
-                      className="cursor-pointer hover:bg-secondary-hover"
+                      className="cursor-pointer hover:!bg-primary"
                     >
                       <span className="capitalize text-xs">
                         {type.toLowerCase().replace("_", " ")}
@@ -197,6 +185,22 @@ export default async function OtherProfilePage({
             ) : (
               <p className="text-sm text-muted-foreground">
                 No events posted yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Latest Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {eventUserSubmitted.length > 0 ? (
+              <div>
+                <TimeLineEvents events={eventUserSubmitted} />
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No recent activities.
               </p>
             )}
           </CardContent>

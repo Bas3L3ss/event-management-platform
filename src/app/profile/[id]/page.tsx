@@ -1,6 +1,9 @@
 import Container from "@/components/Container";
 import OtherProfilePage from "@/components/OtherProfilePage";
-import { getUserLengthByClerkId } from "@/utils/actions/eventsActions";
+import {
+  getEventByClerkId,
+  getUserLengthByClerkId,
+} from "@/utils/actions/eventsActions";
 import {
   getUniqueEventTypes,
   getUserFromDataBase,
@@ -27,12 +30,15 @@ async function SomeoneProfilePage({
     typeUserSubmittedArr.push(el as EventType)
   );
 
+  const eventUserSubmitted = await getEventByClerkId(id);
+
   return (
     <>
       <OtherProfilePage
         eventLength={eventLength}
         typeUserSubmitted={typeUserSubmittedArr}
         userFromDataBase={userFromDataBase!}
+        eventUserSubmitted={eventUserSubmitted}
       />
     </>
   );
