@@ -13,6 +13,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Star } from "lucide-react";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
+import RecommendationCarousel from "./RecomendationCarousel";
 
 export type FiltersType = {
   eventType?: EventType | string;
@@ -105,11 +106,14 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
       />
 
       {events.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <IndividualEvent key={event.id} event={event} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  ">
+            {events.map((event) => (
+              <IndividualEvent key={event.id} event={event} />
+            ))}
+          </div>
+          <RecommendationCarousel className="mt-5" />
+        </>
       ) : (
         <p className="text-center text-gray-500">No events found</p>
       )}
@@ -140,7 +144,6 @@ const IndividualEvent = ({ event }: { event: Event }) => {
           <MediaRenderer
             alt={event.eventName}
             url={event.eventImgOrVideoFirstDisplay!}
-            // className="w-full h-48 object-cover rounded-md"
           />
         </div>
 

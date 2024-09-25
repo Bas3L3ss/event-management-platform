@@ -26,7 +26,6 @@ export const createOrderAction = async (clerkId: string, event: Event) => {
         email: user?.userEmail,
       },
     });
-    console.log(order);
 
     // orderId = order.id;
   } catch (error) {
@@ -39,7 +38,6 @@ export const getOrderByClerkId = async (clerkId: string) => {
     const orders = await prisma.order.findMany({
       where: { clerkId },
     });
-    console.log(orders);
 
     return orders;
   } catch (error) {

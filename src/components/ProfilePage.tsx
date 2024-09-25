@@ -66,13 +66,23 @@ function UserProfilePage({
               <p className="text-2xl font-semibold">
                 {userFromDataBase.followedByUsers.length}
               </p>
-              <p className="text-sm text-muted-foreground">Followers</p>
+              <Link
+                href={`/profile/followers/${userFromDataBase.clerkId}`}
+                className="text-sm text-muted-foreground hover:underline"
+              >
+                Followers
+              </Link>
             </div>
             <div>
               <p className="text-2xl font-semibold">
                 {userFromDataBase.followers.length}
               </p>
-              <p className="text-sm text-muted-foreground">Following</p>
+              <Link
+                href={`/profile/following/${userFromDataBase.clerkId}`}
+                className="text-sm text-muted-foreground hover:underline"
+              >
+                Following
+              </Link>
             </div>
           </div>
           <div className="mt-8 space-y-2">

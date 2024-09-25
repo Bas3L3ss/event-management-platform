@@ -67,3 +67,29 @@
     @apply bg-background text-foreground;
   }
 }
+.slick-dots {
+  bottom: -30px !important; /* Position the dots */
+  text-align: center; /* Center the dots */
+}
+
+.slick-dots li button {
+  display: block;
+
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.slick-dots li.slick-active {
+  background: hsl(var(--primary));
+  border-radius: 50%;
+}
+.slick-dots li:not(.slick-active) {
+  background-color: white;
+  border-radius: 50%;
+}
+.slick-dots li {
+  height: 15px !important;
+  width: 15px !important;
+  & button::before {
+    display: none;
+  }
+}

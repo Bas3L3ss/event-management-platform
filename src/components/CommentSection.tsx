@@ -17,7 +17,7 @@ export default async function CommentSection({ eventId }: CommentProps) {
         eventId={eventId}
         isAuthenticated={isAuthenticated}
       />
-      <Title title="Comments:" className=" md:mb-2 mb-0 mt-2" />
+      <Title title="Comments:" className=" md:mb-2 mb-0 mt-5" />
       <CommentsList comments={comments} currentUserId={userId as string} />
     </div>
   );

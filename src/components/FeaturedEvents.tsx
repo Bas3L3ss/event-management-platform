@@ -24,7 +24,6 @@ import DatePrinter from "./DatePrinter";
 export default async function FeaturedEventsPage() {
   // Fetch multiple featured events
   const featuredEvents: Event[] = await getLatestFeaturedEvent(8);
-  console.log(featuredEvents);
 
   if (!featuredEvents || featuredEvents.length === 0) return null;
 

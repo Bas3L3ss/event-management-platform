@@ -41,7 +41,7 @@ async function FollowingPageOfOther({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/profile/following">Following</BreadcrumbLink>
+            <BreadcrumbLink href="/profile">Following</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

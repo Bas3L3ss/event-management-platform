@@ -18,7 +18,6 @@ const CommentForm = ({
   userId,
 }: CommentFormProps) => {
   const { user } = useUser();
-  console.log(user);
 
   const [rating, setRating] = useState(1);
   const [commentText, setCommentText] = useState("");

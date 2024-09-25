@@ -524,13 +524,27 @@ export const updateEventAction = async (
     await prisma.$disconnect();
   }
 };
-export async function getRandomEvents() {
+
+export async function getRandomEvents(eventId?: string) {
   try {
-    const randomEvents = await prisma.$queryRaw`
+    let query = `
       SELECT * FROM "Event"
+      WHERE 1=1
+    `;
+
+    // If an eventId is provided, add a condition to exclude it
+    if (eventId) {
+      query += ` AND "id" != $1`; // Use parameterized query
+    }
+
+    query += `
       ORDER BY RANDOM()
       LIMIT 10;
     `;
+
+    // Execute the query with the parameter
+    const randomEvents: Event[] = await prisma.$queryRawUnsafe(query, eventId);
+
     return randomEvents;
   } catch (error) {
     console.error("Error fetching random events:", error);

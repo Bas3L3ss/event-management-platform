@@ -4,15 +4,14 @@ import { Button } from "@/components/ui/button";
 import CommentSection from "@/components/CommentSection";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
 import { Event, EventStatus } from "@prisma/client";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 import DatePrinter from "@/components/DatePrinter";
-import { starBad, starGood } from "@/components/OneFeaturedEvent";
 import MediaRenderer from "@/components/MediaFileRender";
 import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
 import ReviewsStarDisplay from "@/components/ReviewsStarDisplay";
+import RecommendationCarousel from "@/components/RecomendationCarousel";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -20,13 +19,17 @@ async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEventsCommentsLength = getCommentsLength(oneEvent.id);
 
   return (
-    <Container className="mt-10 flex flex-col gap-2">
-      <EventDisplay
-        commentsLength={oneEventsCommentsLength}
-        oneEvent={oneEvent}
-      />
-      <Title title="Comments Section:" className=" md:mb-5 mb-3 mt-2" />
-      <CommentSection eventId={oneEvent.id} />
+    <Container className="mt-10  ">
+      <div className="flex gap-5 flex-col">
+        <EventDisplay
+          commentsLength={oneEventsCommentsLength}
+          oneEvent={oneEvent}
+        />
+        <Title title="Comments Section:" className=" md:mb-5 mb-3 mt-2" />
+        <CommentSection eventId={oneEvent.id} />
+      </div>
+
+      <RecommendationCarousel className="mt-28" id={oneEvent.id} />
     </Container>
   );
 }
@@ -85,9 +88,8 @@ function EventDisplay({
                 {oneEvent.status}
               </p>
             </div>
-            {/* End Buttons */}
+
             <div className="mt-6 lg:mt-10 grid grid-cols-2 gap-x-5">
-              {/* Review */}
               <div className="">
                 <div className="flex space-x-1">
                   <ReviewsStarDisplay rating={oneEvent.rating} />
@@ -99,21 +101,17 @@ function EventDisplay({
                   / 5.0 - from {commentsLength} reviews
                 </p>
               </div>
-              {/* End Review */}
             </div>
           </div>
-          {/* Col */}
+
           <div className="relative ms-4">
             <MediaRenderer
               alt={oneEvent.eventName}
               url={oneEvent.eventImgOrVideoFirstDisplay!}
             />
           </div>
-          {/* End Col */}
         </div>
-        {/* End Grid */}
       </div>
-      {/* End Hero */}
     </>
   );
 }

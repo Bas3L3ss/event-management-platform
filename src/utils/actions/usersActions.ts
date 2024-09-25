@@ -128,7 +128,6 @@ export async function followUser(followerId: string, followedId: string) {
     const followedExists = await prisma.user.findUnique({
       where: { clerkId: followedId },
     });
-    console.log(followedExists, followerExists);
 
     if (!followerExists || !followedExists) {
       throw new Error("One of the users does not exist");
