@@ -33,13 +33,14 @@ model User {
 model Notification {
   id                     String   @id @default(uuid())
   clerkId                String
+  eventId                String
   userAvatar             String
   description            String
   title                  String
   notificationCreatedAt  DateTime @default(now())
   seenStatus Boolean @default(false)
   userId                 String
-  user                   User     @relation("UserNotifications", fields: [userId], references: [id])
+  user                   User     @relation("UserNotifications", fields: [userId], references: [id] ,onDelete: Cascade)
 
   @@index([notificationCreatedAt])
 }

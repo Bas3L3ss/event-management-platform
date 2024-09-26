@@ -17,26 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Search,
-  ArrowUpDown,
-  Check,
-  Copy,
-  ChevronDownIcon,
-} from "lucide-react";
+import { Search, Check, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { Order } from "@prisma/client";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -51,22 +38,48 @@ export default function OrderTable({
 }) {
   const [orders, setOrders] = useState<Order[]>(ordersFromDB);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isPaidFilter, setIsPaidFilter] = useState<string | null>(null);
+  const [isPaidFilter, setIsPaidFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     const filteredOrders = ordersFromDB
-      .filter(
-        (order) =>
-          order.eventName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          (isPaidFilter === null || order.isPaid === (isPaidFilter === "true"))
-      )
+      .filter((order) => {
+        const matchesSearch = order.eventName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const matchesPaidFilter =
+          isPaidFilter === "all"
+            ? true
+            : isPaidFilter === "true"
+            ? order.isPaid
+            : isPaidFilter === "false"
+            ? !order.isPaid
+            : true;
+        return matchesSearch && matchesPaidFilter;
+      })
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     setOrders(filteredOrders);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, isPaidFilter, ordersFromDB]);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
   return (
-    <div className="space-y-4  ">
+    <div className="space-y-4">
       <div className="flex space-x-4">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -77,14 +90,15 @@ export default function OrderTable({
             className="pl-8"
           />
         </div>
-        <Select onValueChange={(value) => setIsPaidFilter(value)}>
+        <Select
+          value={isPaidFilter}
+          onValueChange={(value) => setIsPaidFilter(value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by payment" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem defaultChecked value=" ">
-              Default
-            </SelectItem>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="true">Paid</SelectItem>
             <SelectItem value="false">Unpaid</SelectItem>
           </SelectContent>
@@ -104,14 +118,44 @@ export default function OrderTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.map((order) => (
+          {currentItems.map((order) => (
             <IndividualOrder order={order} key={order.id} />
           ))}
         </TableBody>
       </Table>
+      <div className="flex items-center justify-between">
+        <div>
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, orders.length)} of {orders.length} entries
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={prevPage}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <div>
+            Page {currentPage} of {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
+
 const IndividualOrder = ({ order }: { order: Order }) => {
   const [date, setDate] = useState<string>();
   const [datePaid, setDatePaid] = useState<string>();
@@ -136,6 +180,7 @@ const IndividualOrder = ({ order }: { order: Order }) => {
       setDatePaid(" ");
     }
   }, [order.createdAt, order.PaidAt]);
+
   return (
     <TableRow className="cursor-pointer">
       <TableCell className="font-light text-xs ">{order.id}</TableCell>

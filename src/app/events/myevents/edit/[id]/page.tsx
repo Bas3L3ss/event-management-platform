@@ -99,7 +99,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
             <div className="w-full">
               <Label
                 htmlFor="eventType"
-                className="mb-2 block text-sm font-medium text-foreground"
+                className="mb-2 block text-sm font-medium text-primary"
               >
                 Event Type
               </Label>
@@ -129,7 +129,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
             <div>
               <Label
                 htmlFor="dateStart"
-                className="mb-2 block text-sm font-medium text-foreground"
+                className="mb-2 block text-sm font-medium text-primary"
               >
                 Start Date
               </Label>
@@ -144,7 +144,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
             <div>
               <Label
                 htmlFor="dateEnd"
-                className="mb-2 block text-sm font-medium text-foreground"
+                className="mb-2 block text-sm font-medium text-primary"
               >
                 End Date
               </Label>

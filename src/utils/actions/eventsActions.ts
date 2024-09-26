@@ -580,3 +580,21 @@ export async function getEventByClerkId(clerkId: string) {
     throw new Error("Failed to fetch events");
   }
 }
+export async function deleteEventWithRelations(eventId: string) {
+  try {
+    await prisma.$transaction([
+      prisma.notification.deleteMany({
+        where: { eventId },
+      }),
+      prisma.order.deleteMany({
+        where: { eventId },
+      }),
+      prisma.event.delete({
+        where: { id: eventId },
+      }),
+    ]);
+    console.log("Event and all related data successfully deleted.");
+  } catch (error) {
+    console.error("Error deleting event and related data:", error);
+  }
+}
