@@ -186,9 +186,7 @@ const IndividualOrder = ({ order }: { order: Order }) => {
       <TableCell className="font-light text-xs ">{order.id}</TableCell>
       <TableCell>{order.eventName}</TableCell>
       <TableCell>{order.email}</TableCell>
-      <TableCell className="text-right">
-        ${order.orderTotal.toFixed(2)}
-      </TableCell>
+      <TableCell className="text-right">${order.orderTotal / 100}</TableCell>
       <TableCell className="text-right">${order.tax.toFixed(2)}</TableCell>
       <TableCell className="text-right">
         {order.isPaid ? "Yes" : "No"}
@@ -204,7 +202,7 @@ const IndividualOrder = ({ order }: { order: Order }) => {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                copyToClipboard(order.id);
+                copyToClipboard(order.eventId);
               }}
             >
               {copiedId === order.id ? (

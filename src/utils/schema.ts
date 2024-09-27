@@ -66,6 +66,35 @@ export const eventSchema = z
     }
   });
 
+export const eventPaidSchema = z.object({
+  eventName: z
+    .string()
+    .min(2, {
+      message: "event name must be at least 2 characters.",
+    })
+    .max(100, {
+      message: "event name must be less than 100 characters.",
+    }),
+  host: z.string(),
+  eventType: eventTypeSchema,
+  reservationTicketLink: z.string(),
+  eventLocation: z.string(),
+  price: z.coerce.number().int().min(0, {
+    message: "price must be a positive number.",
+  }),
+
+  description: z.string().refine(
+    (description) => {
+      const wordCount = description.split(" ").length;
+      return wordCount >= 10 && wordCount <= 1000;
+    },
+    {
+      message: "description must be between 10 and 1000 words.",
+    }
+  ),
+
+  isVideoFirstDisplay: z.coerce.boolean(),
+});
 export function validateWithZodSchema<T>(
   schema: ZodSchema<T>,
   data: unknown

@@ -27,7 +27,6 @@ export const POST = async (req: NextRequest) => {
     });
   }
   const totalPrice = calculateEventPrice(event.dateStart, event.dateEnd);
-  console.log(totalPrice);
 
   try {
     const session = await stripe.checkout.sessions.create({

@@ -29,39 +29,23 @@ model User {
 
   @@index([accountCreatedAt])
 }
-
 model Notification {
   id                     String   @id @default(uuid())
   clerkId                String
   eventId                String
   userAvatar             String
+  userName               String
   description            String
   title                  String
   notificationCreatedAt  DateTime @default(now())
   seenStatus Boolean @default(false)
   userId                 String
+
   user                   User     @relation("UserNotifications", fields: [userId], references: [id] ,onDelete: Cascade)
+  event     Event    @relation("EventNotifications", fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([notificationCreatedAt])
 }
-
-model Comment {
-  id              String   @id @default(uuid())
-  clerkId         String    
-  authorName      String
-  authorImageUrl  String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  commentText     String
-  rating          Float
-
-  event           Event    @relation("EventComments", fields: [eventId], references: [id], onDelete: Cascade)
-  eventId         String  
-
-  @@index([createdAt])
-}
-
-
 model Event {
   id               String     @id @default(uuid())
   clerkId          String 
@@ -86,16 +70,37 @@ model Event {
   activationTotal Int @default(0)
 
   featured         Boolean     @default(false)
+  orders           Order[]    @relation("EventOrders")
+  notifications    Notification[] @relation("EventNotifications")
   comments         Comment[]   @relation("EventComments")
   hostName         String?
 
 @@index([dateStart, dateEnd])
 }
 
+
+model Comment {
+  id              String   @id @default(uuid())
+  clerkId         String    
+  authorName      String
+  authorImageUrl  String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  commentText     String
+  rating          Float
+
+  event           Event    @relation("EventComments", fields: [eventId], references: [id], onDelete: Cascade)
+  eventId         String  
+
+  @@index([createdAt])
+}
+
+
+
 model Order {
   id        String   @id @default(uuid())
   clerkId   String
-  eventId String
+  eventId String  @unique
   eventName String
   orderTotal Int      @default(0)
   email     String
@@ -104,6 +109,8 @@ model Order {
   createdAt DateTime @default(now())
   PaidAt DateTime? 
   updatedAt DateTime @updatedAt
+
+   event     Event    @relation("EventOrders", fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 enum EventStatus {

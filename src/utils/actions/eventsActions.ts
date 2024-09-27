@@ -1,9 +1,10 @@
 "use server";
 
-import { Comment, Event, EventStatus, EventType } from "@prisma/client";
+import { Comment, Event, EventStatus, EventType, Order } from "@prisma/client";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
 import {
+  eventPaidSchema,
   eventSchema,
   filesEditSchema,
   filesSchema,
@@ -19,6 +20,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Router from "next/router";
 import { createOrderAction } from "./ordersActions";
+import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -454,6 +456,7 @@ export const updateEventAction = async (
     const images = formData.getAll("image") as File[];
     const video = formData.get("video") as File;
     const eventId = formData.get("id") as string;
+    const isPaid = formData.get("isPaid") === "true";
     const imagesFiltered = images.filter(
       (file) => file.size > 0 && file.name !== "undefined"
     );
@@ -461,7 +464,11 @@ export const updateEventAction = async (
       video && video.size > 0 && video.name !== "undefined" ? video : undefined;
 
     // Validate the fields using Zod
-    const validatedFields = validateWithZodSchema(eventSchema, rawData);
+
+    const validatedFields = validateWithZodSchema(
+      isPaid ? eventPaidSchema : eventSchema,
+      rawData
+    ) as typeof isPaid extends true ? EventSchemaType : FullEventSchemaType;
     const validatedFiles = validateWithZodSchema(filesEditSchema, {
       image: imagesFiltered,
       video: validFile,
@@ -498,24 +505,37 @@ export const updateEventAction = async (
       await deleteImages(imagesUrl);
     }
 
+    const updateData: any = {
+      clerkId,
+      eventDescription: validatedFields.description,
+      eventLocation: validatedFields.eventLocation,
+      eventName: validatedFields.eventName,
+      eventTicketPrice: validatedFields.price,
+      type: validatedFields.eventType,
+      eventImg: imagesWillBeSentToDB,
+      eventVideo: videoWillBeSentToDB,
+      hostName: validatedFields.host,
+      reservationTicketLink: validatedFields.reservationTicketLink,
+      eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
+        ? videoWillBeSentToDB
+        : imagesWillBeSentToDB[0],
+    };
+
+    if (!isPaid) {
+      updateData.dateStart = validatedFields.dateStart as Date;
+      updateData.dateEnd = validatedFields.dateEnd as Date;
+    }
+
     const updatedEvent = await prisma.event.update({
       where: { id: eventId },
+      data: updateData,
+    });
+    await prisma.order.update({
+      where: {
+        eventId: updatedEvent.id,
+      },
       data: {
-        clerkId,
-        dateEnd: validatedFields.dateEnd as Date,
-        dateStart: validatedFields.dateStart as Date,
-        eventDescription: validatedFields.description,
-        eventLocation: validatedFields.eventLocation,
-        eventName: validatedFields.eventName,
-        eventTicketPrice: validatedFields.price,
-        type: validatedFields.eventType,
-        eventImg: imagesWillBeSentToDB,
-        eventVideo: videoWillBeSentToDB,
-        hostName: validatedFields.host,
-        reservationTicketLink: validatedFields.reservationTicketLink,
-        eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
-          ? videoWillBeSentToDB
-          : imagesWillBeSentToDB[0],
+        eventName: updatedEvent.eventName,
       },
     });
     revalidatePath(`/events/myevents/${eventId}`);
@@ -524,6 +544,21 @@ export const updateEventAction = async (
     return renderError(error);
   } finally {
     await prisma.$disconnect();
+  }
+};
+export const getOrderByEventId = async (id: string) => {
+  try {
+    const order: Order | null = await prisma.order.findFirst({
+      where: {
+        eventId: id,
+      },
+    });
+    console.log(order);
+
+    return order;
+  } catch (error) {
+    console.log(error);
+    throw new Error("failed to get event order ");
   }
 };
 

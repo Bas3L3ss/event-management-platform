@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import prisma from "../db";
 import { redirect } from "next/dist/server/api-utils";
+import { authenticateAndRedirect } from "./clerkFunc";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function createUser({
   clerkId,
@@ -271,6 +273,97 @@ export async function getUsersIsBeingFollowed(followers: string[]) {
     return users;
   } catch (error) {
     console.error("Error fetching users who follow:", error);
-    throw error;
+    throw new Error("failed to fetch users");
   }
 }
+
+export async function createNotification(
+  userId: string,
+  eventId: string,
+  title: string,
+  description: string
+) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: {
+        clerkId: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+
+    if (!event) {
+      throw new Error(`Event with ID ${eventId} not found.`);
+    }
+
+    const notification = await prisma.notification.create({
+      data: {
+        clerkId: event.clerkId,
+        eventId: eventId,
+        userAvatar: user.userAvatar,
+        userName: user.userName,
+        description: description,
+        title: title,
+        userId: user.id,
+      },
+    });
+
+    return notification;
+  } catch (error) {
+    // Log the error
+    console.error("Error creating notification:", error);
+
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002":
+          throw new Error(`Notification with similar details already exists.`);
+        default:
+          throw new Error(
+            "An unexpected error occurred while creating the notification."
+          );
+      }
+    }
+
+    throw new Error("An error occurred while creating the notification.");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export const getNotificationsByClerkId = async () => {
+  const clerkId = authenticateAndRedirect();
+  try {
+    const notifications = prisma.notification.findMany({
+      where: {
+        clerkId,
+      },
+    });
+    return notifications;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw new Error("failed to fetch notifications");
+  }
+};
+
+export const changeSeenStateNotification = async (
+  id: string,
+  isSeenState: boolean
+) => {
+  try {
+    await prisma.notification.update({
+      where: {
+        id,
+      },
+      data: {
+        seenStatus: isSeenState,
+      },
+    });
+  } catch (error) {}
+};

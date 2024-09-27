@@ -5,11 +5,11 @@ import React from "react";
 
 function Home() {
   return (
-    <main>
+    <>
       <Hero />
       <FeaturedEventsPage />
       <RecommendationCarousel />
-    </main>
+    </>
   );
 }
 

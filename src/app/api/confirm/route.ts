@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 
 import { type NextRequest } from "next/server";
 import prisma from "@/utils/db";
+import { authenticateAndRedirect } from "@/utils/actions/clerkFunc";
+import { createNotification } from "@/utils/actions/usersActions";
 
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
@@ -26,7 +28,7 @@ export const GET = async (req: NextRequest) => {
         },
       });
     }
-    await prisma.event.update({
+    const event = await prisma.event.update({
       where: {
         id: eventId,
       },
@@ -34,6 +36,12 @@ export const GET = async (req: NextRequest) => {
         status: "UPCOMING",
       },
     });
+    await createNotification(
+      event.clerkId,
+      eventId as string,
+      "A newly upcoming event!",
+      "new event added!"
+    );
   } catch (err) {
     console.log(err);
     return Response.json(null, {
