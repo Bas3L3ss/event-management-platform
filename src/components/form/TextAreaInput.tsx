@@ -21,7 +21,6 @@ function TextAreaInput({ name, labelText, defaultValue }: TextAreaInputProps) {
         name={name}
         defaultValue={defaultValue}
         rows={5}
-        required
         className="leading-loose"
       />
     </div>

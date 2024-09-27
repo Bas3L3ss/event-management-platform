@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
-import { renderError } from "./eventsActions";
 import { Event } from "@prisma/client";
-import { calculateEventPrice } from "../utils";
+import { calculateEventPrice, renderError } from "../utils";
 
 export const createOrderAction = async (clerkId: string, event: Event) => {
   try {
@@ -43,5 +42,24 @@ export const getOrderByClerkId = async (clerkId: string) => {
   } catch (error) {
     console.log(error);
     throw new Error("Failed to fetch order");
+  }
+};
+
+export const getAllOderInAdminPage = async () => {
+  const clerkId = authenticateAndRedirect();
+  const isAdmin = clerkId === process.env.CLERK_ADMIN_ID;
+  if (!isAdmin) {
+    redirect("/");
+  }
+  try {
+    const orders = prisma.order.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+    return orders;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to fetch orders");
   }
 };

@@ -30,7 +30,6 @@ function FormInput({
         type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        required
       />
     </div>
   );

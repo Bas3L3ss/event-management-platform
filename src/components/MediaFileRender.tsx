@@ -45,7 +45,7 @@ const MediaRenderer = ({ url, alt }: { url: string; alt: string }) => {
   ) {
     return (
       <Image
-        className="w-full aspect-video object-cover rounded-md"
+        className="w-full aspect-video object-cover rounded-md transition-transform duration-300 hover:scale-105"
         src={url}
         alt={alt}
         about={alt}

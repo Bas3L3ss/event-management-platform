@@ -33,8 +33,10 @@ import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 export default function OrderTable({
   ordersFromDB,
+  isAdminPage,
 }: {
   ordersFromDB: Order[];
+  isAdminPage?: boolean;
 }) {
   const [orders, setOrders] = useState<Order[]>(ordersFromDB);
   const [searchTerm, setSearchTerm] = useState("");
@@ -119,7 +121,11 @@ export default function OrderTable({
         </TableHeader>
         <TableBody>
           {currentItems.map((order) => (
-            <IndividualOrder order={order} key={order.id} />
+            <IndividualOrder
+              isAdminPage={isAdminPage}
+              order={order}
+              key={order.id}
+            />
           ))}
         </TableBody>
       </Table>
@@ -156,7 +162,13 @@ export default function OrderTable({
   );
 }
 
-const IndividualOrder = ({ order }: { order: Order }) => {
+const IndividualOrder = ({
+  order,
+  isAdminPage = false,
+}: {
+  order: Order;
+  isAdminPage?: boolean;
+}) => {
   const [date, setDate] = useState<string>();
   const [datePaid, setDatePaid] = useState<string>();
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -218,7 +230,7 @@ const IndividualOrder = ({ order }: { order: Order }) => {
               )}
               <span className="sr-only">Copy order ID</span>
             </DropdownMenuItem>
-            {!order.isPaid && (
+            {!order.isPaid && !isAdminPage && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="bg-green-600">

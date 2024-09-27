@@ -5,7 +5,6 @@ import EventSearchFilter from "./EventSearchFilter";
 import { Event, EventStatus, EventType } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardContent } from "./ui/card";
-import { starBad, starGood } from "./OneFeaturedEvent";
 import Title from "./Title";
 import { Button } from "./ui/button";
 import DatePrinter from "./DatePrinter";

@@ -40,7 +40,6 @@ import {
 } from "@/components/ui/table";
 import { Event } from "@prisma/client";
 import Link from "next/link";
-import { getUserIdByClerkId } from "@/utils/actions/eventsActions";
 
 export const columns: ColumnDef<Event>[] = [
   {

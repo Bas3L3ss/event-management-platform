@@ -17,10 +17,9 @@ import {
   uploadVideo,
 } from "../supabase";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import Router from "next/router";
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
+import { renderError } from "../utils";
 
 export async function getLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -96,6 +95,21 @@ export async function getAllEvents(): Promise<Event[]> {
       },
       orderBy: {
         dateStart: "asc", // Optionally, order by start date or any other field
+      },
+    });
+    return events;
+  } catch (error) {
+    console.error("Error fetching all events:", error);
+    throw new Error("Unable to fetch all events");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function getAllInAdminPageEvents(): Promise<Event[]> {
+  try {
+    const events = await prisma.event.findMany({
+      orderBy: {
+        createdAt: "asc",
       },
     });
     return events;
@@ -374,17 +388,6 @@ export async function deleteComment(commentId: string): Promise<void> {
     await prisma.$disconnect();
   }
 }
-
-//helper
-export const renderError = (
-  error: unknown
-): { message: string; isError: boolean } => {
-  console.log(error);
-  return {
-    isError: true,
-    message: error instanceof Error ? error.message : "An error occurred",
-  };
-};
 
 export const createEventAction = async (
   prevState: any,

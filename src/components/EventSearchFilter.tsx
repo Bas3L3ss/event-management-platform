@@ -1,5 +1,3 @@
-// components/EventSearchFilter.tsx
-
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { defaultValue, FiltersType } from "./EventsDisplay";
 import { EventStatus, EventType } from "@prisma/client";

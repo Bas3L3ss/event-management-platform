@@ -22,17 +22,6 @@ import { faker } from "@faker-js/faker";
 import { EventType } from "@prisma/client";
 
 async function AddEventsPage() {
-  const name = faker.commerce.productName();
-  const host = faker.company.name();
-  const location =
-    faker.location.streetAddress() +
-    " " +
-    faker.location.city() +
-    ", " +
-    faker.location.country();
-  const description = faker.lorem.paragraph({ min: 10, max: 12 });
-  const eventTicketLink = faker.internet.url();
-
   return (
     <Container className="mt-10 flex flex-col gap-6">
       <Breadcrumb>
@@ -58,29 +47,17 @@ async function AddEventsPage() {
       <div className="border border-border p-8 rounded-lg shadow-sm bg-card">
         <FormContainer action={createEventAction}>
           <div className="grid gap-6 md:grid-cols-2 mb-6">
-            <FormInput
-              type="text"
-              name="eventName"
-              label="Event Name"
-              defaultValue={name}
-            />
-            <FormInput
-              type="text"
-              name="host"
-              label="Host"
-              defaultValue={host}
-            />
+            <FormInput type="text" name="eventName" label="Event Name" />
+            <FormInput type="text" name="host" label="Host" />
             <FormInput
               type="text"
               name="eventLocation"
               label="Event Location"
-              defaultValue={location}
             />
             <FormInput
               type="text"
               name="reservationTicketLink"
               label="Reservation Ticket Link"
-              defaultValue={eventTicketLink}
             />
             <PriceInput />
             <div className="w-full">
@@ -105,11 +82,7 @@ async function AddEventsPage() {
             </div>
           </div>
           <div className="mb-6">
-            <TextAreaInput
-              name="description"
-              labelText="Event Description"
-              defaultValue={description}
-            />
+            <TextAreaInput name="description" labelText="Event Description" />
           </div>
           <div className="grid gap-6 sm:grid-cols-2 mb-6">
             <div>

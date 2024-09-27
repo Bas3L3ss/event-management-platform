@@ -25,3 +25,11 @@ export function limitWords(inputString: string, maxWords: number): string {
   const limitedWords = wordsArray.slice(0, maxWords);
   return limitedWords.join(" ");
 }
+export const renderError = (
+  error: unknown
+): { message: string; isError: boolean } => {
+  return {
+    isError: true,
+    message: error instanceof Error ? error.message : "An error occurred.",
+  };
+};
