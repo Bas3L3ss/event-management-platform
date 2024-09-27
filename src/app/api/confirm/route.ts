@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
 import prisma from "@/utils/db";
 import { authenticateAndRedirect } from "@/utils/actions/clerkFunc";
-import { createNotification } from "@/utils/actions/usersActions";
+import {
+  createNotification,
+  getUsersWhoFollow,
+} from "@/utils/actions/usersActions";
 
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);

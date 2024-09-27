@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import Link from "next/link";
+import DatePrinter from "../DatePrinter";
 
 export default function NotificationCard({
   notification,
@@ -111,7 +112,10 @@ export default function NotificationCard({
           <div className="mt-4 space-y-2">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <Calendar size={16} />
-              <span>{format(new Date(eventDetails.dateStart), "PPP")}</span>
+              <DatePrinter
+                dateEnd={eventDetails.dateEnd}
+                dateStart={eventDetails.dateStart}
+              />
             </div>
 
             <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -143,7 +147,10 @@ export default function NotificationCard({
       )}
       <div className="bg-gray-100 px-4 py-2 text-sm text-gray-600">
         <Bell size={16} className="inline mr-2" />
-        {format(new Date(notification.notificationCreatedAt), "PPP")}
+        {format(
+          new Date(notification.notificationCreatedAt),
+          "MMMM do, yyyy - HH:mm"
+        )}
       </div>
     </div>
   );

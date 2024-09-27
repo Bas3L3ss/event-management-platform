@@ -3,6 +3,7 @@ import prisma from "../db";
 import { redirect } from "next/dist/server/api-utils";
 import { authenticateAndRedirect } from "./clerkFunc";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { User } from "@prisma/client";
 
 export async function createUser({
   clerkId,
@@ -287,6 +288,12 @@ export async function createNotification(
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    const usersToSendNotificationTo: User[] = await getUsersWhoFollow(
+      user.followedByUsers
+    );
 
     const event = await prisma.event.findUnique({
       where: { id: eventId },
@@ -295,27 +302,23 @@ export async function createNotification(
       },
     });
 
-    if (!user) {
-      throw new Error(`User with ID ${userId} not found.`);
-    }
-
     if (!event) {
       throw new Error(`Event with ID ${eventId} not found.`);
     }
-
-    const notification = await prisma.notification.create({
-      data: {
-        clerkId: event.clerkId,
-        eventId: eventId,
-        userAvatar: user.userAvatar,
-        userName: user.userName,
-        description: description,
-        title: title,
-        userId: user.id,
-      },
+    usersToSendNotificationTo.map(async (follower) => {
+      const notification = await prisma.notification.create({
+        data: {
+          clerkId: follower.clerkId,
+          eventId: eventId,
+          userAvatar: user.userAvatar,
+          userName: user.userName,
+          description: description,
+          title: title,
+          userId: follower.id,
+        },
+      });
+      console.log(notification);
     });
-
-    return notification;
   } catch (error) {
     // Log the error
     console.error("Error creating notification:", error);
