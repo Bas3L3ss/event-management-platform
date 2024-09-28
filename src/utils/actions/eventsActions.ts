@@ -20,8 +20,9 @@ import { revalidatePath } from "next/cache";
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
+import { cache } from "../cache";
 
-export async function getLatestFeaturedEvent(amount: number = 2) {
+async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
       where: {
@@ -36,7 +37,7 @@ export async function getLatestFeaturedEvent(amount: number = 2) {
         dateStart: "asc", // Fetch the event with the earliest start date
       },
       take: amount,
-      // skip: 1,
+      skip: 1,
     });
 
     return latestEvent;
@@ -47,7 +48,19 @@ export async function getLatestFeaturedEvent(amount: number = 2) {
     await prisma.$disconnect();
   }
 }
-export async function getOneLatestFeaturedEvent() {
+const getCachedLatestFeaturedEvent = cache(
+  cachedGetLatestFeaturedEvent,
+  ["featured-events"],
+  {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  }
+);
+export async function getLatestFeaturedEvent() {
+  // Call the cached version of the fetchEvents function
+  return await getCachedLatestFeaturedEvent();
+}
+
+async function cachedGetOneLatestFeaturedEvent() {
   try {
     const latestEvent = await prisma.event.findFirst({
       where: {
@@ -69,6 +82,18 @@ export async function getOneLatestFeaturedEvent() {
   }
 }
 
+const getCachedGetOneLatestFeaturedEvent = cache(
+  cachedGetOneLatestFeaturedEvent,
+  ["one-featured-events"],
+  {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  }
+);
+export async function getOneLatestFeaturedEvent() {
+  // Call the cached version of the fetchEvents function
+  return await getCachedGetOneLatestFeaturedEvent();
+}
+
 export async function getCommentsLength(eventId: string): Promise<number> {
   try {
     const commentsCount = await prisma.comment.count({
@@ -83,7 +108,7 @@ export async function getCommentsLength(eventId: string): Promise<number> {
   }
 }
 
-export async function getAllEvents(): Promise<Event[]> {
+async function cachedGetAllEvents(): Promise<Event[]> {
   try {
     const events = await prisma.event.findMany({
       where: {
@@ -105,6 +130,15 @@ export async function getAllEvents(): Promise<Event[]> {
     await prisma.$disconnect();
   }
 }
+
+const getCachedEvents = cache(cachedGetAllEvents, ["events"], {
+  revalidate: 60, // Revalidate cache every 60 seconds
+});
+export async function getAllEvents() {
+  // Call the cached version of the fetchEvents function
+  return await getCachedEvents();
+}
+
 export async function getAllInAdminPageEvents(): Promise<Event[]> {
   try {
     const events = await prisma.event.findMany({
@@ -144,8 +178,8 @@ export async function getUserIdByClerkId(
     await prisma.$disconnect();
   }
 }
-
-export async function getEventById(id: string): Promise<Event | null> {
+//getEventById
+async function cachedGetEventById(id: string) {
   try {
     const event = await prisma.event.findUnique({
       where: {
@@ -159,6 +193,17 @@ export async function getEventById(id: string): Promise<Event | null> {
   } finally {
     await prisma.$disconnect();
   }
+}
+
+// Wrap the fetchEventById function with caching logic
+const getCachedEventById = (id: string) => {
+  return cache(cachedGetEventById, ["event", id], {
+    revalidate: 60,
+  })(id);
+};
+
+export async function getEventById(id: string): Promise<Event | null> {
+  return await getCachedEventById(id);
 }
 
 export async function searchAndFilterEvents(
@@ -268,6 +313,11 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
     const events = await prisma.event.findMany({
       where: {
         clerkId,
+        NOT: {
+          status: {
+            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+          },
+        },
       },
     });
 
@@ -291,10 +341,8 @@ export const getEventFromClerkId = async (clerkId: string) => {
     throw new Error("Unable to fetch events");
   }
 };
-
-export async function getCommentsByEventId(
-  eventId: string
-): Promise<Comment[]> {
+// getCommentsByEventId
+async function cachedGetCommentsByEventId(eventId: string) {
   try {
     const comments = await prisma.comment.findMany({
       where: { eventId },
@@ -312,6 +360,19 @@ export async function getCommentsByEventId(
   }
 }
 
+// Wrap the fetchCommentsByEventId function with caching logic
+const getCachedCommentsByEventId = (eventId: string) => {
+  return cache(cachedGetCommentsByEventId, ["comments", eventId], {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  })(eventId); // Call the caching function with eventId
+};
+
+export async function getCommentsByEventId(
+  eventId: string
+): Promise<Comment[]> {
+  // Call the cached version of the fetchCommentsByEventId function, passing the eventId
+  return await getCachedCommentsByEventId(eventId);
+}
 // Function to calculate and update the average rating for the event
 export async function updateEventRating(eventId: string): Promise<void> {
   try {
@@ -565,7 +626,9 @@ export const getOrderByEventId = async (id: string) => {
   }
 };
 
-export async function getRandomEvents(eventId?: string) {
+// getRandomEvents
+
+async function cachedGetRandomEvents(eventId?: string) {
   try {
     let query = `
       SELECT * FROM "Event"
@@ -594,6 +657,14 @@ export async function getRandomEvents(eventId?: string) {
     console.error("Error fetching random events:", error);
     throw new Error("Failed to fetch random events");
   }
+}
+const getCachedRandomEvents = cache(cachedGetRandomEvents, ["random-events"], {
+  revalidate: 60, // Revalidate cache every 60 seconds
+});
+
+export async function getRandomEvents() {
+  // Call the cached version of the fetchEvents function
+  return await getCachedRandomEvents();
 }
 
 export async function getEventByClerkId(clerkId: string) {

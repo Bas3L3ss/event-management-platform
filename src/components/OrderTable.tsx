@@ -60,7 +60,10 @@ export default function OrderTable({
             : true;
         return matchesSearch && matchesPaidFilter;
       })
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
     setOrders(filteredOrders);
     setCurrentPage(1); // Reset to first page when filters change

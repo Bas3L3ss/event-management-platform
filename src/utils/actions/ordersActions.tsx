@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
-import { Event } from "@prisma/client";
+import { Event, Order } from "@prisma/client";
 import { calculateEventPrice, renderError } from "../utils";
+import { cache } from "../cache";
 
 export const createOrderAction = async (clerkId: string, event: Event) => {
   try {
@@ -31,8 +32,8 @@ export const createOrderAction = async (clerkId: string, event: Event) => {
     return renderError(error);
   }
 };
-
-export const getOrderByClerkId = async (clerkId: string) => {
+//  getOrderByClerkId
+async function cachedGetOrderByClerkId(clerkId: string) {
   try {
     const orders = await prisma.order.findMany({
       where: { clerkId },
@@ -40,9 +41,20 @@ export const getOrderByClerkId = async (clerkId: string) => {
 
     return orders;
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to fetch order");
+    console.error(`Error fetching orders for clerk with id ${clerkId}:`, error);
+    throw new Error("Failed to fetch orders");
   }
+}
+
+// Wrap the fetchOrderByClerkId function with caching logic
+const getCachedOrderByClerkId = (clerkId: string) => {
+  return cache(cachedGetOrderByClerkId, ["orders", clerkId], {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  })(clerkId); // Call the caching function with clerkId
+};
+
+export const getOrderByClerkId = async (clerkId: string): Promise<Order[]> => {
+  return await getCachedOrderByClerkId(clerkId);
 };
 
 export const getAllOderInAdminPage = async () => {

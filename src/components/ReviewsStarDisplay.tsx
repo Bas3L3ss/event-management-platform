@@ -3,7 +3,7 @@ import React from "react";
 
 function ReviewsStarDisplay({ rating }: { rating: number }) {
   return (
-    <span className="flex items-center mb-2">
+    <span className="flex items-center  ">
       {[...Array(5)].map((_, index) => (
         <Star
           key={index}
