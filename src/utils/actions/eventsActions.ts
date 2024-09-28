@@ -329,6 +329,9 @@ export const getEventFromClerkId = async (clerkId: string) => {
       where: {
         clerkId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return events;

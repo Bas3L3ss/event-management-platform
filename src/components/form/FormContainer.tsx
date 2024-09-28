@@ -28,7 +28,7 @@ function FormContainer({
 
   useEffect(() => {
     // Log the current state for debugging purposes
-    // console.log("Current state:", state);
+    console.log("Current state:", state);
 
     // Check for errors and show toast notifications
     if (state.message) {
