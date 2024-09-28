@@ -457,6 +457,10 @@ export const createEventAction = async (
     const rawData = Object.fromEntries(formData);
     const images = formData.getAll("image") as File[];
 
+    if (images.length > 3) {
+      return { message: "For now we only accept 3 images.", isError: true };
+    }
+
     const video = formData.get("video") as File;
     const validatedFields = validateWithZodSchema(eventSchema, rawData);
     const validatedFiles = validateWithZodSchema(filesSchema, {
@@ -469,9 +473,6 @@ export const createEventAction = async (
     // Upload video and get URL
     const videoUrl = await uploadVideo(video);
 
-    if (images.length) {
-      return { message: "For now we only accept 3 images.", isError: true };
-    }
     const newEvent = await prisma.event.create({
       data: {
         clerkId,
@@ -533,6 +534,7 @@ export const updateEventAction = async (
       isPaid ? eventPaidSchema : eventSchema,
       rawData
     ) as typeof isPaid extends true ? EventSchemaType : FullEventSchemaType;
+
     const validatedFiles = validateWithZodSchema(filesEditSchema, {
       image: imagesFiltered,
       video: validFile,
@@ -549,6 +551,14 @@ export const updateEventAction = async (
     let imagesWillBeSentToDB = eventFileFromDB?.eventImg;
     let videoWillBeSentToDB = eventFileFromDB?.eventVideo;
 
+    if (validatedFiles.image) {
+      if (validatedFiles.image.length + imagesWillBeSentToDB.length > 3) {
+        return {
+          message: "You can't send more than 3 images.",
+          isError: false,
+        };
+      }
+    }
     if (validatedFiles.image != undefined && validatedFiles.image.length > 0) {
       const imageUrls = await uploadImages(images);
       imagesWillBeSentToDB = imagesWillBeSentToDB.concat(imageUrls);
