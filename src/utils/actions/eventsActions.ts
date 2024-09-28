@@ -16,12 +16,11 @@ import {
   uploadImages,
   uploadVideo,
 } from "../supabase";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
-
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -658,13 +657,19 @@ async function cachedGetRandomEvents(eventId?: string) {
     throw new Error("Failed to fetch random events");
   }
 }
-const getCachedRandomEvents = cache(cachedGetRandomEvents, ["random-events"], {
-  revalidate: 60, // Revalidate cache every 60 seconds
-});
+const getCachedRandomEvents = (eventId?: string) => {
+  return cache(
+    cachedGetRandomEvents,
+    ["random-events", eventId ? eventId : ""],
+    {
+      revalidate: 60, // Revalidate cache every 60 seconds
+    }
+  )(eventId);
+};
 
-export async function getRandomEvents() {
+export async function getRandomEvents(eventId?: string) {
   // Call the cached version of the fetchEvents function
-  return await getCachedRandomEvents();
+  return await getCachedRandomEvents(eventId);
 }
 
 export async function getEventByClerkId(clerkId: string) {

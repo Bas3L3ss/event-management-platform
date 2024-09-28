@@ -139,12 +139,14 @@ export default function NotificationCard({
           </div>
         )}
       </div>
-      {eventDetails?.eventImgOrVideoFirstDisplay && (
-        <MediaRenderer
-          alt={eventDetails.eventName}
-          url={eventDetails.eventImgOrVideoFirstDisplay}
-        />
-      )}
+      <div className="relative overflow-hidden">
+        {eventDetails?.eventImgOrVideoFirstDisplay && (
+          <MediaRenderer
+            alt={eventDetails.eventName}
+            url={eventDetails.eventImgOrVideoFirstDisplay}
+          />
+        )}
+      </div>
       <div className="bg-gray-100 px-4 py-2 text-sm text-gray-600">
         <Bell size={16} className="inline mr-2" />
         {format(

@@ -19,6 +19,9 @@ const config = {
       },
     },
     extend: {
+      boxShadow: {
+        custom: "0 5px 15px rgba(0, 0, 0, 0.35)",
+      },
       dropShadow: {
         custom: "1px 3px 2px rgba(0, 0, 0, 0.4)", // Custom shadow
       },

@@ -13,6 +13,7 @@ import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
 import ReviewsStarDisplay from "@/components/ReviewsStarDisplay";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
 import { CalendarDays, MapPin, User } from "lucide-react";
+import EventRecordsDisplay from "@/components/EventRecordsDisplay";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
@@ -47,9 +48,9 @@ function EventDisplay({
   commentsLength: Promise<number>;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <BreadCrumbsOfEvent eventName={oneEvent.eventName} />
-      <div className="grid md:grid-cols-2 gap-8 xl:gap-12">
+      <article className="relative grid md:grid-cols-2 gap-8 xl:gap-12  ">
         <div className="space-y-6">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground flex items-center">
@@ -111,13 +112,13 @@ function EventDisplay({
             </div>
           </div>
         </div>
-        <div className="relative rounded-lg overflow-hidden shadow-lg">
-          <MediaRenderer
-            alt={oneEvent.eventName}
-            url={oneEvent.eventImgOrVideoFirstDisplay!}
-          />
-        </div>
-      </div>
+        <EventRecordsDisplay
+          video={oneEvent.eventVideo!}
+          eventImgOrVideoFirstDisplay={oneEvent.eventImgOrVideoFirstDisplay!}
+          eventName={oneEvent.eventName}
+          images={oneEvent.eventImg}
+        />
+      </article>
     </div>
   );
 }

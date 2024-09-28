@@ -1,9 +1,18 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { toastPrint } from "@/utils/toast action/action";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "./ui/card";
+import { Loader2 } from "lucide-react";
 
 function EditBio({
   bioDataFromDB,
@@ -15,15 +24,19 @@ function EditBio({
   const [bioData, setBioData] = useState<string>(bioDataFromDB || "");
   const [textLength, setTextLength] = useState<number>(bioData?.length || 0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const maxLength = 500;
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
     if (bioData.length > maxLength) {
-      return toastPrint(
+      toastPrint(
         "warning",
         "Please keep your bio length in range",
         "destructive"
       );
+      setIsLoading(false);
+      return;
     }
     try {
       const response = await fetch("/api/profile", {
@@ -38,14 +51,13 @@ function EditBio({
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         toastPrint("success", "Bio updated successfully", "default");
       } else {
         toastPrint("error", "Failed to update bio", "destructive");
       }
     } catch (error) {
-      console.log(error);
-
+      console.error(error);
       toastPrint(
         "error",
         "An error occurred while updating bio",
@@ -54,43 +66,69 @@ function EditBio({
     }
     setIsLoading(false);
   }
+
   useEffect(() => {
     setTextLength(bioData?.length || 0);
   }, [bioData?.length]);
-  const maxLength = 500;
-  return (
-    <>
-      <form onSubmit={handleSubmit} className="mb-10">
-        <Label htmlFor="bio">Modify bio:</Label>
-        <Textarea
-          name="bio"
-          className="w-full p-2 mt-2"
-          id="bio"
-          value={bioData}
-          onChange={(e) => {
-            if (maxLength <= e.target.value.length - 1) {
-              return toastPrint(
-                "warning",
-                "Please keep your bio length in range",
-                "destructive"
-              );
-            }
-            setBioData(e.target.value);
-          }}
-        />
 
-        <p
-          className={`${
-            maxLength <= bioData.length ? "text-red-600" : "text-gray-600"
-          }`}
-        >
-          {textLength}/{maxLength}
-        </p>
-        <Button disabled={isLoading} className="mt-2" type="submit">
-          Modify
-        </Button>
-      </form>
-    </>
+  return (
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Modify Your Bio</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="bio" className="text-sm font-medium">
+              Your Bio:
+            </Label>
+            <Textarea
+              name="bio"
+              id="bio"
+              value={bioData}
+              onChange={(e) => {
+                if (e.target.value.length <= maxLength) {
+                  setBioData(e.target.value);
+                } else {
+                  toastPrint(
+                    "warning",
+                    "Please keep your bio length in range",
+                    "destructive"
+                  );
+                }
+              }}
+              className="min-h-[150px] resize-none"
+              placeholder="Tell us about yourself..."
+            />
+            <div className="flex justify-end">
+              <p
+                className={`text-sm ${
+                  textLength > maxLength
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {textLength}/{maxLength}
+              </p>
+            </div>
+          </div>
+          <Button
+            disabled={isLoading || textLength > maxLength}
+            type="submit"
+            className="w-full"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Bio"
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
