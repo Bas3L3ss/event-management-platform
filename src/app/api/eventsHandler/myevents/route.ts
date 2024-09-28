@@ -1,11 +1,12 @@
 import { searchAndFilterUserSpecificEvents } from "@/utils/actions/eventsActions";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { EventType, EventStatus } from "@prisma/client"; // Import your enums
+export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Extract the query parameters from the request URL
-    const url = new URL(request.url);
+    const url = request.nextUrl;
     const searchTerm = url.searchParams.get("searchTerm") || "";
     const clerkID = url.searchParams.get("clerkID") || "";
 
