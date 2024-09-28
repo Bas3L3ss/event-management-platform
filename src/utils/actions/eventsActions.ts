@@ -115,7 +115,7 @@ async function cachedGetAllEvents(): Promise<Event[]> {
         },
       },
       orderBy: {
-        dateStart: "asc", // Optionally, order by start date or any other field
+        dateStart: "desc", // Optionally, order by start date or any other field
       },
     });
     return events;
@@ -293,7 +293,7 @@ export async function searchAndFilterUserSpecificEvents(
         },
       },
       orderBy: {
-        dateStart: "asc", // Order by start date
+        createdAt: "desc", // Order by start date
       },
     });
 
