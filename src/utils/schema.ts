@@ -143,7 +143,7 @@ export function validateWithZodSchema<T>(
 }
 
 function validateImageFiles() {
-  const maxUploadSize = 5 * 1024 * 1024; // 5 MB
+  const maxUploadSize = 4 * 1024 * 1024; // 5 MB
   const acceptedFileTypes = ["image/"];
 
   return z
@@ -163,14 +163,14 @@ function validateImageFiles() {
 }
 
 function validateVideoFile() {
-  const maxUploadSize = 50 * 1024 * 1024; // 50 MB
+  const maxUploadSize = 12 * 1024 * 1024; // 12 MB
   const acceptedFileTypes = ["video/"];
 
   return z
     .instanceof(File)
     .refine(
       (file) => !file || file.size <= maxUploadSize,
-      `File size must be less than 50 MB`
+      `File size must be less than 12 MB`
     )
     .refine(
       (file) =>
@@ -205,14 +205,14 @@ function validateImageEditFiles() {
 }
 
 function validateVideoEditFile() {
-  const maxUploadSize = 50 * 1024 * 1024; // 50 MB
+  const maxUploadSize = 12 * 1024 * 1024; // 12 MB
   const acceptedFileTypes = ["video/"];
 
   return z
     .instanceof(File)
     .refine(
       (file) => !file || file.size <= maxUploadSize,
-      `File size must be less than 50 MB`
+      `File size must be less than 12 MB`
     )
     .refine(
       (file) =>

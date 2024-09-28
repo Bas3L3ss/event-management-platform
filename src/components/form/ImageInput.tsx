@@ -8,7 +8,14 @@ function ImageInput() {
       <Label htmlFor={name} className="capitalize">
         Images
       </Label>
-      <Input id={name} name={name} type="file" multiple accept="image/*" />
+      <Input
+        id={name}
+        name={name}
+        type="file"
+        multiple
+        accept="image/*"
+        max={5}
+      />
     </div>
   );
 }

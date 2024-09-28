@@ -29,7 +29,7 @@ function FormContainer({
     if (state.message) {
       if (state.isError === true) {
         toast({
-          title: "warning",
+          title: "Warning",
           variant: "destructive",
           description: state.message,
         });

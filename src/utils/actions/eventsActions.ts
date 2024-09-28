@@ -195,7 +195,7 @@ async function cachedGetEventById(id: string) {
 // Wrap the fetchEventById function with caching logic
 const getCachedEventById = (id: string) => {
   return cache(cachedGetEventById, ["event", id], {
-    revalidate: 60,
+    revalidate: 20,
   })(id);
 };
 
@@ -469,6 +469,9 @@ export const createEventAction = async (
     // Upload video and get URL
     const videoUrl = await uploadVideo(video);
 
+    if (images.length) {
+      return { message: "For now we only accept 3 images.", isError: true };
+    }
     const newEvent = await prisma.event.create({
       data: {
         clerkId,
