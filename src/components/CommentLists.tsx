@@ -30,7 +30,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { starGood } from "./OneFeaturedEvent";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 
 interface CommentsListProps {
