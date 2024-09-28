@@ -104,9 +104,9 @@ const CommentForm = ({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className={`p-0 ${
-                    star <= rating ? "text-yellow-400" : "text-gray-300"
-                  }`}
+                  className={`p-0 
+                    hover:text-yellow-400
+                    ${star <= rating ? "text-yellow-400" : "text-gray-300"}`}
                   onClick={() => setRating(star)}
                 >
                   <Star className="h-6 w-6 fill-current" />
