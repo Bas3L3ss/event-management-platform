@@ -599,6 +599,7 @@ export const updateEventAction = async (
         eventName: updatedEvent.eventName,
       },
     });
+
     return {
       message:
         "Event updated successfully, please wait 50s-60s to see the update",

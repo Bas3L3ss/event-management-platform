@@ -33,6 +33,7 @@ export const renderError = (
     message: error instanceof Error ? error.message : "An error occurred.",
   };
 };
+
 export function removeDuplicates(urls: string[]): string[] {
   // Use a Set to automatically filter out duplicates
   const uniqueUrls = Array.from(new Set(urls));

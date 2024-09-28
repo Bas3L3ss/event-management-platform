@@ -33,12 +33,10 @@ function FormContainer({
           variant: "destructive",
           description: state.message,
         });
-      } else {
-        toast({
-          title: "notice ",
-          description: state.message,
-        });
       }
+    }
+    if (state.isError === false && state.message) {
+      redirect("/events/myevents");
     }
   }, [state, toast]);
   return <form action={formAction}>{children}</form>;
