@@ -1,6 +1,9 @@
 import { EventType } from "@prisma/client";
 import { z, ZodSchema } from "zod";
 
+const MAX_VIDEO_SIZE = 12 * 1024 * 1024; // 12 MB
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+
 const eventTypeSchema = z.nativeEnum(EventType, {
   errorMap: () => ({
     message: "please select a valid event type from the available options",
@@ -143,7 +146,7 @@ export function validateWithZodSchema<T>(
 }
 
 function validateImageFiles() {
-  const maxUploadSize = 4 * 1024 * 1024; // 4 MB
+  const maxUploadSize = MAX_IMAGE_SIZE;
   const acceptedFileTypes = ["image/"];
 
   return z
@@ -163,7 +166,7 @@ function validateImageFiles() {
 }
 
 function validateVideoFile() {
-  const maxUploadSize = 12 * 1024 * 1024; // 12 MB
+  const maxUploadSize = MAX_VIDEO_SIZE; // 12 MB
   const acceptedFileTypes = ["video/"];
 
   return z
@@ -185,7 +188,7 @@ export const filesEditSchema = z.object({
 });
 
 function validateImageEditFiles() {
-  const maxUploadSize = 4 * 1024 * 1024; // 4 MB
+  const maxUploadSize = MAX_IMAGE_SIZE; // 4 MB
   const acceptedFileTypes = ["image/"];
 
   return z
@@ -205,7 +208,7 @@ function validateImageEditFiles() {
 }
 
 function validateVideoEditFile() {
-  const maxUploadSize = 12 * 1024 * 1024; // 12 MB
+  const maxUploadSize = MAX_VIDEO_SIZE; // 12 MB
   const acceptedFileTypes = ["video/"];
 
   return z
