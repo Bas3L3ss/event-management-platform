@@ -139,7 +139,7 @@ const IndividualEvent = ({ event }: { event: Event }) => {
           </p>
         </div>
 
-        <div className="mb-4 flex-grow">
+        <div className="mb-4 flex-grow overflow-hidden">
           <MediaRenderer
             alt={event.eventName}
             url={event.eventImgOrVideoFirstDisplay!}

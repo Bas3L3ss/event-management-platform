@@ -48,8 +48,9 @@ const RenderingFilesForIndividualEvent = ({
   ) {
     return (
       <Image
-        className="w-full aspect-square object-cover rounded-md  "
+        className=" w-full aspect-square object-cover rounded-md  "
         src={url}
+        draggable={false}
         alt={alt}
         about={alt}
         width={250}
