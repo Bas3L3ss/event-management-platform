@@ -143,7 +143,7 @@ export function validateWithZodSchema<T>(
 }
 
 function validateImageFiles() {
-  const maxUploadSize = 4 * 1024 * 1024; // 5 MB
+  const maxUploadSize = 4 * 1024 * 1024; // 4 MB
   const acceptedFileTypes = ["image/"];
 
   return z
@@ -151,7 +151,7 @@ function validateImageFiles() {
     .refine((files) => files.length > 0, "At least one image file is required")
     .refine(
       (files) => files.every((file) => file.size <= maxUploadSize),
-      `Each file size must be less than 5 MB`
+      `Each file size must be less than 4 MB`
     )
     .refine(
       (files) =>
@@ -185,14 +185,14 @@ export const filesEditSchema = z.object({
 });
 
 function validateImageEditFiles() {
-  const maxUploadSize = 5 * 1024 * 1024; // 5 MB
+  const maxUploadSize = 4 * 1024 * 1024; // 4 MB
   const acceptedFileTypes = ["image/"];
 
   return z
     .array(z.instanceof(File))
     .refine(
       (files) => files.every((file) => file.size <= maxUploadSize),
-      `Each file size must be less than 5 MB`
+      `Each file size must be less than 4 MB`
     )
     .refine(
       (files) =>
