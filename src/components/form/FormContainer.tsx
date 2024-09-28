@@ -2,7 +2,6 @@
 
 import { useFormState } from "react-dom";
 import { useEffect } from "react";
-
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 
@@ -11,6 +10,7 @@ export type actionFunction = (
   formData: FormData
 ) => Promise<{ message: string; isError: boolean }>;
 
+// Initial state for the form
 const initialState = {
   message: "",
   isError: false,
@@ -25,20 +25,27 @@ function FormContainer({
 }) {
   const [state, formAction] = useFormState(action, initialState);
   const { toast } = useToast();
+
   useEffect(() => {
+    // Log the current state for debugging purposes
+    // console.log("Current state:", state);
+
+    // Check for errors and show toast notifications
     if (state.message) {
-      if (state.isError === true) {
+      if (state.isError) {
         toast({
           title: "Warning",
           variant: "destructive",
           description: state.message,
         });
+      } else {
+        // Only redirect if there's no error
+        redirect("/events/myevents");
       }
     }
-    if (state.isError === false && state.message) {
-      redirect("/events/myevents");
-    }
   }, [state, toast]);
+
   return <form action={formAction}>{children}</form>;
 }
+
 export default FormContainer;

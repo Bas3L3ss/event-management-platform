@@ -16,7 +16,6 @@ import {
   uploadImages,
   uploadVideo,
 } from "../supabase";
-import { revalidatePath } from "next/cache";
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
