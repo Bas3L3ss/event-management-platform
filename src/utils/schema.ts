@@ -112,7 +112,7 @@ export const eventPaidSchema = z.object({
     .string()
     .url("Reservation ticket link must be a valid URL."),
 
-  eventLocation: z.string().min(1, "please fill in your event's host name"),
+  eventLocation: z.string().min(1, "please fill in your event's location"),
   price: z.coerce.number().int().min(0, {
     message: "price must be a positive number",
   }),

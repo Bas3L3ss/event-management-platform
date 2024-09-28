@@ -599,7 +599,11 @@ export const updateEventAction = async (
         eventName: updatedEvent.eventName,
       },
     });
-    return { message: "Event updated successfully", isError: false };
+    return {
+      message:
+        "Event updated successfully, please wait 50s-60s to see the update",
+      isError: false,
+    };
   } catch (error) {
     return renderError(error);
   } finally {
