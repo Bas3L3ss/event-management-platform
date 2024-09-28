@@ -1,11 +1,12 @@
 import { searchAndFilterEvents } from "@/utils/actions/eventsActions";
 import { NextResponse } from "next/server";
-import { EventType, EventStatus } from "@prisma/client"; // Import your enums
+import { EventType, EventStatus } from "@prisma/client";
+import { NextRequest } from "next/server"; // Import NextRequest for typing
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Extract the query parameters from the request URL
-    const url = new URL(request.url);
+    // Use request.nextUrl to get the dynamic URL in a Next.js-compliant way
+    const url = request.nextUrl;
     const searchTerm = url.searchParams.get("searchTerm") || "";
 
     // Convert eventType and status from string to the correct enum if they exist
@@ -21,10 +22,10 @@ export async function GET(request: Request) {
       ? Number(url.searchParams.get("minRating"))
       : 0;
 
-    // Construct the filters object
+    // Construct the filters object with optional properties
     const filters = {
-      eventType: eventType || undefined, // Cast to EventType or undefined
-      status: status || undefined, // Cast to EventStatus or undefined
+      eventType: eventType || undefined,
+      status: status || undefined,
       isFeatured: isFeatured || undefined,
       minDate: minDate || undefined,
       maxDate: maxDate || undefined,
@@ -37,7 +38,9 @@ export async function GET(request: Request) {
     return NextResponse.json(events, { status: 200 });
   } catch (error) {
     console.error("Error filtering events:", error);
-
-    return NextResponse.json({ error: "Failed to filter" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to filter events" },
+      { status: 500 }
+    );
   }
 }
