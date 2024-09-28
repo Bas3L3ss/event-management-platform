@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { EventType, EventStatus } from "@prisma/client";
 import { NextRequest } from "next/server"; // Import NextRequest for typing
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     // Use request.nextUrl to get the dynamic URL in a Next.js-compliant way
