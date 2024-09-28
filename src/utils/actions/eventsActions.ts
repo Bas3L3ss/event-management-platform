@@ -16,7 +16,7 @@ import {
   uploadImages,
   uploadVideo,
 } from "../supabase";
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
@@ -451,7 +451,7 @@ export const createEventAction = async (
   prevState: any,
   formData: FormData
 ): Promise<{ message: string; isError: boolean }> => {
-  const clerkId = await authenticateAndRedirect();
+  const clerkId = authenticateAndRedirect();
 
   try {
     const rawData = Object.fromEntries(formData);
@@ -599,7 +599,6 @@ export const updateEventAction = async (
         eventName: updatedEvent.eventName,
       },
     });
-    revalidatePath(`/events/myevents/${eventId}`);
     return { message: "Event updated successfully", isError: false };
   } catch (error) {
     return renderError(error);

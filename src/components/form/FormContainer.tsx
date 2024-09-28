@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 export type actionFunction = (
   prevState: any,
