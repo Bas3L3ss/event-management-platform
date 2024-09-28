@@ -47,16 +47,14 @@ async function cachedGetLatestFeaturedEvent(amount: number = 2) {
     await prisma.$disconnect();
   }
 }
-const getCachedLatestFeaturedEvent = cache(
-  cachedGetLatestFeaturedEvent,
-  ["featured-events"],
-  {
+const getCachedLatestFeaturedEvent = (amount: number = 2) => {
+  return cache(cachedGetLatestFeaturedEvent, ["featured-events"], {
     revalidate: 60, // Revalidate cache every 60 seconds
-  }
-);
-export async function getLatestFeaturedEvent() {
+  })(amount);
+};
+export async function getLatestFeaturedEvent(amount: number = 2) {
   // Call the cached version of the fetchEvents function
-  return await getCachedLatestFeaturedEvent();
+  return await getCachedLatestFeaturedEvent(amount);
 }
 
 async function cachedGetOneLatestFeaturedEvent() {
