@@ -1,5 +1,11 @@
 # Event Advertisement Website
 
+# Notice
+
+Thank you for your interest in my project! Unfortunately, I’m unable to fully deploy it at this time, as some of its essential features rely on paid services, including Stripe, Clerk, and Supabase. As this is a personal project, I can’t currently cover these costs. I apologize if this is disappointing, especially if you were hoping for a live preview. However, I invite you to clone the project yourself—everything is set up for you to explore its features and functionality directly.
+
+Please note that you will need to configure your own API keys for these services to access the full functionality.
+
 ## Overview
 
 The Event Advertisement Website is a comprehensive platform designed to facilitate event creation, management, and promotion. This project aims to provide users with a centralized hub for advertising events, managing event details, and engaging with event attendees through comments and ratings.
@@ -76,5 +82,3 @@ For further information, please contact:
 - GitHub: [Your GitHub Profile URL]
 
 ---
-
-# Event-Advertisement-Website
