@@ -71,14 +71,4 @@ Currently, event organizers often struggle with fragmented platforms for event p
 
 ## Contributing
 
-We welcome contributions to enhance the Event Advertisement Website project. Please contact [Your Email Address]
-
-## Contact
-
-For further information, please contact:
-
-- Name: [Your Name]
-- Email: [Your Email Address]
-- GitHub: [Your GitHub Profile URL]
-
----
+We welcome contributions to enhance the Event Advertisement Website project. Please contact [phamthen.hun060907@yahoo.com]
