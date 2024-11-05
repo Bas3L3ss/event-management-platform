@@ -1,106 +1,80 @@
 # Event Advertisement Website
 
-## Goal:
+## Overview
 
-Create a platform where users can advertise and manage events. The website will include features for event creation, commenting, rating, and administrative controls.
+The Event Advertisement Website is a comprehensive platform designed to facilitate event creation, management, and promotion. This project aims to provide users with a centralized hub for advertising events, managing event details, and engaging with event attendees through comments and ratings.
 
-## Features:
+### Problem Statement
 
-### 1. Event Management:
+Currently, event organizers often struggle with fragmented platforms for event promotion and management. Many existing solutions lack integrated features for event creation, payment processing, and user engagement. Additionally, there's a need for a platform that caters to both event organizers and attendees, providing a seamless experience for event discovery, participation, and feedback.
 
-- **User Actions:**
-  - Users can create, edit, and remove their events.
-  - Authentication is required for managing events.
-  - Users can modify their passwords and usernames.
-- **Event Status:**
-  - Events will have statuses such as `not confirmed`, `upcoming`, `started`, `ended`.
-  - The status will automatically update based on the event’s end date (e.g., if today's date is after the event end date, the status becomes `ended`).
+### Goals
 
-### 2. Comments & Ratings:
+- <b>Centralized Event Management:</b> Provide a single platform for creating, editing, and managing events.
+- <b>User Engagement:</b> Enable attendees to comment on and rate events, fostering community interaction.
+- <b>Automated Status Updates:</b> Implement automatic event status changes based on event dates.
+- <b>Secure Authentication:</b> Ensure user data protection through robust email authentication.
+- <b>Integrated Payments:</b> Streamline the process of creating paid event listings.
+- <b>Administrative Control:</b> Offer comprehensive tools for platform moderation and management.
+- <b>User Notifications:</b> Implement a follow system to keep users informed about new events from their favorite organizers.
 
-- Users can comment on events and rate them **only after** the event has ended.
-- Comments can be edited and removed by the author.
+### Why This Project?
 
-### 3. Administration:
+- <b>Efficiency:</b> Streamline the event creation and promotion process for organizers.
+- <b>Community Building:</b> Foster engagement between event organizers and attendees.
+- <b>Transparency:</b> Provide clear information about event statuses and details.
+- <b>Revenue Generation:</b> Create a sustainable model through paid event listings.
+- <b>User-Centric Design:</b> Focus on both organizer and attendee needs for a comprehensive event platform.
 
-- Admins have full control over the platform and can remove events, comments, and manage other content.
+## Tech Stack
 
-### 4. Event Display:
+### Frontend
 
-- Events will be listed on the homepage and categorized in suggestion categories.
-- Filtering options will be available for events (e.g., by date, price, status).
+- <b>Next.js:</b> For building a responsive and dynamic user interface.
 
-### 5. Authentication:
+### Backend
 
-- **Admin:** Simple username and password authentication.
-- **User:** Email authentication with a verification code sent to their email.
+- <b>Node.js:</b> To handle server-side logic and API endpoints.
 
-### 6. Payments:
+### Authentication
 
-- Users must pay to create an event and have it displayed on the website for a certain duration.
-- Once payment is confirmed, the admin receives the order, and communication between the user and admin can occur (consider a built-in real-time chat for this purpose).
+- <b>Clerk:</b> Manages user authentication and profile management.
 
-### 7. Routing:
+### Database
 
-- **Home**: Display a simple event list.
-- **Events**: Event searching and filtering.
-- **Login/Signup**: Authentication page using [Clerk](https://clerk.dev/).
-- **Your Events**: Page to manage your created events (view, edit, delete).
-- **Profile**: Profile management using Clerk.
-- **Notification & Comments**:
-  - Users can follow other users to receive notifications when they upload new events.
-  - Comments are linked to the specific events where they were posted.
-- **Event Details (`/events/:id`)**:
-  - View event details.
-  - If the event belongs to the user, they will see more options (e.g., edit, delete).
-- **Event Audit (`/events/:id/method`)**: Secure actions for event management (authenticate users before proceeding).
+- <b>Supabase:</b> Provides database services and storage for event images and videos.
 
-### 8. Payment:
+### Payment Processing
 
-- Users must pay to create and display their events.
-- Use [Stripe](https://stripe.com/) for payment processing.
-- Upon successful payment, an order is created in the system, and the database is updated.
+- <b>Stripe:</b> Handles secure payment transactions for event listings.
 
-## Database Models (Prisma):
+### Hosting
 
-### **Event:**
+- <b>Vercel:</b> For seamless deployment and hosting of the Next.js application.
 
-- `eventId` (String)
-- `clerkId` (String) - Clerk authentication ID
-- `eventName` (String)
-- `eventDescription` (String)
-- `eventDate` (DateTime)
-- `status` (Enum: `not confirmed`, `upcoming`, `started`, `ended`) - Automatically updated using cron jobs
-- `rating` (Number)
-- `eventImg` (String) - URL of the event image
-- `eventTicketPrice` (Number)
-- `eventTicketCurrency` (String)
-- `featured` (Boolean)
-- `comments` (Relation to `Comment` model)
-- `hostName` (String) - Can be fetched from Clerk user details
+## Features
 
-### **Comment:**
+1. Event Management
+2. Comments & Ratings
+3. Administration
+4. Event Display
+5. Authentication
+6. Payments
+7. User Notifications
+8. Profile Management
 
-- `commentId` (String)
-- `clerkId` (String)
-- `authorName` (String)
-- `authorImageUrl` (String)
-- `createdAt` (DateTime) - Default: `now()`
-- `updatedAt` (DateTime) - Updated automatically
-- `eventId` (String)
+## Contributing
 
-### **Order:**
+We welcome contributions to enhance the Event Advertisement Website project. Please contact [Your Email Address]
 
-- `id` (String) - Default: UUID
-- `clerkId` (String)
-- `orderTotal` (Int) - Default: `0`
-- `email` (String)
-- `isPaid` (Boolean) - Default: `false`
-- `createdAt` (DateTime) - Default: `now()`
-- `updatedAt` (DateTime) - Updated automatically
+## Contact
 
-## Additional Considerations:
+For further information, please contact:
 
-- **UI/UX**: Focus on user experience after core features are implemented.
-- **Storage**: Use a bucket system (e.g., Supabase storage) to store event images.
-- **Real-time Chat**: Consider building a real-time chat feature for user/admin communication post-payment.
+- Name: [Your Name]
+- Email: [Your Email Address]
+- GitHub: [Your GitHub Profile URL]
+
+---
+
+# Event-Advertisement-Website
