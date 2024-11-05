@@ -24,13 +24,12 @@ import ReviewsStarDisplay from "./ReviewsStarDisplay";
 
 export default async function FeaturedEventsPage() {
   const featuredEvents: Event[] = await getLatestFeaturedEvent(8);
-
   if (!featuredEvents || featuredEvents.length === 0) return null;
 
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
   if (!oneFeaturedEvent) return null;
 
-  const oneEventsCommentsLength = getCommentsLength(oneFeaturedEvent.id);
+  const oneEventsCommentsLength = await getCommentsLength(oneFeaturedEvent.id);
 
   return (
     <div

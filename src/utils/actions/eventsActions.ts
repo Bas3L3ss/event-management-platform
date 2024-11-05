@@ -644,23 +644,26 @@ export const getOrderByEventId = async (id: string) => {
 
 // getRandomEvents
 
-async function cachedGetRandomEvents(eventId?: string) {
+async function cachedGetRandomEvents(eventId?: string): Promise<Event[]> {
   try {
+    // Construct the base SQL query with status filtering
     let query = `
       SELECT * FROM "Event"
-      WHERE 1=1
+      WHERE "status" IN ('UPCOMING', 'STARTED') -- Only include public events
     `;
 
+    // Exclude specific eventId if provided
     if (eventId) {
       query += ` AND "id" != $1`; // Use parameterized query
     }
 
+    // Order the results randomly and limit to 10
     query += `
       ORDER BY RANDOM()
       LIMIT 10;
     `;
 
-    // Execute the query with the parameter
+    // Execute the query with the eventId parameter if provided
     let randomEvents: Event[];
     if (eventId) {
       randomEvents = await prisma.$queryRawUnsafe(query, eventId);
@@ -674,6 +677,8 @@ async function cachedGetRandomEvents(eventId?: string) {
     throw new Error("Failed to fetch random events");
   }
 }
+
+// Caching wrapper function to manage revalidation and key generation
 const getCachedRandomEvents = (eventId?: string) => {
   return cache(
     cachedGetRandomEvents,
@@ -684,8 +689,8 @@ const getCachedRandomEvents = (eventId?: string) => {
   )(eventId);
 };
 
-export async function getRandomEvents(eventId?: string) {
-  // Call the cached version of the fetchEvents function
+// Exported function to fetch random events with caching
+export async function getRandomEvents(eventId?: string): Promise<Event[]> {
   return await getCachedRandomEvents(eventId);
 }
 

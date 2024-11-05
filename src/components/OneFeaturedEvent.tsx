@@ -11,7 +11,7 @@ export default function OneFeaturedEvent({
   commentsLength,
 }: {
   featuredEvent: Event;
-  commentsLength: Promise<number>;
+  commentsLength: number;
 }) {
   return (
     <div className="container px-4 py-8 md:py-12 lg:py-16">
