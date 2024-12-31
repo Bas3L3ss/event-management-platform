@@ -9,13 +9,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { LIMIT } from "@/constants/values";
 import { authenticateAndRedirect } from "@/utils/actions/clerkFunc";
-import { getEventFromClerkId } from "@/utils/actions/eventsActions";
+import { getEventsPaginated } from "@/utils/actions/eventsActions";
 import React from "react";
 
 async function MyEventsPage() {
   const clerkID = authenticateAndRedirect();
-  const events = await getEventFromClerkId(clerkID);
+  const events = await getEventsPaginated(0, LIMIT, "", undefined, clerkID);
 
   return (
     <Container className="mt-10">

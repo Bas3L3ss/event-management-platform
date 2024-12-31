@@ -2,8 +2,12 @@ import Container from "@/components/Container";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
 import CommentSection from "@/components/CommentSection";
-import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
-import { Event, EventStatus } from "@prisma/client";
+import {
+  getCommentsLength,
+  getEventById,
+  getUserIdByClerkId,
+} from "@/utils/actions/eventsActions";
+import { Event, EventStatus, User as UserType } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -12,13 +16,23 @@ import MediaRenderer from "@/components/MediaFileRender";
 import BreadCrumbsOfEvent from "@/components/BreadCrumbsOfEvent";
 import ReviewsStarDisplay from "@/components/ReviewsStarDisplay";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
-import { CalendarDays, MapPin, User } from "lucide-react";
+import { CalendarDays, CrownIcon, MapPin, User } from "lucide-react";
 import EventRecordsDisplay from "@/components/EventRecordsDisplay";
+import { getUserByClerkId } from "@/utils/actions/usersActions";
+import { UserButton } from "@/components/UserButton";
+import { Badge } from "@/components/ui/badge";
+import { auth } from "@clerk/nextjs/server";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);
+
   if (oneEvent === null) redirect("/");
   const oneEventsCommentsLength = getCommentsLength(oneEvent.id);
+  const author = await getUserByClerkId(oneEvent.clerkId);
+  const { userId } = auth();
+
+  if (oneEvent.status == "NOT_CONFIRMED" && author?.clerkId != userId)
+    redirect("/events");
 
   return (
     <Container className="py-10 space-y-12">
@@ -26,11 +40,17 @@ async function OneEventPage({ params: { id } }: { params: { id: string } }) {
         <EventDisplay
           commentsLength={oneEventsCommentsLength}
           oneEvent={oneEvent}
+          author={author}
         />
-        <div className="space-y-4">
-          <Title title="Comments" className="text-2xl font-bold text-primary" />
-          <CommentSection eventId={oneEvent.id} />
-        </div>
+        {oneEvent.status != "NOT_CONFIRMED" && (
+          <div className="space-y-4">
+            <Title
+              title="Comments"
+              className="text-2xl font-bold text-primary"
+            />
+            <CommentSection eventId={oneEvent.id} />
+          </div>
+        )}
       </div>
 
       <RecommendationCarousel className="mt-16" id={oneEvent.id} />
@@ -43,9 +63,11 @@ export default OneEventPage;
 function EventDisplay({
   oneEvent,
   commentsLength,
+  author,
 }: {
   oneEvent: Event;
   commentsLength: Promise<number>;
+  author?: UserType | null;
 }) {
   return (
     <div className="space-y-6 ">
@@ -53,7 +75,7 @@ function EventDisplay({
       <article className="relative grid md:grid-cols-2 gap-8 xl:gap-12  ">
         <div className="space-y-6">
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground flex items-center">
+            <p className="text-sm text-primary flex items-center ">
               <CalendarDays className="mr-2 h-4 w-4" />
               <DatePrinter
                 dateEnd={oneEvent.dateEnd}
@@ -73,6 +95,12 @@ function EventDisplay({
                 {oneEvent.type.toLowerCase()}
               </span>
             </div>
+            {author && (
+              <div className="flex items-center space-x-2 text-muted-foreground">
+                <UserButton user={author} />
+                <span className="text-sm font-bold ">{author.userName}</span>
+              </div>
+            )}
           </div>
           <p className="text-lg leading-7 text-muted-foreground">
             {oneEvent.eventDescription.split("\n").map((line, index) => (
@@ -88,6 +116,7 @@ function EventDisplay({
                 Book ticket
               </Link>
             </Button>
+
             <span
               className={`px-3 py-1 text-sm font-semibold rounded-full ${
                 (oneEvent.status === EventStatus.NOT_CONFIRMED &&
@@ -102,6 +131,11 @@ function EventDisplay({
             >
               {oneEvent.status}
             </span>
+            {oneEvent.featured && (
+              <Badge className="bg-yellow-400 hover:bg-yellow-300">
+                <CrownIcon />
+              </Badge>
+            )}
           </div>
           <div className="flex items-center  space-x-4">
             <div className="flex items-center">

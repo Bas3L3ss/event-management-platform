@@ -37,7 +37,6 @@ export default function NotificationCard({
         console.error("Error fetching event details:", error);
       }
     };
-    console.log(notification.seenStatus);
 
     loadEventDetails();
   }, [notification.eventId, notification.seenStatus]);

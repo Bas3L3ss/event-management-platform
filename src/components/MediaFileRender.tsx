@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { Badge } from "./ui/badge";
+import { CrownIcon } from "lucide-react";
 
 const MediaRenderer = ({
   url,
@@ -9,9 +11,11 @@ const MediaRenderer = ({
   onPlay,
   onPause,
   onEnded,
+  featured,
 }: {
   url: string;
   alt: string;
+  featured?: boolean;
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -58,13 +62,20 @@ const MediaRenderer = ({
     fileExtension === "jpeg"
   ) {
     return (
-      <Image
-        className=" w-full aspect-video object-cover rounded-md transition-transform duration-300 hover:scale-105"
-        src={url}
-        alt={alt}
-        width={500}
-        height={500}
-      />
+      <div className="relative">
+        {featured && (
+          <Badge className="hover:bg-yellow-300 bg-yellow-400 absolute top-3 left-3">
+            <CrownIcon />
+          </Badge>
+        )}
+        <Image
+          className=" w-full aspect-video object-cover rounded-md transition-transform duration-300  "
+          src={url}
+          alt={alt}
+          width={500}
+          height={500}
+        />
+      </div>
     );
   }
 

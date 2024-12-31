@@ -68,6 +68,7 @@ export default function OneFeaturedEvent({
         </div>
         <div className="relative rounded-lg overflow-hidden shadow-xl">
           <MediaRenderer
+            featured={featuredEvent.featured}
             url={featuredEvent.eventImgOrVideoFirstDisplay as string}
             alt={featuredEvent.eventName}
           />

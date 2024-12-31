@@ -19,7 +19,7 @@ import {
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
-import { cache } from "../cache";
+import { cache, invalidateCache } from "../cache";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -104,10 +104,15 @@ export async function getCommentsLength(eventId: string): Promise<number> {
   }
 }
 
-async function cachedGetAllEvents(): Promise<Event[]> {
+export async function hasNext(
+  offset: number,
+  limit: number,
+  clerkId?: string
+): Promise<boolean> {
   try {
-    const events = await prisma.event.findMany({
+    const nextBatch = await prisma.event.findMany({
       where: {
+        ...(clerkId && { clerkId }),
         NOT: {
           status: {
             in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
@@ -115,8 +120,68 @@ async function cachedGetAllEvents(): Promise<Event[]> {
         },
       },
       orderBy: {
-        dateStart: "desc", // Optionally, order by start date or any other field
+        dateStart: "desc",
       },
+      skip: offset,
+      take: limit,
+    });
+
+    return nextBatch.length > 0;
+  } catch (error) {
+    console.error("Error checking for next events batch:", error);
+    throw new Error("Unable to check for next events batch");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getEventsPaginated(
+  offset: number,
+  limit: number,
+  searchTerm: string = "",
+  filter?: {
+    eventType?: EventType;
+    status?: EventStatus;
+    isFeatured?: boolean;
+    minDate?: string;
+    maxDate?: string;
+    minRating?: number;
+  },
+  clerkId: string | undefined = undefined
+) {
+  try {
+    if (filter) {
+      return await searchAndFilterEvents(
+        searchTerm,
+        filter,
+        offset,
+        limit,
+        clerkId
+      );
+    }
+
+    const events = await prisma.event.findMany({
+      where: {
+        ...(clerkId && { clerkId }),
+        eventName: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+        ...(clerkId
+          ? {}
+          : {
+              NOT: {
+                status: {
+                  in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+                },
+              },
+            }),
+      },
+      orderBy: {
+        dateStart: "desc",
+      },
+      skip: offset,
+      take: limit,
     });
     return events;
   } catch (error) {
@@ -125,14 +190,6 @@ async function cachedGetAllEvents(): Promise<Event[]> {
   } finally {
     await prisma.$disconnect();
   }
-}
-
-const getCachedEvents = cache(cachedGetAllEvents, ["events"], {
-  revalidate: 60, // Revalidate cache every 60 seconds
-});
-export async function getAllEvents() {
-  // Call the cached version of the fetchEvents function
-  return await getCachedEvents();
 }
 
 export async function getAllInAdminPageEvents(): Promise<Event[]> {
@@ -165,7 +222,6 @@ export async function getUserIdByClerkId(
       },
     });
 
-    // Return the user ID if found, or null if not found
     return user ? user.id : null;
   } catch (error) {
     console.error("Error fetching user ID by clerkId:", error);
@@ -211,21 +267,28 @@ export async function searchAndFilterEvents(
     minDate?: string;
     maxDate?: string;
     minRating?: number;
-  }
+  },
+  offset: number,
+  limit: number,
+  clerkId?: string
 ) {
   try {
     const events = await prisma.event.findMany({
       where: {
+        ...(clerkId && { clerkId }),
         eventName: {
           contains: searchTerm,
           mode: "insensitive",
         },
-        NOT: {
-          status: {
-            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
-          },
-        },
-
+        ...(clerkId
+          ? {}
+          : {
+              NOT: {
+                status: {
+                  in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+                },
+              },
+            }),
         type: filters.eventType ? filters.eventType : undefined,
         status: filters.status ? filters.status : undefined,
 
@@ -245,58 +308,11 @@ export async function searchAndFilterEvents(
         },
       },
       orderBy: {
-        dateStart: "asc", // Order by start date
+        dateStart: "desc",
       },
+      skip: offset,
+      take: limit,
     });
-
-    return events;
-  } catch (error) {
-    console.error("Error searching and filtering events:", error);
-    throw new Error("Unable to fetch events");
-  }
-}
-export async function searchAndFilterUserSpecificEvents(
-  clerkId: string,
-  searchTerm: string,
-  filters: {
-    eventType?: EventType;
-    status?: EventStatus;
-    isFeatured?: boolean;
-    minDate?: string;
-    maxDate?: string;
-    minRating?: number;
-  }
-) {
-  try {
-    const events = await prisma.event.findMany({
-      where: {
-        clerkId,
-        eventName: {
-          contains: searchTerm, // Fuzzy search on event name
-          mode: "insensitive", // Case-insensitive search
-        },
-        type: filters.eventType ? filters.eventType : undefined,
-        status: filters.status ? filters.status : undefined,
-        featured: filters.isFeatured ? filters.isFeatured : undefined,
-        dateStart: filters.minDate
-          ? {
-              gte: new Date(filters.minDate),
-            }
-          : undefined,
-        dateEnd: filters.maxDate
-          ? {
-              lte: new Date(filters.maxDate),
-            }
-          : undefined,
-        rating: {
-          gte: filters.minRating || 0,
-        },
-      },
-      orderBy: {
-        createdAt: "desc", // Order by start date
-      },
-    });
-
     return events;
   } catch (error) {
     console.error("Error searching and filtering events:", error);
@@ -311,7 +327,7 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
         clerkId,
         NOT: {
           status: {
-            in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
+            in: [EventStatus.NOT_CONFIRMED],
           },
         },
       },
@@ -323,24 +339,7 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
     throw new Error("Unable to fetch events");
   }
 };
-export const getEventFromClerkId = async (clerkId: string) => {
-  try {
-    const events = await prisma.event.findMany({
-      where: {
-        clerkId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
 
-    return events;
-  } catch (error) {
-    console.error("Error getting events:", error);
-    throw new Error("Unable to fetch events");
-  }
-};
-// getCommentsByEventId
 async function cachedGetCommentsByEventId(eventId: string) {
   try {
     const comments = await prisma.comment.findMany({
@@ -439,8 +438,9 @@ export async function deleteComment(commentId: string): Promise<void> {
         id: commentId,
       },
     });
-    console.log(comment);
+
     await updateEventRating(comment.eventId);
+    invalidateCache(["comments", comment.eventId]);
   } catch (error) {
     console.error("Error deleting comment:", error);
     throw new Error("Unable to delete comment");

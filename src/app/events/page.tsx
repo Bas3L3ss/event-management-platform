@@ -8,10 +8,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getAllEvents } from "@/utils/actions/eventsActions";
+import { LIMIT } from "@/constants/values";
+import { getEventsPaginated } from "@/utils/actions/eventsActions";
 
 async function EventsPage() {
-  const eventsData = await getAllEvents();
+  const eventsData = await getEventsPaginated(0, LIMIT);
 
   return (
     <Container className="mt-10">

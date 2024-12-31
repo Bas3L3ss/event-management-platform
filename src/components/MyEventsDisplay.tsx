@@ -1,6 +1,5 @@
-// components/EventsPage.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EventSearchFilter from "./EventSearchFilter";
 import { Event, EventStatus, EventType } from "@prisma/client";
 import Link from "next/link";
@@ -12,6 +11,11 @@ import { useFilters } from "@/hooks/useQueryParam";
 import { deepEqual } from "@/utils/utils";
 import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
+import { LIMIT } from "@/constants/values";
+import { getEventsPaginated, hasNext } from "@/utils/actions/eventsActions";
+import { debounce } from "lodash";
+import { Separator } from "./ui/separator";
+import SkeletonLoading from "./SkeletonLoading";
 
 export type FiltersType = {
   eventType?: EventType | undefined | string;
@@ -38,69 +42,138 @@ const MyEventsDisplay = ({
   eventsData: Event[];
   clerkID: string;
 }) => {
+  const [offset, setOffset] = useState(LIMIT);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filters, setFilters] = useState<FiltersType | null>(null);
-  const [events, setEvents] = useState<Event[]>([...eventsData]);
-  const [isDefValueAndFiltersEquals, setIsDefValueAndFiltersEquals] =
-    useState<boolean>(deepEqual(defaultValue, filters));
+  const [events, setEvents] = useState<Event[]>(eventsData);
 
+  const separatorRef = useRef<HTMLDivElement>(null);
   const queryParam = useFilters();
 
   useEffect(() => {
     if (!filters && Object.keys(queryParam).length > 0) {
-      setFilters({
-        ...defaultValue,
-        ...queryParam,
-      });
+      setFilters({ ...defaultValue, ...queryParam });
     }
   }, [queryParam, filters]);
 
   useEffect(() => {
-    setIsDefValueAndFiltersEquals(deepEqual(defaultValue, filters));
-  }, [filters]);
+    setIsLoading(true);
+    setOffset(LIMIT);
 
-  useEffect(() => {
     const searchEvents = async () => {
       if (!filters) return;
       try {
         const queryParams = new URLSearchParams({
-          searchTerm: searchTerm || "",
-          eventType: filters.eventType || "",
-          status: filters.status || "",
-          minDate: filters.minDate || "",
-          maxDate: filters.maxDate || "",
-          minRating: filters.minRating ? filters.minRating.toString() : "",
-          isFeatured: filters.isFeatured ? "true" : "",
+          isNonFilter: `${deepEqual(defaultValue, filters)}`,
           clerkID: clerkID,
+          offset: "0",
+          searchTerm: searchTerm || "",
+          ...Object.entries(filters).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== "") {
+              acc[key] = value.toString();
+            }
+            return acc;
+          }, {} as Record<string, string>),
         });
-        for (const [key, value] of queryParams.entries()) {
-          if (!value) queryParams.delete(key);
-        }
 
         const response = await fetch(
-          `/api/eventsHandler/myevents?${queryParams.toString()}`,
+          `/api/events/myevents?${queryParams.toString()}`,
           {
             method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           }
         );
-        if (!response.ok) {
-          throw new Error("Failed to fetch events");
-        }
+
+        if (!response.ok) throw new Error("Failed to fetch events");
+
         const fetchedEvents = await response.json();
         setEvents(fetchedEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     };
-    searchEvents();
 
-    const intervalId = setInterval(searchEvents, 5000);
+    setIsLoading(false);
+    const debouncedSearch = debounce(searchEvents, 300);
+    debouncedSearch();
 
-    return () => clearInterval(intervalId);
-  }, [filters, searchTerm, clerkID]);
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [filters, searchTerm]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    const newEvent = async () => {
+      try {
+        const canFetch = await hasNext(offset, LIMIT, clerkID);
+
+        if (canFetch) {
+          setIsLoading(true);
+          if (deepEqual(defaultValue, filters)) {
+            const newEvents = await getEventsPaginated(
+              offset,
+              LIMIT,
+              searchTerm ? searchTerm : "",
+              undefined,
+              clerkID
+            );
+            setEvents((prev) => [...prev, ...newEvents]);
+          } else {
+            const newEvents = await getEventsPaginated(
+              offset,
+              LIMIT,
+              searchTerm ? searchTerm : "",
+              filters as
+                | {
+                    eventType?: EventType | undefined;
+                    status?: EventStatus | undefined;
+                    isFeatured?: boolean | undefined;
+                    minDate?: string | undefined;
+                    maxDate?: string | undefined;
+                    minRating?: number | undefined;
+                  }
+                | undefined,
+              clerkID
+            );
+            setEvents((prev) => [...prev, ...newEvents]);
+          }
+
+          setOffset((prevOffset) => prevOffset + LIMIT);
+        }
+      } catch (error) {
+        console.error("Error loading more events:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    const debouncedNewEvent = debounce(newEvent, 500);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            debouncedNewEvent();
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    const currentRef = separatorRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+      observer.disconnect();
+      debouncedNewEvent.cancel();
+    };
+  }, [offset, isLoading]);
   return (
     <div>
       <EventSearchFilter
@@ -109,7 +182,7 @@ const MyEventsDisplay = ({
         searchTerm={searchTerm}
         setFilters={setFilters}
         setSearchTerm={setSearchTerm}
-        isDefValueAndFiltersEquals={isDefValueAndFiltersEquals}
+        isDefValueAndFiltersEquals={deepEqual(defaultValue, filters)}
       />
 
       <Title
@@ -130,6 +203,8 @@ const MyEventsDisplay = ({
           </Link>
         )}
       </div>
+      <Separator className="hidden " ref={separatorRef} />
+      {isLoading && <SkeletonLoading />}
     </div>
   );
 };
@@ -155,6 +230,7 @@ const IndividualEvent = ({ event }: { event: Event }) => {
 
         <div className="mb-4 flex-grow">
           <MediaRenderer
+            featured={event.featured}
             alt={event.eventName}
             url={event.eventImgOrVideoFirstDisplay!}
           />

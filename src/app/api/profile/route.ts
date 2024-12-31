@@ -20,7 +20,6 @@ export async function POST(req: Request) {
     });
 
     revalidatePath("/profile/profileedit");
-    console.log("updated User");
 
     return NextResponse.json(
       { message: "Bio updated successfully" },

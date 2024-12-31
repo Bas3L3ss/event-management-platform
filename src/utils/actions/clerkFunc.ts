@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export function authenticateAndRedirect(): string {
   const { userId } = auth();
   if (userId === null) {
-    redirect("/");
+    redirect("/sign-in");
   }
   return userId;
 }

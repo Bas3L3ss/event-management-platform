@@ -71,8 +71,6 @@ export async function POST(req: Request) {
         userPhone: user.phone_numbers[0]?.phone_number || "",
         userBiography: "", // Default to empty string
       });
-
-      console.log("created user");
     } catch (error) {
       console.error("Error creating user in database:", error);
       return new Response("Error occurred while creating user", {
@@ -94,7 +92,6 @@ export async function POST(req: Request) {
 
         userBiography: "", // Default to empty string
       });
-      console.log("updated user");
       revalidatePath(`/profile`);
     } catch (error) {
       console.error("Error updating user in database:", error);
@@ -114,7 +111,6 @@ export async function POST(req: Request) {
     try {
       // Call the createUser action with the relevant user details from the Clerk webhook
       await SoftDeleteUser(user.id);
-      console.log("deleted user");
     } catch (error) {
       console.error("Error deleting user in database:", error);
       return new Response("Error occurred while deleting user", {

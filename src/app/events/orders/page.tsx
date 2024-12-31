@@ -15,6 +15,7 @@ import React from "react";
 
 async function EventOrdersPage() {
   const clerkId = authenticateAndRedirect();
+
   const orders = await getOrderByClerkId(clerkId);
   return (
     <Container className="mt-10 flex flex-col gap-2">

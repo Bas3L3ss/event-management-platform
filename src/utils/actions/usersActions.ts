@@ -317,7 +317,6 @@ export async function createNotification(
           userId: follower.id,
         },
       });
-      console.log(notification);
     });
   } catch (error) {
     // Log the error
@@ -368,5 +367,20 @@ export const changeSeenStateNotification = async (
         seenStatus: isSeenState,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getUserByClerkId = async (clerkId: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
 };

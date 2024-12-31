@@ -41,6 +41,7 @@ const CommentsList: React.FC<CommentsListProps> = ({
   comments,
   currentUserId,
 }) => {
+  const router = useRouter();
   const sortedComments = [...comments].sort((a, b) => {
     if (a.clerkId === currentUserId) return -1; // Move currentUserId's comment to the top
     if (b.clerkId === currentUserId) return 1; // Keep currentUserId's comment at the top
@@ -55,6 +56,7 @@ const CommentsList: React.FC<CommentsListProps> = ({
 
       if (response.ok) {
         toastPrint("Success", "Comment deleted successfully", "default");
+        router.refresh();
         // Optionally refresh or refetch comments
       } else {
         const error = await response.json();

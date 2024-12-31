@@ -12,11 +12,13 @@ type CommentFormProps = {
   isAuthenticated: boolean;
   userId: string | null;
   eventId: string;
+  userAddedComment: Boolean;
 };
 
 const CommentForm = ({
   eventId,
   isAuthenticated,
+  userAddedComment,
   userId,
 }: CommentFormProps) => {
   const { user } = useUser();
@@ -36,6 +38,10 @@ const CommentForm = ({
         "default",
         true
       );
+      return;
+    }
+    if (userAddedComment) {
+      toastPrint("Already rated", "You're only allowed to submit one rating");
       return;
     }
 

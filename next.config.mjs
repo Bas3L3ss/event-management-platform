@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["date-fns"],
   productionBrowserSourceMaps: true,
   images: {
     remotePatterns: [

@@ -190,7 +190,6 @@ const EventSearchFilter = ({
                         All Statuses
                       </option>
                       {Object.values(EventStatus).map((status) => {
-                        if (status == "NOT_CONFIRMED") return null;
                         return (
                           <option
                             className="capitalize"

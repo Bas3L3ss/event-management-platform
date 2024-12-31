@@ -44,7 +44,6 @@ export const deleteVideo = async (filePath: string) => {
   if (!file) throw new Error("Invalid URL");
 
   const { data, error } = await supabase.storage.from(bucket).remove([file]);
-  console.log(data);
 
   if (error) {
     console.error("Error deleting files:", error.message);
@@ -62,7 +61,6 @@ export const deleteImages = async (filePath: string[]) => {
     )[1];
 
     const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-    console.log(cleanPath);
 
     const { data, error } = await supabase.storage
       .from("main-bucket")

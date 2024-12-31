@@ -10,9 +10,11 @@ export default async function CommentSection({ eventId }: CommentProps) {
   const comments = await getCommentsByEventId(eventId);
   const userId = auth().userId;
   const isAuthenticated = userId !== null;
+  const userComment = comments.find((comment) => comment.clerkId === userId);
   return (
     <div>
       <CommentForm
+        userAddedComment={userComment != undefined}
         userId={userId}
         eventId={eventId}
         isAuthenticated={isAuthenticated}

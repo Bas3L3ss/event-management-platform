@@ -15,6 +15,7 @@ export async function DELETE(
   }
   try {
     await deleteComment(commentId);
+
     return NextResponse.json(
       { message: "Comment deleted successfully" },
       { status: 200 }

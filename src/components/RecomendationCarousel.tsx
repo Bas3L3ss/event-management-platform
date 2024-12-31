@@ -85,7 +85,7 @@ const RecommendationCarousel = ({
   };
 
   return (
-    <div className={cn(`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8`, className)}>
+    <div className={cn(`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 `, className)}>
       <h2 className="text-3xl font-bold text-center mb-8 text-primary">
         Recommended Events
       </h2>
@@ -96,6 +96,7 @@ const RecommendationCarousel = ({
               <CardHeader className="p-0">
                 <div className="relative aspect-video">
                   <MediaRenderer
+                    featured={event.featured}
                     url={event.eventImgOrVideoFirstDisplay || ""}
                     alt={event.eventName}
                   />
