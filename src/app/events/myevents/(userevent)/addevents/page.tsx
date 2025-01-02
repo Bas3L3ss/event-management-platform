@@ -1,6 +1,8 @@
 import Container from "@/components/Container";
+import DatetimePickerPlaceholder from "@/components/DateTimePickerPlaceHolder";
 import { SubmitButton } from "@/components/form/Buttons";
 import CheckboxInput from "@/components/form/CheckBoxInput";
+import DateTimePicker from "@/components/form/DateTimePicker";
 import FormContainer from "@/components/form/FormContainer";
 import FormInput from "@/components/form/FormInput";
 import ImageInput from "@/components/form/ImageInput";
@@ -18,7 +20,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createEventAction } from "@/utils/actions/eventsActions";
-import { faker } from "@faker-js/faker";
 import { EventType } from "@prisma/client";
 
 async function AddEventsPage() {
@@ -84,36 +85,8 @@ async function AddEventsPage() {
           <div className="mb-6">
             <TextAreaInput name="description" labelText="Event Description" />
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 mb-6">
-            <div>
-              <Label
-                htmlFor="dateStart"
-                className="mb-2 block text-sm font-medium text-primary"
-              >
-                Start Date
-              </Label>
-              <Input
-                id="dateStart"
-                type="date"
-                name="dateStart"
-                className="w-full"
-              />
-            </div>
-            <div>
-              <Label
-                htmlFor="dateEnd"
-                className="mb-2 block text-sm font-medium text-primary"
-              >
-                End Date
-              </Label>
-              <Input
-                id="dateEnd"
-                type="date"
-                name="dateEnd"
-                className="w-full"
-              />
-            </div>
-          </div>
+          <DateTimePicker />
+
           <div className="space-y-6 mb-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 text-primary">

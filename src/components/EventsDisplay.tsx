@@ -18,7 +18,7 @@ import { getEventsPaginated, hasNext } from "@/utils/actions/eventsActions";
 import SkeletonLoading from "./SkeletonLoading";
 import { debounce } from "lodash";
 import Link from "next/link";
-import { LIMIT } from "@/constants/values";
+import { LIMIT, LoadingVariant } from "@/constants/values";
 
 export type FiltersType = {
   eventType?: EventType | string;
@@ -51,6 +51,9 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
   useEffect(() => {
     if (!filters && Object.keys(queryParam).length > 0) {
       setFilters({ ...defaultValue, ...queryParam });
+    }
+    if (filters == null) {
+      setFilters(defaultValue);
     }
   }, [queryParam, filters]);
 
@@ -178,10 +181,8 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
       />
 
       <Title
-        title={`Events - ${events.length} event${
-          events.length !== 1 ? "s" : ""
-        }`}
-        className="my-6 text-2xl font-bold"
+        title={`Events`}
+        className="my-6 text-2xl font-bold text-primary"
       />
 
       {events.length > 0 ? (
@@ -191,7 +192,7 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
               <IndividualEvent key={event.id} event={event} />
             ))}
           </div>
-          {isLoading && <SkeletonLoading />}
+          {isLoading && <SkeletonLoading variant={LoadingVariant.CARD} />}
           <Separator ref={separatorRef} className="space-y-10 " />
 
           <RecommendationCarousel className="mt-5" />
@@ -204,10 +205,7 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
 };
 
 const IndividualEvent = ({ event }: { event: Event }) => {
-  const [isTextExpanded, setIsTextExpanded] = useState(false);
   const maxLength = 100;
-
-  const toggleText = () => setIsTextExpanded(!isTextExpanded);
 
   return (
     <Card className="h-full flex flex-col">
@@ -217,8 +215,15 @@ const IndividualEvent = ({ event }: { event: Event }) => {
             <DatePrinter dateEnd={event.dateEnd} dateStart={event.dateStart} />
           </p>
           <h3 className="text-xl font-semibold mb-2">{event.eventName}</h3>
-          <p className="text-sm text-gray-600">
-            Host: {event.hostName} - Genre: {event.type.toLowerCase()}
+          <p className="text-sm text-white ">
+            <span className="font-bold">Host</span>: {event.hostName}
+          </p>
+          <p className="text-sm text-white  ">
+            <span className="font-bold">Genre</span>:{" "}
+            {event.type
+              .toLowerCase()
+              .replace(/_/g, " ")
+              .replace(/^\w/, (c) => c.toUpperCase())}
           </p>
         </div>
 
@@ -231,18 +236,12 @@ const IndividualEvent = ({ event }: { event: Event }) => {
         </div>
 
         <ReviewsStarDisplay rating={event.rating} />
-
         <div className="mb-4">
           <p className="text-sm">
-            {isTextExpanded || event.eventDescription.length <= maxLength
+            {event.eventDescription.length <= maxLength
               ? event.eventDescription
               : `${event.eventDescription.substring(0, maxLength)}...`}
           </p>
-          {event.eventDescription.length > maxLength && (
-            <button onClick={toggleText} className="text-blue-500 text-sm mt-1">
-              {isTextExpanded ? "See Less" : "See More"}
-            </button>
-          )}
         </div>
 
         <div className="flex gap-2 mt-auto">

@@ -1,8 +1,11 @@
 // pages/api/comments.ts
 import { createComment } from "@/utils/actions/eventsActions";
-import { changeSeenStateNotification } from "@/utils/actions/usersActions";
+import {
+  changeSeenStateNotification,
+  getUnseenNotificationsByClerkId,
+} from "@/utils/actions/usersActions";
 import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // For a POST request handler
 export async function POST(request: Request) {

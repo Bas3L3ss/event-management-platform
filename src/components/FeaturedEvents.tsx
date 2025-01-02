@@ -14,10 +14,9 @@ import {
 import { Event } from "@prisma/client";
 import Container from "./Container";
 import Title from "./Title";
-import Image from "next/image";
 import Link from "next/link";
 import DatePrinter from "./DatePrinter";
-import { Calendar, Star } from "lucide-react";
+import { Calendar } from "lucide-react";
 import MediaRenderer from "./MediaFileRender";
 import OneFeaturedEvent from "./OneFeaturedEvent";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";

@@ -6,8 +6,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { cn } from "@/lib/utils";
 
-function BreadCrumbsOfEvent({ eventName }: { eventName: string }) {
+function BreadCrumbsOfEvent({
+  eventName,
+  pulse,
+}: {
+  eventName: string;
+  pulse?: boolean;
+}) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -20,7 +27,9 @@ function BreadCrumbsOfEvent({ eventName }: { eventName: string }) {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>{eventName}</BreadcrumbPage>
+          <BreadcrumbPage className={cn(pulse && "animate-pulse")}>
+            {eventName}
+          </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

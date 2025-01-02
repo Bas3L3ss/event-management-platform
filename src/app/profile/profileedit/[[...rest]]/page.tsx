@@ -57,7 +57,7 @@ async function EditMyProfilePage() {
               <TabsTrigger value="bio">Biography</TabsTrigger>
             </TabsList>
             <TabsContent value="clerk-profile" className="mt-4">
-              <div className="bg-background p-4 rounded-lg">
+              <div className="bg-background p-4 rounded-lg w-full h-full flex items-center justify-center ">
                 <UserProfile path="/profile/profileedit" />
               </div>
             </TabsContent>

@@ -20,7 +20,6 @@ function NotificationsDisplay({
   const [sortOrder, setSortOrder] = useState<SortOrder>("latest");
 
   const toggleSeenStatus = async (id: string) => {
-    // Update local state
     setNotifications(
       notifications.map((notification) =>
         notification.id === id
@@ -28,8 +27,6 @@ function NotificationsDisplay({
           : notification
       )
     );
-    // You might want to call the changeSeenStateNotification function here
-    // await changeSeenStateNotification(id);
   };
 
   const filteredNotifications = notifications

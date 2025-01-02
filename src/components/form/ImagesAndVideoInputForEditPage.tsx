@@ -2,9 +2,7 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { Checkbox } from "../ui/checkbox";
 import { toastPrint } from "@/utils/toast action/action";
-import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 
 interface ImagesAndVideoInputForEditPageProps {
@@ -21,7 +19,6 @@ const ImagesAndVideoInputForEditPage: React.FC<
   const [itemSelected, setItemSelected] = useState<string[]>([]);
 
   useEffect(() => {
-    // Initialize checked count based on existing images
     setCountImagesRemaining(existingImages.length);
   }, [existingImages]);
 
@@ -57,7 +54,9 @@ const ImagesAndVideoInputForEditPage: React.FC<
   return (
     <>
       <div className="mb-5">
-        <Label>Select images to remove them (can&apos;t remove all)</Label>
+        <Label className="mb-2">
+          Select images to remove them (can&apos;t remove all)
+        </Label>
         <Input
           className="mb-2"
           type="file"
@@ -101,6 +100,7 @@ const ImagesAndVideoInputForEditPage: React.FC<
           ))}
         </div>
       </div>
+      <Label className="mb-2">Replace the video</Label>
 
       <Input name="video" className="mb-2" type="file" accept="video/*" />
       {existingVideo && (

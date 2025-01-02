@@ -1,16 +1,14 @@
 import Container from "@/components/Container";
-import Hero from "@/components/Hero";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { LoadingVariant } from "@/constants/values";
 import React from "react";
 
-function loading() {
+const loading = () => {
   return (
-    <Container>
-      <Hero />
-      <SkeletonLoading variant={LoadingVariant.FEATURED} />
+    <Container className="mt-10">
+      <SkeletonLoading variant={LoadingVariant.FORM} />
     </Container>
   );
-}
+};
 
 export default loading;

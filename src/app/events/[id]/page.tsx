@@ -92,7 +92,10 @@ function EventDisplay({
               </span>
               <span>•</span>
               <span className="text-sm font-medium capitalize">
-                {oneEvent.type.toLowerCase()}
+                {oneEvent.type
+                  .toLowerCase()
+                  .replace(/_/g, " ")
+                  .replace(/^\w/, (c) => c.toUpperCase())}
               </span>
             </div>
             {author && (

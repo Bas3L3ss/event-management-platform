@@ -15,6 +15,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,7 +24,10 @@ import {
   getOrderByEventId,
   updateEventAction,
 } from "@/utils/actions/eventsActions";
+import { getUserByClerkId } from "@/utils/actions/usersActions";
+import { auth } from "@clerk/nextjs/server";
 import { EventType } from "@prisma/client";
+import Link from "next/link";
 
 import { redirect } from "next/navigation";
 
@@ -45,6 +49,10 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
     type,
     hostName,
   } = defaultEvent;
+  const author = await getUserByClerkId(defaultEvent.clerkId);
+  const curUserClerkId = auth().userId;
+
+  if (author?.clerkId != curUserClerkId) redirect("/events/myevents");
 
   const dateStartObject = new Date(dateStart.toString());
   const formattedStartDate = dateStartObject.toISOString().split("T")[0];
@@ -52,7 +60,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
   const formattedEndDate = dateEndObject.toISOString().split("T")[0];
 
   return (
-    <Container className="mt-10 flex flex-col gap-2">
+    <Container className="mt-10 flex flex-col gap-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -73,7 +81,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h1 className="text-3xl font-bold mb-8 ">Edit Event</h1>
+      <h1 className="text-3xl font-bold  ">Edit Event</h1>
       <div className="border border-border p-8 rounded-lg shadow-sm bg-card">
         <div className="relative">
           <div className="absolute top-0 right-0">
@@ -195,7 +203,23 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
                 label="Display Video First"
               />
             </div>
-            <SubmitButton text="Update Event" className="mt-8 w-full" />
+            <div className="grid grid-cols-2 gap-4">
+              <SubmitButton text="Update Event" className="mt-8 text-white " />
+              {!relatedOrder.isPaid && (
+                <Button
+                  className=" bg-green-600 hover:bg-green-500 mt-8"
+                  size={"lg"}
+                  asChild
+                >
+                  <Link
+                    href={`/checkout?orderId=${relatedOrder.id}&eventId=${relatedOrder.eventId}`}
+                    className="text-white"
+                  >
+                    Activate Advertisement
+                  </Link>
+                </Button>
+              )}
+            </div>
           </FormEditContainer>
         </div>
       </div>

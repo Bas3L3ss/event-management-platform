@@ -19,7 +19,6 @@ import {
 import { FilterIcon, FilterXIcon, PlusIcon } from "lucide-react";
 import { Label } from "./ui/label";
 import { redirect } from "next/navigation";
-import { deepEqual } from "@/utils/utils";
 import SkeletonLoading from "./SkeletonLoading";
 import Link from "next/link";
 import {
@@ -28,6 +27,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import DatetimePickerPlaceholder from "./DateTimePickerPlaceHolder";
+import { LoadingVariant } from "@/constants/values";
 
 type EventSearchFilterProps = {
   searchTerm: string;
@@ -46,18 +47,27 @@ const EventSearchFilter = ({
   isEditPage = false,
   isDefValueAndFiltersEquals,
 }: EventSearchFilterProps) => {
-  const [isResetable, setIsResetable] = useState(false);
+  const [isResettable, setIsResettable] = useState(false);
+  const [minDate, setMinDate] = useState<Date | undefined>(undefined);
+  const [maxDate, setMaxDate] = useState<Date | undefined>(undefined);
   useEffect(() => {
-    if (isResetable) {
-      setIsResetable(false);
-
+    if (isResettable) {
+      setIsResettable(false);
+      if (isEditPage) redirect("/events/myevents");
       redirect("/events");
     }
-  }, [isResetable]);
+  }, [isResettable]);
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      maxDate: maxDate?.toISOString(),
+      minDate: minDate?.toISOString(),
+    }));
+  }, [minDate, maxDate]);
   if (!filters)
     return (
       <div>
-        <SkeletonLoading />
+        <SkeletonLoading variant={LoadingVariant.SEARCH} />
       </div>
     );
   return (
@@ -76,28 +86,26 @@ const EventSearchFilter = ({
         {/* Filter options */}
         <div className="flex gap-3 flex-wrap">
           <div>
-            <Label htmlFor="minDate">Date start</Label>
-            <Input
-              id="minDate"
-              className=" w-auto"
-              type="date"
-              value={filters.minDate}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, minDate: e.target.value }))
-              }
-            />
+            <Label htmlFor="minDate">Date from</Label>
+            <div>
+              <DatetimePickerPlaceholder
+                date={minDate}
+                className="w-64"
+                setDate={setMinDate}
+                placeholder="Date start"
+              />
+            </div>
           </div>
           <div>
-            <Label htmlFor="maxDate">Date end</Label>
-            <Input
-              id="maxDate"
-              className=" w-auto"
-              type="date"
-              value={filters.maxDate}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, maxDate: e.target.value }))
-              }
-            />
+            <Label htmlFor="maxDate">Date to</Label>
+            <div>
+              <DatetimePickerPlaceholder
+                date={maxDate}
+                className="w-64"
+                setDate={setMaxDate}
+                placeholder="Date end"
+              />
+            </div>
           </div>
           <div>
             <Label htmlFor="Ratings">Rating from</Label>
@@ -107,8 +115,8 @@ const EventSearchFilter = ({
               min={0}
               max={5}
               type="number"
-              placeholder="Min Rating"
               value={filters.minRating}
+              placeholder="0"
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
@@ -190,6 +198,7 @@ const EventSearchFilter = ({
                         All Statuses
                       </option>
                       {Object.values(EventStatus).map((status) => {
+                        if (status == "NOT_CONFIRMED" && !isEditPage) return;
                         return (
                           <option
                             className="capitalize"
@@ -231,7 +240,9 @@ const EventSearchFilter = ({
                     onClick={(e) => {
                       e.preventDefault();
                       setFilters(defaultValue);
-                      setIsResetable(true);
+                      setMaxDate(undefined);
+                      setMinDate(undefined);
+                      setIsResettable(true);
                     }}
                   >
                     Clear all filters

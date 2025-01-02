@@ -342,9 +342,25 @@ export async function createNotification(
 export const getNotificationsByClerkId = async () => {
   const clerkId = authenticateAndRedirect();
   try {
-    const notifications = prisma.notification.findMany({
+    const notifications = await prisma.notification.findMany({
       where: {
         clerkId,
+      },
+    });
+    return notifications;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw new Error("failed to fetch notifications");
+  }
+};
+export const getUnseenNotificationsByClerkId = async (clerkId: string) => {
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: {
+        clerkId,
+        NOT: {
+          seenStatus: true,
+        },
       },
     });
     return notifications;

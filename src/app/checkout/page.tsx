@@ -19,7 +19,6 @@ export default function CheckoutPage() {
   const eventId = searchParams.get("eventId");
 
   const fetchClientSecret = useCallback(async () => {
-    // Create a Checkout Session
     const response = await axios.post("/api/payment", {
       orderId: orderId,
       eventId: eventId,
@@ -27,7 +26,9 @@ export default function CheckoutPage() {
     return response.data.clientSecret;
   }, [orderId, eventId]);
 
-  const options = { fetchClientSecret };
+  const options = {
+    fetchClientSecret,
+  };
 
   return (
     <div id="checkout">

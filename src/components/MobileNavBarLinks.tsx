@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   Tooltip,
   TooltipTrigger,
@@ -20,9 +20,10 @@ import { SignInButton, SignOutButton, SignUpButton } from "@clerk/nextjs";
 interface MenuProps {
   isOpen: boolean | undefined;
   userId: string | null;
+  unseenAmount?: number;
 }
 
-function MobileNavBarLinks({ isOpen, userId }: MenuProps) {
+function MobileNavBarLinks({ isOpen, userId, unseenAmount }: MenuProps) {
   const pathname = usePathname();
 
   const menuList = getMenuList(pathname);
@@ -45,7 +46,7 @@ function MobileNavBarLinks({ isOpen, userId }: MenuProps) {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="right">
-                    <p>{groupLabel}</p>
+                    <p>{groupLabel} </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -65,25 +66,55 @@ function MobileNavBarLinks({ isOpen, userId }: MenuProps) {
                         >
                           <Link href={href}>
                             <span
-                              className={cn(isOpen === false ? "" : "mr-4")}
+                              className={cn(
+                                isOpen === false ? "" : "mr-4",
+                                label === "Notifications" &&
+                                  unseenAmount &&
+                                  unseenAmount > 0 &&
+                                  "text-primary"
+                              )}
                             >
                               <Icon size={18} />
                             </span>
-                            <p
-                              className={cn(
-                                "max-w-[200px] truncate",
-                                isOpen === false
-                                  ? "-translate-x-96 opacity-0"
-                                  : "translate-x-0 opacity-100"
-                              )}
-                            >
-                              {label}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p
+                                className={cn(
+                                  "max-w-[200px] truncate",
+                                  isOpen === false
+                                    ? "-translate-x-96 opacity-0"
+                                    : "translate-x-0 opacity-100",
+                                  label === "Notifications" &&
+                                    unseenAmount &&
+                                    unseenAmount > 0 &&
+                                    "text-primary"
+                                )}
+                              >
+                                {label}
+                              </p>
+                              {label === "Notifications" &&
+                                unseenAmount &&
+                                unseenAmount > 0 && (
+                                  <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                                    {unseenAmount}
+                                  </span>
+                                )}
+                            </div>
                           </Link>
                         </Button>
                       </TooltipTrigger>
                       {isOpen === false && (
-                        <TooltipContent side="right">{label}</TooltipContent>
+                        <TooltipContent side="right">
+                          <div className="flex items-center gap-2">
+                            {label}
+                            {label === "Notifications" &&
+                              unseenAmount &&
+                              unseenAmount > 0 && (
+                                <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                                  {unseenAmount}
+                                </span>
+                              )}
+                          </div>
+                        </TooltipContent>
                       )}
                     </Tooltip>
                   </TooltipProvider>

@@ -1,19 +1,25 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { cn } from "@/lib/utils";
 
 const DatetimePickerPlaceholder = ({
   placeholder,
+  className,
+  date,
+  setDate,
 }: {
   placeholder: string;
+  className?: string;
+  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  date: Date | undefined;
 }) => {
-  const [date, setDate] = useState<Date | undefined>(undefined);
   return (
     <DateTimePicker
       value={date}
       onChange={setDate}
       placeholder={placeholder}
-      className="w-72"
+      className={cn("w-72", className)}
     />
   );
 };

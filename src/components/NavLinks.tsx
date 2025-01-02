@@ -13,6 +13,8 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { LogInCheck, SignUpAndSignInCheck } from "./SignUpSignInLogOutCheck";
+import { getUnseenNotificationsByClerkId } from "@/utils/actions/usersActions";
+import { Notification as NotificationType } from "@prisma/client";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -66,11 +68,61 @@ const adminComponents: { title: string; href: string; description: string }[] =
     },
   ];
 
-export function NavLinks() {
+const NotificationMenuItem = ({
+  href,
+  title,
+  description,
+  unSeenCount,
+}: {
+  href: string;
+  title: string;
+  description: string;
+  unSeenCount?: number;
+}) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          href={href}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        >
+          <div className="text-sm font-medium leading-none flex items-center gap-2">
+            <p className={cn(unSeenCount && unSeenCount > 0 && "text-primary")}>
+              {title}
+            </p>
+
+            <span
+              className={cn(
+                "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground opacity-0",
+                unSeenCount && unSeenCount > 0 && "opacity-100"
+              )}
+            >
+              {unSeenCount}
+            </span>
+          </div>
+          <p
+            className={cn(
+              "line-clamp-2 text-sm leading-snug text-muted-foreground"
+            )}
+          >
+            {description}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+};
+
+export async function NavLinks({
+  unSeenNotificationsCount,
+}: {
+  unSeenNotificationsCount?: number;
+}) {
   const userId = auth().userId;
   const isAdmin = userId === process.env.CLERK_ADMIN_ID;
+
   return (
-    <div className=" ">
+    <>
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -117,7 +169,14 @@ export function NavLinks() {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem className="!z-10">
+          <NavigationMenuItem
+            className={cn(
+              "!z-10",
+              unSeenNotificationsCount &&
+                unSeenNotificationsCount > 0 &&
+                "text-primary"
+            )}
+          >
             <NavigationMenuTrigger>My Profile</NavigationMenuTrigger>
             <NavigationMenuContent className="!z-10">
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
@@ -147,6 +206,16 @@ export function NavLinks() {
                         title={component.title}
                         href={component.href}
                         description={component.description}
+                      />
+                    );
+                  } else if (component.title === "Notifications") {
+                    return (
+                      <NotificationMenuItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                        description={component.description}
+                        unSeenCount={unSeenNotificationsCount}
                       />
                     );
                   } else
@@ -191,13 +260,15 @@ export function NavLinks() {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-    </div>
+    </>
   );
 }
 
 export const ListItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
+  React.ComponentPropsWithoutRef<"a"> & {
+    title: React.ReactNode;
+  }
 >(({ className, title, children, ...props }, ref) => {
   return (
     <li>

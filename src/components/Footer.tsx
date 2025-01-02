@@ -1,3 +1,4 @@
+"use client";
 import {
   DiscordLogoIcon,
   GitHubLogoIcon,
@@ -5,6 +6,8 @@ import {
   LinkedInLogoIcon,
 } from "@radix-ui/react-icons";
 import Container from "./Container";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export function SiteFooter() {
   return (
@@ -20,14 +23,15 @@ export function SiteFooter() {
                 Find us on any of these platforms, we respond 1-2 business days.
               </h5>
               <div className="mt-6 flex lg:mb-0 mb-6">
-                <button
+                {/* <button
                   className="bg-white text-lightBlue-400 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2 flex"
                   type="button"
                 >
                   <InstagramLogoIcon className="text-black" />
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   className="bg-white text-lightBlue-600 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2 flex"
+                  onClick={() => redirectUser()}
                   type="button"
                 >
                   <LinkedInLogoIcon className="text-black" />
@@ -37,13 +41,15 @@ export function SiteFooter() {
                   type="button"
                 >
                   <DiscordLogoIcon className="text-black" />
-                </button>
-                <button
+                </button> */}
+                <a
                   className="bg-white text-blueGray-800 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2 flex"
                   type="button"
+                  target="_blank"
+                  href="https://github.com/Bas3L3ss"
                 >
                   <GitHubLogoIcon className="  text-black " />
-                </button>
+                </a>
               </div>
             </div>
             <div className="w-full lg:w-6/12 px-4">
@@ -54,17 +60,17 @@ export function SiteFooter() {
                   </span>
                   <ul className="list-unstyled">
                     <li>
-                      <a
+                      <Link
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://www.creative-tim.com/presentation?ref=njs-profile"
+                        href="/aboutus"
                       >
                         About Us
-                      </a>
+                      </Link>
                     </li>
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://blog.creative-tim.com?ref=njs-profile"
+                        href=""
                       >
                         Blog
                       </a>
@@ -72,17 +78,9 @@ export function SiteFooter() {
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://www.github.com/creativetimofficial?ref=njs-profile"
+                        href="https://github.com/Bas3L3ss"
                       >
                         Github
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://www.creative-tim.com/bootstrap-themes/free?ref=njs-profile"
-                      >
-                        Free Products
                       </a>
                     </li>
                   </ul>
@@ -95,7 +93,7 @@ export function SiteFooter() {
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://github.com/creativetimofficial/notus-js/blob/main/LICENSE.md?ref=njs-profile"
+                        href=""
                       >
                         MIT License
                       </a>
@@ -103,7 +101,7 @@ export function SiteFooter() {
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://creative-tim.com/terms?ref=njs-profile"
+                        href=""
                       >
                         Terms &amp; Conditions
                       </a>
@@ -111,7 +109,7 @@ export function SiteFooter() {
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://creative-tim.com/privacy?ref=njs-profile"
+                        href=""
                       >
                         Privacy Policy
                       </a>
@@ -119,7 +117,7 @@ export function SiteFooter() {
                     <li>
                       <a
                         className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
-                        href="https://creative-tim.com/contact-us?ref=njs-profile"
+                        href="mailto:phamthen.hun060907@gmail.com"
                       >
                         Contact Us
                       </a>
@@ -134,19 +132,10 @@ export function SiteFooter() {
               <div className="text-sm text-blueGray-500 font-semibold py-1">
                 Copyright ©{" "}
                 <span id="get-current-year">{new Date().getFullYear()} </span>
-                <a
-                  href="https://www.creative-tim.com/product/notus-js"
-                  className="text-blueGray-500 hover:text-gray-800"
-                  target="_blank"
-                >
-                  Event Manager
-                </a>
-                <a
-                  href=""
-                  className="text-blueGray-500  block hover:text-gray-800"
-                >
+                <span className="text-blueGray-500 ">Event Manager</span>
+                <span className="text-blueGray-500  block ">
                   Made by BaseLess.
-                </a>
+                </span>
               </div>
             </div>
           </div>
