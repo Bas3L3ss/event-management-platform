@@ -82,8 +82,14 @@
   background: hsl(var(--primary));
   border-radius: 50%;
 }
+
 .slick-dots li:not(.slick-active) {
+  background-color: aqua;
+  border-radius: 50%;
+}
+.dark .slick-dots li:not(.slick-active) {
   background-color: white;
+
   border-radius: 50%;
 }
 .slick-dots li {
@@ -92,4 +98,20 @@
   & button::before {
     display: none;
   }
+}
+
+.dark .leaflet-layer,
+.dark .leaflet-control-zoom-in,
+.dark .leaflet-control-zoom-out,
+.dark .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) !important;
+}
+.custom-description ul {
+  list-style-type: disc; /* Default bullet style */
+  margin-left: 1.5rem; /* Add indentation */
+}
+
+.custom-description ol {
+  list-style-type: decimal; /* Default numbered style */
+  margin-left: 1.5rem; /* Add indentation */
 }

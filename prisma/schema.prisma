@@ -62,6 +62,9 @@ model Event {
   eventTicketPrice Float
  
   eventLocation String 
+  latitude Float?
+  longitude Float?
+
   reservationTicketLink String @default("") 
 
   createdAt DateTime @default(now())

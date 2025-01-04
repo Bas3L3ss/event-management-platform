@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon } from "lucide-react";
@@ -34,10 +34,12 @@ export default function MobileNav({
             )}
           >
             <MenuIcon />
-            {unSeenNotificationsCount && unSeenNotificationsCount > 0 && (
+            {unSeenNotificationsCount && unSeenNotificationsCount > 0 ? (
               <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-xs">
                 {unSeenNotificationsCount}
               </span>
+            ) : (
+              ""
             )}
           </Button>
         </SheetTrigger>

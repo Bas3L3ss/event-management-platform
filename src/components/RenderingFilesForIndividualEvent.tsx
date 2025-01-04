@@ -44,7 +44,8 @@ const RenderingFilesForIndividualEvent = ({
   if (
     fileExtension === "png" ||
     fileExtension === "jpg" ||
-    fileExtension === "jpeg"
+    fileExtension === "jpeg" ||
+    fileExtension === "webp"
   ) {
     return (
       <Image

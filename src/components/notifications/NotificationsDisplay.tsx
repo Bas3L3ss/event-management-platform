@@ -2,10 +2,17 @@
 
 import { FilterStatus } from "@/utils/types/EventTypes";
 import { Notification } from "@prisma/client";
-import { Filter, SortAsc, SortDesc } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { SortAsc, SortDesc } from "lucide-react";
+import React, { useState } from "react";
 import NotificationCard from "./NotificationCard";
-import { changeSeenStateNotification } from "@/utils/actions/usersActions";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type SortOrder = "latest" | "oldest";
 
@@ -47,26 +54,30 @@ function NotificationsDisplay({
   };
 
   return (
-    <div className="px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Your Notifications</h1>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Filter size={20} className="text-gray-500" />
-            <select
-              className="border rounded-md px-2 py-1"
+    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <h1 className="text-2xl sm:text-3xl font-bold">Your Notifications</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+          <div className="w-full sm:w-auto">
+            <Select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-              aria-label="Filter notifications"
+              onValueChange={(e) => setFilterStatus(e as FilterStatus)}
             >
-              <option value="all">All</option>
-              <option value="unseen">Unseen</option>
-              <option value="seen">Seen</option>
-            </select>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Select filter mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="unseen">Unseen</SelectItem>
+                  <SelectItem value="seen">Seen</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
           <button
             onClick={toggleSortOrder}
-            className="flex items-center space-x-2 text-gray-500 hover:text-gray-700"
+            className="flex items-center justify-center space-x-2 text-gray-500 hover:text-gray-700 w-full sm:w-auto py-2 px-4 border border-gray-300 rounded-md"
             aria-label={`Sort ${
               sortOrder === "latest" ? "oldest to latest" : "latest to oldest"
             }`}
@@ -83,7 +94,7 @@ function NotificationsDisplay({
       {filteredNotifications.length === 0 ? (
         <p className="text-center text-gray-500">No notifications found.</p>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-4 sm:gap-6">
           {filteredNotifications.map((notification) => (
             <NotificationCard
               key={notification.id}

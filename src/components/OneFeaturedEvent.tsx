@@ -30,7 +30,10 @@ export default function OneFeaturedEvent({
             </h1>
             <p className="text-lg text-muted-foreground capitalize">
               Host: {featuredEvent.hostName} - Genre:{" "}
-              {featuredEvent.type.toLowerCase()}
+              {featuredEvent.type
+                .toLowerCase()
+                .replace(/_/g, " ")
+                .replace(/^\w/, (c: string) => c.toUpperCase())}
             </p>
           </div>
           <p className="text-xl text-muted-foreground leading-relaxed">

@@ -5,7 +5,10 @@ import { Event, Order } from "@prisma/client";
 import { calculateEventPrice, renderError } from "../utils";
 import { cache } from "../cache";
 
-export const createOrderAction = async (clerkId: string, event: Event) => {
+export const createOrderAction = async (
+  clerkId: string,
+  event: Event
+): Promise<Order> => {
   try {
     const user = await prisma.user.findFirst({
       where: {
@@ -27,9 +30,11 @@ export const createOrderAction = async (clerkId: string, event: Event) => {
       },
     });
 
-    // orderId = order.id;
+    return order;
   } catch (error) {
-    return renderError(error);
+    throw new Error(
+      error instanceof Error ? error.message : "An error occurred."
+    );
   }
 };
 //  getOrderByClerkId

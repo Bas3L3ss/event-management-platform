@@ -121,7 +121,11 @@ export function CarouselFeatured({
                       {el.eventName}
                     </h3>
                     <p className="mb-4 text-sm text-muted-foreground">
-                      Host: {el.hostName} - Genre: {el.type.toLowerCase()}
+                      Host: {el.hostName} - Genre:{" "}
+                      {el.type
+                        .toLowerCase()
+                        .replace(/_/g, " ")
+                        .replace(/^\w/, (c: string) => c.toUpperCase())}
                     </p>
                   </div>
                   <div className="relative w-full h-40 mb-4 overflow-hidden rounded-md">

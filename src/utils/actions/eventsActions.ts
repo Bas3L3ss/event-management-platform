@@ -451,16 +451,31 @@ export async function deleteComment(commentId: string): Promise<void> {
 
 export const createEventAction = async (
   prevState: any,
-  formData: FormData
-): Promise<{ message: string; isError: boolean }> => {
+  formData: any
+): Promise<{ message: string; isError: boolean; order: Order | undefined }> => {
   const clerkId = authenticateAndRedirect();
 
   try {
     const rawData = Object.fromEntries(formData);
+
     const images = formData.getAll("image") as File[];
 
     if (images.length > 3) {
-      return { message: "For now we only accept 3 images.", isError: true };
+      return {
+        message: "For now we only accept 3 images.",
+        isError: true,
+        order: undefined,
+      };
+    }
+    if (rawData.latitude) {
+      rawData.latitude = parseFloat(rawData.latitude);
+    } else {
+      throw new Error("No latitude is found.");
+    }
+    if (rawData.longitude) {
+      rawData.longitude = parseFloat(rawData.longitude);
+    } else {
+      throw new Error("No longitude is found.");
     }
 
     const video = formData.get("video") as File;
@@ -488,6 +503,8 @@ export const createEventAction = async (
         eventImg: imageUrls,
         eventVideo: videoUrl,
         hostName: validatedFields.host,
+        latitude: validatedFields.latitude,
+        longitude: validatedFields.longitude,
         reservationTicketLink: validatedFields.reservationTicketLink,
         eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
           ? videoUrl
@@ -495,11 +512,22 @@ export const createEventAction = async (
       },
     });
 
-    await createOrderAction(clerkId, newEvent);
+    const order: Order | undefined = await createOrderAction(clerkId, newEvent);
 
-    return { message: "product created", isError: false };
-  } catch (error) {
-    return renderError(error);
+    return { message: "product created", isError: false, order };
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      error.message.includes("eventName") &&
+      error.message.includes("Unique")
+    ) {
+      throw new Error(
+        "Event name already exists. Please choose a different name."
+      );
+    }
+    throw new Error(
+      error instanceof Error ? error.message : "An error occurred."
+    );
   } finally {
     await prisma.$disconnect();
   }
@@ -507,7 +535,7 @@ export const createEventAction = async (
 
 export const updateEventAction = async (
   prevState: unknown,
-  formData: FormData
+  formData: any
 ): Promise<{ message: string; isError: boolean }> => {
   const clerkId = await authenticateAndRedirect();
 
@@ -520,6 +548,24 @@ export const updateEventAction = async (
     }
 
     const rawData = Object.fromEntries(formData);
+    console.log(rawData);
+    if (rawData.latitude) {
+      rawData.latitude = parseFloat(rawData.latitude);
+    } else {
+      return {
+        isError: true,
+        message: "No latitude is found.",
+      };
+    }
+    if (rawData.longitude) {
+      rawData.longitude = parseFloat(rawData.longitude);
+    } else {
+      return {
+        isError: true,
+        message: "No longitude is found.",
+      };
+    }
+
     const images = formData.getAll("image") as File[];
     const video = formData.get("video") as File;
     const eventId = formData.get("id") as string;
@@ -542,21 +588,21 @@ export const updateEventAction = async (
       video: validFile,
     });
 
-    const eventFileFromDB = await prisma.event.findUnique({
+    const dataFromDB = await prisma.event.findUnique({
       where: { id: eventId },
-      select: { eventImg: true, eventVideo: true }, // Select only the images field
+      select: { eventImg: true, eventVideo: true, eventName: true }, // Select only the images field
     });
 
-    if (!eventFileFromDB) {
+    if (!dataFromDB) {
       throw new Error("invalid edit");
     }
-    let imagesWillBeSentToDB = eventFileFromDB?.eventImg;
-    let videoWillBeSentToDB = eventFileFromDB?.eventVideo;
+    let imagesWillBeSentToDB = dataFromDB?.eventImg;
+    let videoWillBeSentToDB = dataFromDB?.eventVideo;
 
     if (validatedFiles.image) {
       if (validatedFiles.image.length + imagesWillBeSentToDB.length > 3) {
         return {
-          message: "You can't send more than 3 images.",
+          message: "You can't have more than 3 images.",
           isError: false,
         };
       }
@@ -574,7 +620,7 @@ export const updateEventAction = async (
     }
 
     if (imagesUrl.length > 0) {
-      imagesWillBeSentToDB = eventFileFromDB.eventImg.filter(
+      imagesWillBeSentToDB = dataFromDB.eventImg.filter(
         (item) => !imagesUrl.includes(item)
       );
 
@@ -595,6 +641,8 @@ export const updateEventAction = async (
       eventImgOrVideoFirstDisplay: validatedFields.isVideoFirstDisplay
         ? videoWillBeSentToDB
         : imagesWillBeSentToDB[0],
+      longitude: validatedFields.longitude,
+      latitude: validatedFields.latitude,
     };
 
     if (!isPaid) {
@@ -606,18 +654,20 @@ export const updateEventAction = async (
       where: { id: eventId },
       data: updateData,
     });
-    await prisma.order.update({
-      where: {
-        eventId: updatedEvent.id,
-      },
-      data: {
-        eventName: updatedEvent.eventName,
-      },
-    });
+    if (dataFromDB.eventName != updateData.eventName) {
+      await prisma.order.update({
+        where: {
+          eventId: updatedEvent.id,
+        },
+        data: {
+          eventName: updatedEvent.eventName,
+        },
+      });
+    }
 
     return {
       message:
-        "Event updated successfully, please wait 50s-60s to see the update",
+        "Event updated successfully, please wait 5s-6s to see the update",
       isError: false,
     };
   } catch (error) {

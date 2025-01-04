@@ -9,6 +9,8 @@ export type EventSchemaType = {
   price: number;
   description: string;
   isVideoFirstDisplay: boolean;
+  latitude: number;
+  longitude: number;
 };
 
 export type FullEventSchemaType = EventSchemaType & {

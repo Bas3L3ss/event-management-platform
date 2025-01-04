@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "./Container";
 import { Skeleton } from "./ui/skeleton";
-import { LoadingVariant } from "@/constants/values";
+import { LIMIT, LoadingVariant } from "@/constants/values";
 import { Card, CardContent, CardHeader } from "./ui/card";
 
 function SkeletonLoading({ variant }: { variant?: LoadingVariant }) {
@@ -9,7 +9,7 @@ function SkeletonLoading({ variant }: { variant?: LoadingVariant }) {
     case LoadingVariant.CARD:
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(LIMIT)].map((_, i) => (
             <div key={i} className="flex flex-col h-full">
               <div className="p-6 space-y-4">
                 <Skeleton className="h-48 w-full" />

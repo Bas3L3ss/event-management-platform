@@ -30,6 +30,16 @@ export function limitWords(inputString: string, maxWords: number): string {
 export const renderError = (
   error: unknown
 ): { message: string; isError: boolean } => {
+  if (
+    error instanceof Error &&
+    error.message.includes("eventName") && // Check for eventName in the error message
+    error.message.includes("Unique") // Check for Unique constraint violation
+  ) {
+    return {
+      isError: true,
+      message: error instanceof Error ? error.message : "An error occurred.",
+    };
+  }
   return {
     isError: true,
     message: error instanceof Error ? error.message : "An error occurred.",

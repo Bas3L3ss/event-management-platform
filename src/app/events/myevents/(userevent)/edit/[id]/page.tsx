@@ -3,6 +3,7 @@ import { SubmitButton } from "@/components/form/Buttons";
 import CheckboxInput from "@/components/form/CheckBoxInput";
 import DeleteEventButton from "@/components/form/DeleteEventButton";
 import FormEditContainer from "@/components/form/FormEditContainer";
+import FormEditInputEventLocation from "@/components/form/FormEditInputEventLocation";
 import FormInput from "@/components/form/FormInput";
 import ImagesAndVideoInputForEditPage from "@/components/form/ImagesAndVideoInputForEditPage";
 import PriceInput from "@/components/form/PriceInput";
@@ -18,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   deleteEventWithRelations,
   getEventById,
@@ -42,6 +44,8 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
     dateStart,
     eventImg,
     eventLocation,
+    latitude,
+    longitude,
     eventName,
     eventTicketPrice,
     eventVideo,
@@ -113,12 +117,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
                 label="Host"
                 defaultValue={hostName as string | undefined}
               />
-              <FormInput
-                type="text"
-                name="eventLocation"
-                label="Event Location"
-                defaultValue={eventLocation}
-              />
+
               <FormInput
                 type="text"
                 name="reservationTicketLink"
@@ -153,6 +152,13 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
                 name="description"
                 labelText="Event Description"
                 defaultValue={eventDescription}
+              />
+            </div>
+            <div className="mt-6">
+              <FormEditInputEventLocation
+                eventLocation={!latitude ? "" : eventLocation}
+                lat={latitude ? latitude : null}
+                lon={longitude ? longitude : null}
               />
             </div>
             {!relatedOrder.isPaid && (
@@ -197,13 +203,19 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
                 existingVideo={eventVideo}
               />
             </div>
+
             <div className="mt-6">
               <CheckboxInput
                 name="isVideoFirstDisplay"
                 label="Display Video First"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-4",
+                relatedOrder.isPaid && "grid-cols-1"
+              )}
+            >
               <SubmitButton text="Update Event" className="mt-8 text-white " />
               {!relatedOrder.isPaid && (
                 <Button

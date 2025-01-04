@@ -87,6 +87,12 @@ export const eventSchema = z
       })
     ),
     isVideoFirstDisplay: z.coerce.boolean(),
+    latitude: z.number().refine((value) => !isNaN(value), {
+      message: "Latitude must be a number",
+    }),
+    longitude: z.number().refine((value) => !isNaN(value), {
+      message: "Longitude must be a number",
+    }),
   })
 
   .superRefine((data, ctx) => {
@@ -131,6 +137,12 @@ export const eventPaidSchema = z.object({
   ),
 
   isVideoFirstDisplay: z.coerce.boolean(),
+  latitude: z.number().refine((value) => !isNaN(value), {
+    message: "Latitude must be a number",
+  }),
+  longitude: z.number().refine((value) => !isNaN(value), {
+    message: "Longitude must be a number",
+  }),
 });
 export function validateWithZodSchema<T>(
   schema: ZodSchema<T>,

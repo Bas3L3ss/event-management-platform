@@ -1,12 +1,21 @@
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { UseFormRegister } from "react-hook-form";
 
 const name = "price";
 type FormInputNumberProps = {
   defaultValue?: number;
+  register?: UseFormRegister<any>;
+  validation?: object;
+  isZod?: boolean;
 };
 
-function PriceInput({ defaultValue }: FormInputNumberProps) {
+function PriceInput({
+  defaultValue,
+  register,
+  validation,
+  isZod = false,
+}: FormInputNumberProps) {
   return (
     <div className="mb-2">
       <Label
@@ -22,6 +31,7 @@ function PriceInput({ defaultValue }: FormInputNumberProps) {
         min={0}
         defaultValue={defaultValue || 100}
         required
+        {...(isZod && register ? register(name, validation) : {})}
       />
     </div>
   );

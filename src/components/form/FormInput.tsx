@@ -1,5 +1,6 @@
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { UseFormRegister } from "react-hook-form";
 
 type FormInputProps = {
   name: string;
@@ -7,6 +8,10 @@ type FormInputProps = {
   label?: string;
   defaultValue?: string;
   placeholder?: string;
+  register?: UseFormRegister<any>;
+  validation?: object;
+  isZod?: boolean;
+  disabled?: boolean;
 };
 
 function FormInput({
@@ -15,6 +20,10 @@ function FormInput({
   type,
   defaultValue,
   placeholder,
+  register,
+  validation,
+  isZod = false,
+  disabled = false,
 }: FormInputProps) {
   return (
     <div className="mb-2">
@@ -27,9 +36,11 @@ function FormInput({
       <Input
         id={name}
         name={name}
+        disabled={disabled}
         type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
+        {...(isZod && register ? register(name, validation) : {})}
       />
     </div>
   );

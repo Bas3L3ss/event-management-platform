@@ -15,7 +15,7 @@ async function NavBar() {
   }
 
   return (
-    <nav className="border-b py-4 sticky w-full isolate z-[100] bg-inherit top-0 left-0">
+    <nav className="border-b py-4 sticky w-full isolate z-[999] bg-inherit top-0 left-0 ">
       <Container className="mx-auto">
         <PcNavBar unSeenNotificationsCount={unSeenNotificationsCount} />
         <MobileNav

@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { CrownIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 const MediaRenderer = ({
   url,
@@ -59,7 +65,8 @@ const MediaRenderer = ({
   if (
     fileExtension === "png" ||
     fileExtension === "jpg" ||
-    fileExtension === "jpeg"
+    fileExtension === "jpeg" ||
+    fileExtension === "webp"
   ) {
     return (
       <div className="relative">
@@ -68,13 +75,32 @@ const MediaRenderer = ({
             <CrownIcon />
           </Badge>
         )}
-        <Image
-          className=" w-full aspect-video object-cover rounded-md transition-transform duration-300  "
-          src={url}
-          alt={alt}
-          width={500}
-          height={500}
-        />
+
+        {/* Trigger the dialog to open on image click */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="relative cursor-zoom-in">
+              <Image
+                className="w-full aspect-video object-cover rounded-md transition-transform duration-300"
+                src={url}
+                alt={alt}
+                width={500}
+                height={500}
+              />
+            </div>
+          </DialogTrigger>
+
+          {/* Dialog content (zoomed image view) */}
+          <DialogContent className=" z-[99999999999999] bg-black/50 rounded-md p-4 max-w-full max-h-full flex justify-center items-center">
+            <Image
+              className="object-contain max-w-full max-h-screen"
+              src={url}
+              alt={alt}
+              width={1000}
+              height={1000}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
