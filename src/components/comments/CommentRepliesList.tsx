@@ -1,7 +1,7 @@
 "use client";
-import { ChevronDown, CopyCheckIcon, Delete } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+import { ChevronDown, ChevronUp, CopyCheckIcon, Delete } from "lucide-react";
+import React, { Dispatch, useEffect, useState } from "react";
+import { Button } from "../ui/button";
 import {
   getRepliesToComment,
   updateComment,
@@ -12,8 +12,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
-import { Card, CardDescription, CardTitle } from "./ui/card";
+} from "../ui/tooltip";
+import { Card, CardDescription, CardTitle } from "../ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,8 +34,8 @@ import { toastPrint } from "@/utils/toast action/action";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "./ui/toast";
-import { Textarea } from "./ui/textarea";
+import { ToastAction } from "../ui/toast";
+import { Textarea } from "../ui/textarea";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 const CommentRepliesList = ({
@@ -46,6 +46,7 @@ const CommentRepliesList = ({
   currentUser: User | null | undefined;
 }) => {
   const [replies, setReplies] = useState<Comment[]>([]);
+  const [showReplies, setShowReplies] = useState(false);
   useEffect(() => {
     const commentReplies = async () => {
       try {
@@ -66,18 +67,27 @@ const CommentRepliesList = ({
   return (
     <div>
       {repliesAmount > 0 && (
-        <Button className="mt-4 flex gap-2 items-center " variant={"ghost"}>
-          <ChevronDown size={16} /> <span>{repliesAmount} Replies</span>
+        <Button
+          className="my-4 flex gap-2 items-center text-primary  "
+          onClick={() => setShowReplies((prev: boolean) => !prev)}
+          variant={"ghost"}
+        >
+          {!showReplies ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+          <span>{repliesAmount} Replies</span>
         </Button>
       )}
-      {replies.map((reply) => {
-        return (
-          <CommentListItem
-            comment={reply}
-            currentUserId={currentUser?.clerkId}
-          />
-        );
-      })}
+      {showReplies && (
+        <div className="flex flex-col gap-3 ">
+          {replies.map((reply) => {
+            return (
+              <CommentListItem
+                comment={reply}
+                currentUserId={currentUser?.clerkId}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -174,6 +184,7 @@ function CommentListItem({
   comment: Comment;
   currentUserId?: string;
 }) {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
@@ -220,12 +231,18 @@ function CommentListItem({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
+      setIsLoading(true);
       const response = await fetch(`/api/comments/${commentId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventId: comment.eventId,
+        }),
       });
 
       if (response.ok) {
-        toastPrint("Success", "Comment deleted successfully", "default");
         router.refresh();
       } else {
         const error = await response.json();
@@ -234,6 +251,8 @@ function CommentListItem({
     } catch (error) {
       console.error("Error deleting comment:", error);
       toastPrint("Error", "Something went wrong", "destructive");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -242,7 +261,11 @@ function CommentListItem({
   }, [comment.createdAt]);
 
   return (
-    <Card className="flex p-4 hover:shadow-md rounded-lg">
+    <Card
+      className={`flex p-4 hover:shadow-md rounded-lg ${
+        isLoading && "animate-pulse pointer-events-none"
+      }`}
+    >
       <Link href={`/profile/`}>
         <Image
           src={comment.authorImageUrl}
@@ -285,6 +308,7 @@ function CommentListItem({
               value={editedText}
               onChange={(e) => setEditedText(e.target.value)}
               className=" mb-2"
+              placeholder="Fill in your reply..."
             />
             <div className="flex gap-2">
               <Button
@@ -341,7 +365,7 @@ function CommentListItem({
           </p>
         )}
         <br />
-        <CardDescription>{date}</CardDescription>
+        <CardDescription className="text-sm">{date}</CardDescription>
       </div>
     </Card>
   );

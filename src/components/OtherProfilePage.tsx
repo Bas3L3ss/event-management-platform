@@ -1,21 +1,10 @@
-import Container from "@/components/Container";
 import { Event, User } from "@prisma/client";
-import { Mail, Phone, MapPin, Calendar, User as UserIcon } from "lucide-react";
-import Image from "next/image";
+import { Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { Button } from "./ui/button";
 import FollowButton from "./FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { isFollowable } from "@/utils/actions/usersActions";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "./ui/breadcrumb";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -39,23 +28,7 @@ export default async function OtherProfilePage({
   );
 
   return (
-    <Container className="mt-10 space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/profile">Profile</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{userFromDataBase.userName}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
+    <>
       <Card className="overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-blue-400 to-purple-500"></div>
         <CardContent className="relative pt-16 pb-8 px-4 sm:px-6 lg:px-8">
@@ -206,6 +179,6 @@ export default async function OtherProfilePage({
           </CardContent>
         </Card>
       </div>
-    </Container>
+    </>
   );
 }

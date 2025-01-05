@@ -8,10 +8,17 @@ import {
   getUniqueEventTypes,
   getUserFromDataBase,
 } from "@/utils/actions/usersActions";
-import { toastPrint } from "@/utils/toast action/action";
 import { EventType } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 async function SomeoneProfilePage({
   params: { id },
@@ -33,14 +40,29 @@ async function SomeoneProfilePage({
   const eventUserSubmitted = await getEventByClerkId(id);
 
   return (
-    <>
+    <Container className="mt-10 space-y-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/profile">Profile</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{userFromDataBase.userName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <OtherProfilePage
         eventLength={eventLength}
         typeUserSubmitted={typeUserSubmittedArr}
         userFromDataBase={userFromDataBase!}
         eventUserSubmitted={eventUserSubmitted}
       />
-    </>
+    </Container>
   );
 }
 

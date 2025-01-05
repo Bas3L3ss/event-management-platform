@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 import { toastPrint } from "@/utils/toast action/action";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { Textarea } from "./ui/textarea";
+import { Textarea } from "../ui/textarea";
 import { Star } from "lucide-react";
 
 type CommentFormProps = {
@@ -34,7 +34,7 @@ const CommentForm = ({
     if (!isAuthenticated) {
       toastPrint(
         "Authentication Required",
-        "Please log in to leave a review.",
+        "Please log in to leave a comment.",
         "default",
         true
       );
@@ -76,7 +76,7 @@ const CommentForm = ({
       }
 
       await response.json();
-      toastPrint("Review Sent!", "Your review has been posted.", "default");
+      toastPrint("Comment Sent!", "Your comment has been posted.", "default");
       setCommentText("");
       setRating(0);
       router.refresh();
@@ -95,7 +95,7 @@ const CommentForm = ({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Leave a Review</CardTitle>
+        <CardTitle>Leave a Comment</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,7 +122,7 @@ const CommentForm = ({
           </div>
           <div>
             <label htmlFor="comment" className="block text-sm font-medium mb-1">
-              Your Review:
+              Your Comment:
             </label>
             <Textarea
               id="comment"
@@ -138,7 +138,7 @@ const CommentForm = ({
                   );
                 }
               }}
-              placeholder="Write your review here..."
+              placeholder="Write your Comment here..."
               className="min-h-[100px]"
             />
             <p
@@ -156,7 +156,7 @@ const CommentForm = ({
             className="w-full"
             disabled={pending || !isAuthenticated}
           >
-            {pending ? "Sending..." : "Submit Review"}
+            {pending ? "Sending..." : "Submit Comment"}
           </Button>
         </form>
       </CardContent>

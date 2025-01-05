@@ -215,7 +215,6 @@ export async function isFollowable(
   followedId: string
 ): Promise<boolean> {
   try {
-    // User cannot follow themselves
     if (followerId === followedId) {
       return true;
     }

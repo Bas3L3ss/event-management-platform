@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { SignInButton } from "@clerk/nextjs";
 
 type FollowButtonProps = {
   userFromDataBase: User;
@@ -19,6 +20,7 @@ function FollowButton({
 }: FollowButtonProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
   const handleFollow = async (clerkId: string) => {
     setLoading(true);
 
@@ -43,6 +45,7 @@ function FollowButton({
     setLoading(false);
     router.refresh();
   };
+
   const handleUnFollow = async (clerkId: string) => {
     setLoading(true);
     try {
@@ -78,13 +81,27 @@ function FollowButton({
           {!loading ? "Follow" : "Following..."}
         </Button>
       ) : (
-        <Button
-          onClick={() => handleUnFollow(userFromDataBase.clerkId)}
-          size={"sm"}
-          disabled={loading}
-        >
-          {!loading ? "Unfollow" : "Unfollowing..."}
-        </Button>
+        <>
+          {!currentClerkId ? (
+            <SignInButton
+              fallbackRedirectUrl={
+                new URLSearchParams(window.location.search).get(
+                  "redirectUrl"
+                ) || "/"
+              }
+            >
+              <Button>Sign in to follow this user</Button>
+            </SignInButton>
+          ) : (
+            <Button
+              onClick={() => handleUnFollow(userFromDataBase.clerkId)}
+              size={"sm"}
+              disabled={loading}
+            >
+              {!loading ? "Unfollow" : "Unfollowing..."}
+            </Button>
+          )}
+        </>
       )}
     </div>
   );

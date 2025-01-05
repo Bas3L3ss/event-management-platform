@@ -145,55 +145,56 @@ function OneEventDisplay({
           </div>
         </div>
 
-        <div className="relative group">
-          {oneEvent.latitude && oneEvent.longitude ? (
-            <>
-              <div
-                className={cn(
-                  "w-full h-full bg-gradient-to-b from-black to-transparent opacity-0 group-hover:opacity-30 transition-all duration-300 absolute top-0 left-0 z-[99] pointer-events-none rounded-[10px]",
-                  isMapView ? "h-[50%]" : "h-full" // Adjust the height conditionally based on view
-                )}
-              ></div>
+        <div>
+          <div className="relative group">
+            {oneEvent.latitude && oneEvent.longitude ? (
+              <>
+                <div className="absolute top-4 right-4 flex flex-col space-y-2 z-[101] opacity-0 group-hover:opacity-100 duration-300">
+                  <button
+                    onClick={() => toggleView("images")}
+                    className={cn(
+                      "px-3 py-2 bg-white text-black rounded-md shadow-md hover:bg-gray-200 focus:outline-none",
+                      !isMapView && "bg-blue-500 text-white" // Highlight selected view for images
+                    )}
+                  >
+                    <ImageIcon size={16} />
+                  </button>
+                  <button
+                    onClick={() => toggleView("map")}
+                    className={cn(
+                      "px-3 py-2 bg-white text-black rounded-md shadow-md hover:bg-gray-200 focus:outline-none  ",
+                      isMapView && "bg-blue-500 text-white" // Highlight selected view for map
+                    )}
+                  >
+                    <MapIcon size={16} />
+                  </button>
+                </div>
+              </>
+            ) : null}
+            <div
+              className={cn(
+                "w-full h-full bg-gradient-to-b from-black to-transparent opacity-0 group-hover:opacity-30 transition-all duration-300 absolute top-0 left-0 z-[99] pointer-events-none rounded-[10px]",
+                isMapView ? "h-[50%]" : "h-full" // Adjust the height conditionally based on view
+              )}
+            ></div>
+            {!isMapView && (
+              <EventRecordsDisplay
+                video={oneEvent.eventVideo!}
+                eventImgOrVideoFirstDisplay={
+                  oneEvent.eventImgOrVideoFirstDisplay!
+                }
+                eventName={oneEvent.eventName}
+                images={oneEvent.eventImg}
+              />
+            )}
 
-              <div className="absolute top-4 right-4 flex flex-col space-y-2 z-[101] opacity-0 group-hover:opacity-100 duration-300">
-                <button
-                  onClick={() => toggleView("images")}
-                  className={cn(
-                    "px-3 py-2 bg-white text-black rounded-md shadow-md hover:bg-gray-200 focus:outline-none",
-                    !isMapView && "bg-blue-500 text-white" // Highlight selected view for images
-                  )}
-                >
-                  <ImageIcon size={16} />
-                </button>
-                <button
-                  onClick={() => toggleView("map")}
-                  className={cn(
-                    "px-3 py-2 bg-white text-black rounded-md shadow-md hover:bg-gray-200 focus:outline-none  ",
-                    isMapView && "bg-blue-500 text-white" // Highlight selected view for map
-                  )}
-                >
-                  <MapIcon size={16} />
-                </button>
-              </div>
-            </>
-          ) : null}
-          {!isMapView && (
-            <EventRecordsDisplay
-              video={oneEvent.eventVideo!}
-              eventImgOrVideoFirstDisplay={
-                oneEvent.eventImgOrVideoFirstDisplay!
-              }
-              eventName={oneEvent.eventName}
-              images={oneEvent.eventImg}
-            />
-          )}
-
-          {isMapView && oneEvent.latitude && oneEvent.longitude ? (
-            <EventLocationMap
-              lat={oneEvent.latitude}
-              lon={oneEvent.longitude}
-            />
-          ) : null}
+            {isMapView && oneEvent.latitude && oneEvent.longitude ? (
+              <EventLocationMap
+                lat={oneEvent.latitude}
+                lon={oneEvent.longitude}
+              />
+            ) : null}
+          </div>
         </div>
       </section>
     </div>

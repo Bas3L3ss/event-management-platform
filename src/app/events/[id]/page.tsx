@@ -1,7 +1,6 @@
 import Container from "@/components/Container";
 import Title from "@/components/Title";
 
-import CommentSection from "@/components/CommentSection";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
 import { Event } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -10,6 +9,7 @@ import RecommendationCarousel from "@/components/RecomendationCarousel";
 import { getUserByClerkId } from "@/utils/actions/usersActions";
 import { auth } from "@clerk/nextjs/server";
 import OneEventDisplay from "@/components/OneEventDisplay";
+import CommentSection from "@/components/comments/CommentSection";
 
 async function OneEventPage({ params: { id } }: { params: { id: string } }) {
   const oneEvent: Event | null = await getEventById(id);

@@ -10,16 +10,3 @@ export function cache<T extends Callback>(
 ) {
   return nextCache(reactCache(cb), keyParts, options);
 }
-
-export async function invalidateCache(keyParts: string[]) {
-  try {
-    const tag = keyParts.join(":");
-
-    revalidateTag(tag);
-
-    return true;
-  } catch (error) {
-    console.error("Error invalidating cache:", error);
-    return false;
-  }
-}

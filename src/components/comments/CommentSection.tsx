@@ -2,10 +2,10 @@ import { getCommentsByEventId } from "@/utils/actions/eventsActions";
 import React from "react";
 import CommentForm from "./CommentForm";
 import { auth } from "@clerk/nextjs/server";
-import CommentsList from "./CommentLists";
-import Title from "./Title";
+import Title from "../Title";
 import { getUserByClerkId } from "@/utils/actions/usersActions";
 import { User } from "@prisma/client";
+import CommentsList from "./CommentLists";
 
 type CommentProps = { eventId: string };
 export default async function CommentSection({ eventId }: CommentProps) {

@@ -29,13 +29,13 @@ export default function RootLayout({
         className={cn(inter.className, "min-h-full")}
         suppressHydrationWarning
       >
-        <Providers>
-          <ClerkProviderWithTheme>
+        <ClerkProviderWithTheme>
+          <Providers>
             <NavBar />
             <main className="min-h-[100vh]">{children}</main>
             <SiteFooter />
-          </ClerkProviderWithTheme>
-        </Providers>
+          </Providers>
+        </ClerkProviderWithTheme>
       </body>
     </html>
   );

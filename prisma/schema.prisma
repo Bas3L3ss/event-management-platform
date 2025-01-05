@@ -94,6 +94,8 @@ model Comment {
   event           Event    @relation("EventComments", fields: [eventId], references: [id], onDelete: Cascade)
   parentCommentId String?   
   eventId         String  
+  likes           CommentLike[] @relation("CommentLikes")
+
   isEdited Boolean @default(false)
 
   @@index([createdAt]) 
@@ -103,8 +105,8 @@ model CommentLike {
   clerkId         String
   commentId       String
   disLike         Boolean?  
+  comment   Comment   @relation("CommentLikes", fields: [commentId], references: [id], onDelete: Cascade)
   @@unique([clerkId, commentId]) 
-  
 }
 
 

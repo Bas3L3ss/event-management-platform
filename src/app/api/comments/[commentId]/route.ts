@@ -7,14 +7,17 @@ export async function DELETE(
 ) {
   const { commentId } = params;
 
-  if (!commentId) {
+  const { eventId } = await req.json();
+
+  if (!commentId || !eventId) {
     return NextResponse.json(
-      { error: "Comment ID is required" },
+      { error: "Comment ID and Event ID are required" },
       { status: 400 }
     );
   }
+
   try {
-    await deleteComment(commentId);
+    await deleteComment(commentId, eventId);
 
     return NextResponse.json(
       { message: "Comment deleted successfully" },

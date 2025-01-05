@@ -26,7 +26,7 @@ import {
 import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
-import { cache, invalidateCache } from "../cache";
+import { cache } from "../cache";
 import { revalidatePath } from "next/cache";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
@@ -439,19 +439,29 @@ export async function createComment({
   }
 }
 
-export async function deleteComment(commentId: string): Promise<void> {
+export async function deleteComment(
+  commentId: string,
+  eventId: string
+): Promise<void> {
   try {
-    const comment = await prisma.comment.delete({
-      where: {
-        id: commentId,
-      },
-    });
+    const [deletedComment] = await prisma.$transaction([
+      prisma.comment.deleteMany({
+        where: {
+          parentCommentId: commentId,
+        },
+      }),
+      prisma.comment.delete({
+        where: {
+          id: commentId,
+        },
+      }),
+    ]);
 
-    await updateEventRating(comment.eventId);
-    revalidatePath(`/events/${comment.eventId}`);
+    await updateEventRating(eventId);
+    revalidatePath(`/events/${eventId}`);
   } catch (error) {
-    console.error("Error deleting comment:", error);
-    throw new Error("Unable to delete comment");
+    console.error("Error deleting comment and its replies:", error);
+    throw new Error("Unable to delete comment and its replies");
   } finally {
     await prisma.$disconnect();
   }
@@ -834,10 +844,12 @@ export async function toggleLikeDislike({
   clerkId,
   commentId,
   action,
+  eventId,
 }: {
   clerkId: string;
   commentId: string;
   action: "like" | "dislike";
+  eventId: string;
 }): Promise<CommentLike | null | undefined> {
   try {
     // Find the existing like/dislike record for the comment and clerk
@@ -888,10 +900,9 @@ export async function toggleLikeDislike({
         where: { clerkId_commentId: { clerkId, commentId } },
       });
 
-      return null; // Indicating the dislike was removed
+      return null;
     }
 
-    // Case 5: Existing dislike but switching to like
     if (existingLike.disLike && action === "like") {
       // Change the dislike to a like
       const updatedLikeDislike = await prisma.commentLike.update({
@@ -907,7 +918,7 @@ export async function toggleLikeDislike({
     console.error("Error toggling like/dislike:", error);
     throw new Error("Unable to toggle like/dislike");
   } finally {
-    await prisma.$disconnect();
+    revalidatePath(`/events/${eventId}`);
   }
 }
 
@@ -951,30 +962,48 @@ export async function updateComment({
   }
 }
 
-export async function getRepliesToComment({
-  parentCommentId,
-}: {
-  parentCommentId: string;
-}): Promise<Comment[]> {
+export async function cachedGetRepliesToComment(
+  parentCommentId: string
+): Promise<Comment[]> {
   try {
     const replies = await prisma.comment.findMany({
       where: {
         parentCommentId,
       },
       orderBy: {
-        createdAt: "asc", // Optional: You can adjust ordering as needed
+        createdAt: "asc", // Optional: Adjust ordering if needed
       },
     });
 
     return replies;
   } catch (error) {
-    console.error("Error getting replies:", error);
+    console.error(
+      `Error fetching replies for parentCommentId ${parentCommentId}:`,
+      error
+    );
     throw new Error("Unable to fetch replies");
   } finally {
     await prisma.$disconnect();
   }
 }
-export async function countLikesAndDislikes({
+
+// Wrap the fetchRepliesToComment function with caching logic
+const getCachedRepliesToComment = (parentCommentId: string) => {
+  return cache(cachedGetRepliesToComment, ["replies", parentCommentId], {
+    revalidate: 20, // Adjust the revalidation time as needed
+  })(parentCommentId);
+};
+
+// Main exported function
+export async function getRepliesToComment({
+  parentCommentId,
+}: {
+  parentCommentId: string;
+}): Promise<Comment[]> {
+  return await getCachedRepliesToComment(parentCommentId);
+}
+
+export async function getLikesAndDislikes({
   commentId,
 }: {
   commentId: string;
@@ -1002,4 +1031,62 @@ export async function countLikesAndDislikes({
   } finally {
     await prisma.$disconnect();
   }
+}
+
+// Wrap the countLikesAndDislikes function with caching logic
+const getCachedCountLikesAndDislikes = (commentId: string) => {
+  return cache(getLikesAndDislikes, ["likesDislikes", commentId], {
+    revalidate: 20, // Adjust the revalidation time as needed
+  })({ commentId });
+};
+
+// Main exported function
+export async function countLikesAndDislikes({
+  commentId,
+}: {
+  commentId: string;
+}): Promise<{ likeCount: number; dislikeCount: number }> {
+  return await getCachedCountLikesAndDislikes(commentId);
+}
+
+// The original function to get the user's comment like
+export async function fetchUserCommentLike({
+  clerkId,
+  commentId,
+}: {
+  clerkId: string;
+  commentId: string;
+}) {
+  if (!clerkId) return undefined;
+  try {
+    const existingLike = await prisma.commentLike.findUnique({
+      where: { clerkId_commentId: { clerkId, commentId } },
+    });
+    return existingLike;
+  } catch (error) {
+    console.error(
+      `Error whilst getting user's comment like. clerkId: ${clerkId}, commentId: ${commentId}`,
+      error
+    );
+
+    throw new Error("Unable to get user's comment like");
+  }
+}
+
+// Wrap the fetchUserCommentLike function with caching logic
+const getCachedUserCommentLike = (clerkId: string, commentId: string) => {
+  return cache(fetchUserCommentLike, ["userCommentLike", clerkId, commentId], {
+    revalidate: 20, // Adjust the revalidation time as needed
+  })({ clerkId, commentId });
+};
+
+// Main exported function
+export async function getUserCommentLike({
+  clerkId,
+  commentId,
+}: {
+  clerkId: string;
+  commentId: string;
+}) {
+  return await getCachedUserCommentLike(clerkId, commentId);
 }
