@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import EventDescriptionParser from "../EventDescriptionParser";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface ConfirmationStepProps {
   formData: any;
@@ -31,101 +35,169 @@ export function ConfirmationStep({ formData }: ConfirmationStepProps) {
   }, [formData.image, formData.video]);
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Review Your Event Details</h3>
-
-          <div className="grid gap-4">
-            <div>
-              <h4 className="font-medium">Event Type</h4>
-              <p className="text-muted-foreground">
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6 max-w-4xl mx-auto"
+    >
+      <Card className="bg-background/40 dark:bg-slate-950/50 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Review Your Event Details</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-8">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Event Type
+              </h4>
+              <p className="text-lg">
                 {formData.eventType
                   .toLowerCase()
                   .replace(/_/g, " ")
                   .replace(/^\w/, (c: string) => c.toUpperCase())}
               </p>
-            </div>
+            </article>
 
-            <div>
-              <h4 className="font-medium">Event Name</h4>
-              <p className="text-muted-foreground">{formData.eventName}</p>
-            </div>
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Event Name
+              </h4>
+              <p className="text-lg">{formData.eventName}</p>
+            </article>
 
-            <div>
-              <h4 className="font-medium">Host</h4>
-              <p className="text-muted-foreground">{formData.host}</p>
-            </div>
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Host
+              </h4>
+              <p className="text-lg">{formData.host}</p>
+            </article>
 
-            <div>
-              <h4 className="font-medium">Location</h4>
-              <p className="text-muted-foreground">{formData.eventLocation}</p>
-            </div>
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Location
+              </h4>
+              <p className="text-lg">{formData.eventLocation}</p>
+            </article>
+          </div>
 
-            <div>
-              <h4 className="font-medium">Description</h4>
-              <p className="text-muted-foreground">{formData.description}</p>
-            </div>
+          <Separator />
 
-            <div>
-              <h4 className="font-medium">Price</h4>
-              <p className="text-muted-foreground">{formData.price}</p>
-            </div>
-            <div>
-              <h4 className="font-medium">Reservation Link</h4>
-              <p className="text-muted-foreground">
+          <article className="space-y-2">
+            <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Description
+            </h4>
+            <Card className="overflow-hidden">
+              <ScrollArea className="h-[200px]">
+                <CardContent className="p-4">
+                  <EventDescriptionParser
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    description={formData.description}
+                  />
+                </CardContent>
+              </ScrollArea>
+            </Card>
+          </article>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Price
+              </h4>
+              <p className="text-lg">{formData.price}</p>
+            </article>
+
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Reservation Link
+              </h4>
+              <p className="text-lg break-all">
                 {formData.reservationTicketLink}
               </p>
-            </div>
+            </article>
 
-            <div>
-              <h4 className="font-medium">Date Range</h4>
-              <p className="text-muted-foreground">
+            <article className="space-y-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Date Range
+              </h4>
+              <p className="text-lg">
                 {formData.dateStart &&
                   new Date(formData.dateStart).toLocaleDateString()}{" "}
                 -
                 {formData.dateEnd &&
                   new Date(formData.dateEnd).toLocaleDateString()}
               </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium">Images</h4>
-              {imagePreviews.length > 0 ? (
-                <div className="mt-2 flex gap-2 flex-wrap">
-                  {imagePreviews.map((preview, index) => (
-                    <img
-                      key={index}
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-24 h-24 object-cover rounded"
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">No images selected</p>
-              )}
-            </div>
-
-            <div>
-              <h4 className="font-medium">Video</h4>
-              {videoPreview ? (
-                <video className="mt-2 max-w-xs" controls>
-                  <source src={videoPreview} type={formData.video[0]?.type} />
-                </video>
-              ) : (
-                <p className="text-muted-foreground">No video selected</p>
-              )}
-            </div>
-            <div>
-              <h4 className="font-medium">Display video first?</h4>
-              <p className="text-muted-foreground">
-                {formData.isVideoFirstDisplay ? "Chosen" : "Not chosen"}
-              </p>
-            </div>
+            </article>
           </div>
-        </div>
-      </div>
-    </div>
+
+          <Separator />
+
+          <article className="space-y-4">
+            <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Media
+            </h4>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-4">
+                <h5 className="font-medium">Images</h5>
+                {imagePreviews.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {imagePreviews.map((preview, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full aspect-square object-cover rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    No images selected
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="font-medium">Video</h5>
+                {videoPreview ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <video
+                      className="w-full rounded-lg shadow-sm aspect-video object-cover"
+                      controls
+                    >
+                      <source
+                        src={videoPreview}
+                        type={formData.video[0]?.type}
+                      />
+                    </video>
+                  </motion.div>
+                ) : (
+                  <p className="text-muted-foreground italic">
+                    No video selected
+                  </p>
+                )}
+
+                <div className="mt-4">
+                  <h5 className="font-medium">Display Preference</h5>
+                  <p className="text-muted-foreground">
+                    Video will be displayed{" "}
+                    {formData.isVideoFirstDisplay ? "first" : "after images"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </CardContent>
+      </Card>
+    </motion.section>
   );
 }

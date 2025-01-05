@@ -19,6 +19,7 @@ import SkeletonLoading from "./SkeletonLoading";
 import { debounce } from "lodash";
 import Link from "next/link";
 import { LIMIT, LoadingVariant } from "@/constants/values";
+import { EventDescriptionDialog } from "./EventDescriptionDialog";
 
 export type FiltersType = {
   eventType?: EventType | string;
@@ -215,10 +216,10 @@ const IndividualEvent = ({ event }: { event: Event }) => {
             <DatePrinter dateEnd={event.dateEnd} dateStart={event.dateStart} />
           </p>
           <h3 className="text-xl font-semibold mb-2">{event.eventName}</h3>
-          <p className="text-sm text-white ">
+          <p className="text-sm   ">
             <span className="font-bold">Host</span>: {event.hostName}
           </p>
-          <p className="text-sm text-white  ">
+          <p className="text-sm    ">
             <span className="font-bold">Genre</span>:{" "}
             {event.type
               .toLowerCase()
@@ -237,11 +238,7 @@ const IndividualEvent = ({ event }: { event: Event }) => {
 
         <ReviewsStarDisplay rating={event.rating} />
         <div className="mb-4">
-          <p className="text-sm">
-            {event.eventDescription.length <= maxLength
-              ? event.eventDescription
-              : `${event.eventDescription.substring(0, maxLength)}...`}
-          </p>
+          <EventDescriptionDialog description={event.eventDescription} />
         </div>
 
         <div className="flex gap-2 mt-auto">

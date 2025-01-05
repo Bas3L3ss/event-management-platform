@@ -388,7 +388,9 @@ export const changeSeenStateNotification = async (
   }
 };
 
-export const getUserByClerkId = async (clerkId: string) => {
+export const getUserByClerkId = async (
+  clerkId: string
+): Promise<User | undefined | null> => {
   try {
     const user = await prisma.user.findUnique({
       where: {

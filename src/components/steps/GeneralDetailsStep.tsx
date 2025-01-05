@@ -114,21 +114,11 @@ export function GeneralDetailsStep() {
 
       <div className="col-span-2">
         <TextAreaInput
+          watch={watch}
           name="description"
           labelText="Event Description"
+          setValue={setValue}
           isZod
-          register={register}
-          validation={{
-            required: "Description is required",
-            minLength: {
-              value: 10,
-              message: "Description must be between 10 and 1000 words",
-            },
-            maxLength: {
-              value: 1000,
-              message: "Description must be between 10 and 1000 words",
-            },
-          }}
         />
         {errors.description && (
           <p className="text-destructive text-sm mt-1">

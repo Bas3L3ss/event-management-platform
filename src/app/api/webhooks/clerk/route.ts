@@ -6,7 +6,7 @@ import {
   SoftDeleteUser,
   updateUser,
 } from "@/utils/actions/usersActions"; // Import the createUser action
-import { redirect } from "next/navigation";
+
 import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {

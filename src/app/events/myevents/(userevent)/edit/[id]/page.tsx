@@ -151,7 +151,7 @@ async function EditEventsPage({ params: { id } }: { params: { id: string } }) {
               <TextAreaInput
                 name="description"
                 labelText="Event Description"
-                defaultValue={eventDescription}
+                contentData={eventDescription}
               />
             </div>
             <div className="mt-6">

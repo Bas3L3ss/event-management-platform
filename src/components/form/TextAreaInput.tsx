@@ -1,24 +1,36 @@
+"use client";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { UseFormRegister } from "react-hook-form";
+import { FieldValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
+import FormDescriptionRIchText from "./FormDescriptionRIchText";
+import { useEffect, useState } from "react";
 
 type TextAreaInputProps = {
   name: string;
   labelText?: string;
-  defaultValue?: string;
-  register?: UseFormRegister<any>;
-  validation?: object;
+  watch?: UseFormWatch<FieldValues>;
+  setValue?: UseFormSetValue<FieldValues>;
   isZod?: boolean;
+  contentData?: string;
 };
 
 function TextAreaInput({
   name,
   labelText,
-  defaultValue,
-  register,
-  validation,
+  contentData,
+  setValue,
+  watch,
   isZod = false,
 }: TextAreaInputProps) {
+  const [content, setContent] = useState<string>(
+    contentData ? contentData : watch ? watch(name) : ""
+  );
+  useEffect(() => {
+    if (isZod && setValue) {
+      setValue(name, content);
+    }
+  }, [content]);
+
   return (
     <div className="mb-2">
       <Label
@@ -30,11 +42,12 @@ function TextAreaInput({
       <Textarea
         id={name}
         name={name}
-        defaultValue={defaultValue}
+        value={content}
         rows={5}
-        className="leading-loose"
-        {...(isZod && register ? register(name, validation) : {})}
+        className="leading-loose opacity-0 absolute top-0 left-0"
       />
+
+      <FormDescriptionRIchText content={content} setContent={setContent} />
     </div>
   );
 }

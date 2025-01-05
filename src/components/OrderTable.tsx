@@ -215,6 +215,7 @@ const IndividualOrder = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
+              className="hover:cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
                 copyToClipboard(order.eventId);
@@ -236,8 +237,9 @@ const IndividualOrder = ({
             {!order.isPaid && !isAdminPage && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="bg-green-600">
+                <DropdownMenuItem className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white dark:text-white rounded-md  hover:cursor-pointer transition-colors">
                   <Link
+                    className="w-full"
                     href={`/checkout?orderId=${order.id}&eventId=${order.eventId}`}
                   >
                     Activate Advertisement

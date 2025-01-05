@@ -3,7 +3,7 @@ import Title from "@/components/Title";
 
 import CommentSection from "@/components/CommentSection";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
-import { Event, User as UserType } from "@prisma/client";
+import { Event } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
 import RecommendationCarousel from "@/components/RecomendationCarousel";

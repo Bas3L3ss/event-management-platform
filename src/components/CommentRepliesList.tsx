@@ -1,10 +1,19 @@
 "use client";
+import { ChevronDown, CopyCheckIcon, Delete } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import {
+  getRepliesToComment,
+  updateComment,
+} from "@/utils/actions/eventsActions";
 import { Comment, User } from "@prisma/client";
-import Image from "next/image";
-import { Card, CardTitle } from "./ui/card";
-import Link from "next/link";
-import { toastPrint } from "@/utils/toast action/action";
-import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import { Card, CardDescription, CardTitle } from "./ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,76 +28,53 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  CopyCheckIcon,
-  Delete,
-  Reply,
-  ThumbsDown,
-  ThumbsUp,
-} from "lucide-react";
+
+import { useRouter } from "next/navigation";
+import { toastPrint } from "@/utils/toast action/action";
+import Image from "next/image";
+import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "./ui/toast";
-import React, { useEffect, useState } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
-import ReviewsStarDisplay from "./ReviewsStarDisplay";
-import { replyToComment, updateComment } from "@/utils/actions/eventsActions";
-import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import CommentRepliesList from "./CommentRepliesList";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
-interface CommentsListProps {
-  comments: Comment[];
-  curUser: User | null | undefined;
-}
-
-const CommentsList: React.FC<CommentsListProps> = ({ comments, curUser }) => {
-  const currentUserId = curUser?.clerkId;
-  const router = useRouter();
-  const sortedComments = [...comments].sort((a, b) => {
-    if (a.clerkId === currentUserId) return -1;
-    if (b.clerkId === currentUserId) return 1;
-    return 0;
-  });
-
-  const handleDeleteComment = async (commentId: string) => {
-    try {
-      const response = await fetch(`/api/comments/${commentId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toastPrint("Success", "Comment deleted successfully", "default");
-        router.refresh();
-      } else {
-        const error = await response.json();
-        toastPrint("Error", error.error, "destructive");
+const CommentRepliesList = ({
+  parentCommentId,
+  currentUser,
+}: {
+  parentCommentId: string;
+  currentUser: User | null | undefined;
+}) => {
+  const [replies, setReplies] = useState<Comment[]>([]);
+  useEffect(() => {
+    const commentReplies = async () => {
+      try {
+        const result = await getRepliesToComment({ parentCommentId });
+        const sortedComments = [...result].sort((a, b) => {
+          if (a.clerkId === currentUser?.clerkId) return -1;
+          if (b.clerkId === currentUser?.clerkId) return 1;
+          return 0;
+        });
+        setReplies(sortedComments);
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      toastPrint("Error", "Something went wrong", "destructive");
-    }
-  };
-
-  if (sortedComments.length == 0)
-    return <p className="text-gray-400  ">This event has no reviews.</p>;
-
+    };
+    commentReplies();
+  }, []);
+  const repliesAmount = replies.length;
   return (
-    <div className="space-y-4">
-      {sortedComments.map((comment) => {
+    <div>
+      {repliesAmount > 0 && (
+        <Button className="mt-4 flex gap-2 items-center " variant={"ghost"}>
+          <ChevronDown size={16} /> <span>{repliesAmount} Replies</span>
+        </Button>
+      )}
+      {replies.map((reply) => {
         return (
           <CommentListItem
-            currentUserId={currentUserId}
-            handleDeleteComment={handleDeleteComment}
-            key={comment.id}
-            comment={comment}
-            currentUser={curUser}
+            comment={reply}
+            currentUserId={currentUser?.clerkId}
           />
         );
       })}
@@ -96,7 +82,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ comments, curUser }) => {
   );
 };
 
-export default CommentsList;
+export default CommentRepliesList;
 
 function DropDownEdit({
   isRightUser,
@@ -184,22 +170,15 @@ function DropDownEdit({
 function CommentListItem({
   comment,
   currentUserId,
-  handleDeleteComment,
-  currentUser,
 }: {
   comment: Comment;
   currentUserId?: string;
-  handleDeleteComment: (commentId: string) => Promise<void>;
-  currentUser: User | null | undefined;
 }) {
   const router = useRouter();
-  const [isSendingReply, setIsSendingReply] = useState(false);
-  const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
   const [editedText, setEditedText] = useState(comment.commentText);
   const [date, setDate] = useState<string>();
-  const [replyText, setReplyText] = useState("");
 
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const maxLength = 100;
@@ -233,38 +212,31 @@ function CommentListItem({
       setIsMutating(false);
     }
   };
-  const handleReply = async () => {
-    if (!currentUserId || !currentUser) return;
-    try {
-      setIsSendingReply(true);
-      await replyToComment({
-        clerkId: currentUserId,
-        authorImageUrl: currentUser.userAvatar,
-        authorName: currentUser.userName,
-        commentText: replyText,
-        eventId: comment.eventId,
-        parentCommentId: comment.id,
-      });
-      setIsReplying(false);
-      setReplyText("");
-      router.refresh();
-      toastPrint("Success", "Reply successfully", "default");
-    } catch (error) {
-      console.error("Error updating comment:", error);
-      toastPrint("Error", "Failed to update comment", "destructive");
-    } finally {
-      setIsSendingReply(false);
-    }
-  };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditedText(comment.commentText);
   };
-  const handleCancelReply = () => {
-    setIsReplying(false);
-    setReplyText("");
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toastPrint("Success", "Comment deleted successfully", "default");
+        router.refresh();
+      } else {
+        const error = await response.json();
+        toastPrint("Error", error.error, "destructive");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toastPrint("Error", "Something went wrong", "destructive");
+    }
   };
+
   useEffect(() => {
     setDate(new Date(comment.createdAt).toLocaleString());
   }, [comment.createdAt]);
@@ -306,7 +278,6 @@ function CommentListItem({
               handleDeleteComment={handleDeleteComment}
             />
           </CardTitle>
-          <ReviewsStarDisplay rating={comment.rating} />
         </div>
         {isEditing ? (
           <div className="mt-2">
@@ -370,104 +341,7 @@ function CommentListItem({
           </p>
         )}
         <br />
-        <div className="text-sm text-muted-foreground">
-          <div className="flex items-center ">
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button className="mr-2" variant={"outline"}>
-                    <ThumbsUp size={16} /> <span className="ml-1">0</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Like this comment</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant={"outline"}>
-                    <ThumbsDown size={16} /> <span className="ml-1">0</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Dislike this comment</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {
-                      setIsReplying(!isReplying);
-                      if (isReplying) {
-                        setReplyText("");
-                      }
-                    }}
-                    className="ml-2"
-                    variant={"outline"}
-                  >
-                    <Reply size={16} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Reply to this comment</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <p className="text-xs ml-4">{date}</p>
-          </div>
-        </div>
-        {isReplying && (
-          <div className="mt-2">
-            <Textarea
-              placeholder="Write in your reply..."
-              value={replyText}
-              onChange={(e) => {
-                setReplyText(e.target.value);
-              }}
-              autoFocus
-              className=" mb-2"
-            />
-
-            <div className="flex justify-end gap-2">
-              {currentUser && (
-                <div className="mr-auto flex text-muted-foreground items-center gap-1">
-                  <Avatar className="size-9">
-                    <AvatarImage
-                      src={currentUser?.userAvatar}
-                      alt="current user"
-                    />
-                    <AvatarFallback>Me</AvatarFallback>
-                  </Avatar>
-                  <p className="text-sm">{currentUser.userName}</p>
-                </div>
-              )}
-              <Button
-                disabled={isSendingReply}
-                onClick={handleCancelReply}
-                variant="outline"
-                size="sm"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleReply} disabled={isSendingReply} size="sm">
-                {isSendingReply ? (
-                  <span className="animate-pulse">...Sending</span>
-                ) : (
-                  "Send reply"
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
-        <CommentRepliesList
-          parentCommentId={comment.id}
-          currentUser={currentUser}
-        />
+        <CardDescription>{date}</CardDescription>
       </div>
     </Card>
   );

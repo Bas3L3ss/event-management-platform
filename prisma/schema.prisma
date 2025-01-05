@@ -90,12 +90,21 @@ model Comment {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   commentText     String
-  rating          Float
-
+  rating          Float?
   event           Event    @relation("EventComments", fields: [eventId], references: [id], onDelete: Cascade)
+  parentCommentId String?   
   eventId         String  
+  isEdited Boolean @default(false)
 
-  @@index([createdAt])
+  @@index([createdAt]) 
+}
+model CommentLike {
+  id              String   @id @default(uuid())
+  clerkId         String
+  commentId       String
+  disLike         Boolean?  
+  @@unique([clerkId, commentId]) 
+  
 }
 
 

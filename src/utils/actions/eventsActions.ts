@@ -1,6 +1,13 @@
 "use server";
 
-import { Comment, Event, EventStatus, EventType, Order } from "@prisma/client";
+import {
+  Comment,
+  CommentLike,
+  Event,
+  EventStatus,
+  EventType,
+  Order,
+} from "@prisma/client";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
 import {
@@ -20,6 +27,7 @@ import { createOrderAction } from "./ordersActions";
 import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache, invalidateCache } from "../cache";
+import { revalidatePath } from "next/cache";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -343,7 +351,7 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
 async function cachedGetCommentsByEventId(eventId: string) {
   try {
     const comments = await prisma.comment.findMany({
-      where: { eventId },
+      where: { eventId, parentCommentId: null },
       orderBy: { createdAt: "asc" },
     });
     return comments;
@@ -440,7 +448,7 @@ export async function deleteComment(commentId: string): Promise<void> {
     });
 
     await updateEventRating(comment.eventId);
-    invalidateCache(["comments", comment.eventId]);
+    revalidatePath(`/events/${comment.eventId}`);
   } catch (error) {
     console.error("Error deleting comment:", error);
     throw new Error("Unable to delete comment");
@@ -782,5 +790,216 @@ export async function deleteEventWithRelations(eventId: string) {
     console.log("Event and all related data successfully deleted.");
   } catch (error) {
     console.error("Error deleting event and related data:", error);
+  }
+}
+
+export async function replyToComment({
+  clerkId,
+  commentText,
+  eventId,
+  authorName,
+  authorImageUrl,
+  parentCommentId,
+}: {
+  clerkId: string;
+  commentText: string;
+  eventId: string;
+  authorName: string;
+  authorImageUrl: string;
+  parentCommentId: string;
+}): Promise<Comment> {
+  try {
+    const reply = await prisma.comment.create({
+      data: {
+        clerkId,
+        commentText,
+        eventId,
+        authorName,
+        authorImageUrl,
+        parentCommentId,
+      },
+    });
+
+    revalidatePath(`/events/${eventId}`);
+    return reply;
+  } catch (error) {
+    console.error("Error replying to comment:", error);
+    throw new Error("Unable to reply to comment");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function toggleLikeDislike({
+  clerkId,
+  commentId,
+  action,
+}: {
+  clerkId: string;
+  commentId: string;
+  action: "like" | "dislike";
+}): Promise<CommentLike | null | undefined> {
+  try {
+    // Find the existing like/dislike record for the comment and clerk
+    const existingLike = await prisma.commentLike.findUnique({
+      where: { clerkId_commentId: { clerkId, commentId } },
+    });
+
+    // Case 1: No existing like/dislike, so create a new like/dislike record
+    if (!existingLike) {
+      const newLikeDislike = await prisma.commentLike.create({
+        data: {
+          clerkId,
+          commentId,
+          disLike: action === "dislike" ? true : false, // Assign based on action
+        },
+      });
+
+      return newLikeDislike;
+    }
+
+    // Case 2: Existing like
+    if (!existingLike.disLike && action === "like") {
+      // If they are clicking like again, remove the like (delete the record)
+      await prisma.commentLike.delete({
+        where: { clerkId_commentId: { clerkId, commentId } },
+      });
+
+      return null; // Indicating the like was removed
+    }
+
+    // Case 3: Existing like but switching to dislike
+    if (!existingLike.disLike && action === "dislike") {
+      // Change the like to a dislike
+      const updatedLikeDislike = await prisma.commentLike.update({
+        where: { clerkId_commentId: { clerkId, commentId } },
+        data: {
+          disLike: true, // Switch to dislike
+        },
+      });
+
+      return updatedLikeDislike;
+    }
+
+    // Case 4: Existing dislike
+    if (existingLike.disLike && action === "dislike") {
+      // If they are clicking dislike again, remove the dislike (delete the record)
+      await prisma.commentLike.delete({
+        where: { clerkId_commentId: { clerkId, commentId } },
+      });
+
+      return null; // Indicating the dislike was removed
+    }
+
+    // Case 5: Existing dislike but switching to like
+    if (existingLike.disLike && action === "like") {
+      // Change the dislike to a like
+      const updatedLikeDislike = await prisma.commentLike.update({
+        where: { clerkId_commentId: { clerkId, commentId } },
+        data: {
+          disLike: false, // Switch to like
+        },
+      });
+
+      return updatedLikeDislike;
+    }
+  } catch (error) {
+    console.error("Error toggling like/dislike:", error);
+    throw new Error("Unable to toggle like/dislike");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function updateComment({
+  clerkId,
+  commentId,
+  commentText,
+}: {
+  clerkId: string;
+  commentId: string;
+  commentText: string;
+}): Promise<Comment> {
+  try {
+    const existingComment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!existingComment) {
+      throw new Error("Comment not found");
+    }
+
+    if (existingComment.clerkId !== clerkId) {
+      throw new Error("You are not authorized to update this comment");
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: {
+        commentText,
+        isEdited: true,
+      },
+    });
+    revalidatePath(`/events/${existingComment.eventId}`);
+
+    return updatedComment;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw new Error("Unable to update comment");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getRepliesToComment({
+  parentCommentId,
+}: {
+  parentCommentId: string;
+}): Promise<Comment[]> {
+  try {
+    const replies = await prisma.comment.findMany({
+      where: {
+        parentCommentId,
+      },
+      orderBy: {
+        createdAt: "asc", // Optional: You can adjust ordering as needed
+      },
+    });
+
+    return replies;
+  } catch (error) {
+    console.error("Error getting replies:", error);
+    throw new Error("Unable to fetch replies");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function countLikesAndDislikes({
+  commentId,
+}: {
+  commentId: string;
+}): Promise<{ likeCount: number; dislikeCount: number }> {
+  try {
+    // Count likes (disLike is false) and dislikes (disLike is true)
+    const likeCount = await prisma.commentLike.count({
+      where: {
+        commentId,
+        disLike: false, // Count only the likes
+      },
+    });
+
+    const dislikeCount = await prisma.commentLike.count({
+      where: {
+        commentId,
+        disLike: true, // Count only the dislikes
+      },
+    });
+
+    return { likeCount, dislikeCount };
+  } catch (error) {
+    console.error("Error counting likes and dislikes:", error);
+    throw new Error("Unable to count likes and dislikes");
+  } finally {
+    await prisma.$disconnect();
   }
 }

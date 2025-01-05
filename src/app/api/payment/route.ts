@@ -2,7 +2,7 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 import { type NextRequest } from "next/server";
 import prisma from "@/utils/db";
-import { calculateEventPrice, limitWords } from "@/utils/utils";
+import { calculateEventPrice, limitWords, sanitizeText } from "@/utils/utils";
 
 export const POST = async (req: NextRequest) => {
   const requestHeaders = new Headers(req.headers);
@@ -40,7 +40,7 @@ export const POST = async (req: NextRequest) => {
             product_data: {
               name: event.eventName, // Assuming there's an eventName field
               images: event.eventImg,
-              description: limitWords(event.eventDescription, 20),
+              description: sanitizeText(event.eventDescription),
             },
             unit_amount: totalPrice, // Total price based on event duration
           },

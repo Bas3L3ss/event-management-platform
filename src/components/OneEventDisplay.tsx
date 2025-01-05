@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Event, EventStatus, User as UserType } from "@prisma/client";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils";
 
 import dynamic from "next/dynamic";
 import SkeletonLoading from "./SkeletonLoading";
+import EventDescriptionParser from "./EventDescriptionParser";
 
 const EventLocationMap = dynamic(
   () => import("@/components/EventLocationMap"),
@@ -40,15 +42,6 @@ function OneEventDisplay({
   author?: UserType | null;
 }) {
   const [isMapView, setIsMapView] = useState(false);
-  const handleDownload = () => {
-    console.log("Download file triggered.");
-    // Implement file download logic here
-  };
-
-  const handleSnapshot = () => {
-    console.log("Snapshot triggered.");
-    // Implement map snapshot logic here (e.g., using leaflet or canvas)
-  };
 
   const toggleView = (view: "images" | "map") => {
     if (view === "images") {
@@ -60,7 +53,7 @@ function OneEventDisplay({
   return (
     <div className="space-y-6 ">
       <BreadCrumbsOfEvent eventName={oneEvent.eventName} />
-      <article className="relative grid md:grid-cols-2 gap-8 xl:gap-12  ">
+      <section className="relative grid md:grid-cols-2 gap-8 xl:gap-12  ">
         <div className="space-y-6">
           <div className="space-y-2">
             <p className="text-sm text-primary flex items-center ">
@@ -99,15 +92,22 @@ function OneEventDisplay({
               </div>
             )}
           </div>
-
-          <p className="text-lg leading-7 text-muted-foreground">
-            {oneEvent.eventDescription.split("\n").map((line, index) => (
-              <React.Fragment key={index}>
-                {line}
-                <br />
-              </React.Fragment>
-            ))}
-          </p>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold tracking-tight">
+                Event Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px] pr-4">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
+                  <EventDescriptionParser
+                    description={oneEvent.eventDescription}
+                  />
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
           <div className="flex items-center space-x-4">
             <Button asChild size="lg">
               <Link href={`${oneEvent.reservationTicketLink}`}>
@@ -195,7 +195,7 @@ function OneEventDisplay({
             />
           ) : null}
         </div>
-      </article>
+      </section>
     </div>
   );
 }
