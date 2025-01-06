@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "quill-emoji/dist/quill-emoji.css";

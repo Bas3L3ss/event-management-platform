@@ -1,3 +1,4 @@
+"use client";
 import { useFormContext } from "react-hook-form";
 import FormInput from "@/components/form/FormInput";
 import TextAreaInput from "@/components/form/TextAreaInput";
@@ -12,6 +13,7 @@ import dynamic from "next/dynamic";
 const EventLocationPicker = dynamic(
   () => import("@/components/EventLocationPicker"),
   {
+    ssr: false,
     loading: () => <SkeletonLoading />,
   }
 );
@@ -28,6 +30,7 @@ export function GeneralDetailsStep() {
   );
   const [latitude, setLatitude] = useState<number>(watch("latitude") || 0);
   const [longitude, setLongitude] = useState<number>(watch("longitude") || 0);
+
   useEffect(() => {
     setValue("eventLocation", location);
     setValue("latitude", latitude);

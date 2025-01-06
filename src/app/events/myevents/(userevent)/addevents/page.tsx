@@ -29,14 +29,7 @@ import {
 import { cn, getFieldsForStep } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { Order } from "@prisma/client";
-
-const formSteps = {
-  EVENT_TYPE: 0,
-  GENERAL_DETAILS: 1,
-  DATE_SELECTION: 2,
-  MEDIA_UPLOAD: 3,
-  COMPLETION: 4,
-} as const;
+import { formSteps, steps } from "@/constants/form";
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -54,15 +47,6 @@ const slideVariants = {
     opacity: 0,
   }),
 };
-
-// Progress steps for the stepper
-const steps = [
-  { title: "Event Type", description: "Choose your event type" },
-  { title: "Details", description: "Fill in event details" },
-  { title: "Date & Time", description: "Set event schedule" },
-  { title: "Media", description: "Upload images & videos" },
-  { title: "Confirm", description: "Review and submit" },
-];
 
 function AddEventsPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -117,7 +101,7 @@ function AddEventsPage() {
       | "isVideoFirstDisplay"
       | "image"
       | "video"
-    > = getFieldsForStep(currentStep); // Ensure correct type
+    > = getFieldsForStep(currentStep);
 
     // Special handling for media upload step
     if (currentStep === formSteps.MEDIA_UPLOAD) {
@@ -161,7 +145,6 @@ function AddEventsPage() {
       }
     }
 
-    // Normal validation for other steps
     const isStepValid = await trigger(fieldsToValidate);
     if (isStepValid) {
       setDirection(1);

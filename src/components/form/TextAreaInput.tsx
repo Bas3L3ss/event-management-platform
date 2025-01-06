@@ -2,9 +2,16 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldValues, UseFormSetValue, UseFormWatch } from "react-hook-form";
-import FormDescriptionRIchText from "./FormDescriptionRIchText";
 import { useEffect, useState } from "react";
+import SkeletonLoading from "../SkeletonLoading";
+import dynamic from "next/dynamic";
 
+const FormDescriptionRIchText = dynamic(
+  () => import("@/components/form/FormDescriptionRIchText"),
+  {
+    loading: () => <SkeletonLoading />,
+  }
+);
 type TextAreaInputProps = {
   name: string;
   labelText?: string;
