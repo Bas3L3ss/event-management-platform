@@ -1,74 +1,157 @@
-# Event Advertisement Website
+<div align="center">
 
-# Notice
+⭐ **If you like this project, please star the repository!** ⭐ <br>
+------- 👇 **Live Demo Below** 👇 --------
 
-Thank you for your interest in my project! Unfortunately, I’m unable to fully deploy it at this time, as some of its essential features rely on paid services, including Stripe, Clerk, and Supabase. As this is a personal project, I can’t currently cover these costs. I apologize if this is disappointing, especially if you were hoping for a live preview. However, I invite you to clone the project yourself—everything is set up for you to explore its features and functionality directly.
+<hr>
+</div>
 
-Please note that you will need to configure your own API keys for these services to access the full functionality.
+<div align="center">
+<a href="[Your Repository URL]" target="blank">
+<img src="[Your Logo Path]" width="90" alt="Logo" />
+</a>
 
-## Overview
+<h2>Event Management & Advertisement Platform</h2>
 
-The Event Advertisement Website is a comprehensive platform designed to facilitate event creation, management, and promotion. This project aims to provide users with a centralized hub for advertising events, managing event details, and engaging with event attendees through comments and ratings.
+![](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![](https://img.shields.io/badge/Supabase-61DAFB?style=for-the-badge&logo=supabase&logoColor=black)
+![](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![](https://img.shields.io/badge/Clerk-6B46C1?style=for-the-badge&logo=clerk&logoColor=white)
+![](https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radix-ui&logoColor=white)
 
-### Problem Statement
+<img src="[Your Screenshot Path]" width="80%">
 
-Currently, event organizers often struggle with fragmented platforms for event promotion and management. Many existing solutions lack integrated features for event creation, payment processing, and user engagement. Additionally, there's a need for a platform that caters to both event organizers and attendees, providing a seamless experience for event discovery, participation, and feedback.
+</div>
 
-### Goals
+## 💡 Overview
 
-- <b>Centralized Event Management:</b> Provide a single platform for creating, editing, and managing events.
-- <b>User Engagement:</b> Enable attendees to comment on and rate events, fostering community interaction.
-- <b>Automated Status Updates:</b> Implement automatic event status changes based on event dates.
-- <b>Secure Authentication:</b> Ensure user data protection through robust email authentication.
-- <b>Integrated Payments:</b> Streamline the process of creating paid event listings.
-- <b>Administrative Control:</b> Offer comprehensive tools for platform moderation and management.
-- <b>User Notifications:</b> Implement a follow system to keep users informed about new events from their favorite organizers.
+A modern event management platform built with Next.js, designed to connect event organizers with attendees. This platform offers a seamless experience for discovering, creating, and managing events with features focused on user engagement and event promotion.
 
-### Why This Project?
+## ✨ Features
 
-- <b>Efficiency:</b> Streamline the event creation and promotion process for organizers.
-- <b>Community Building:</b> Foster engagement between event organizers and attendees.
-- <b>Transparency:</b> Provide clear information about event statuses and details.
-- <b>Revenue Generation:</b> Create a sustainable model through paid event listings.
-- <b>User-Centric Design:</b> Focus on both organizer and attendee needs for a comprehensive event platform.
+- **📅 Event Management & Advertisement:** Create, edit, manage, search and promote events with rich text descriptions
+- **👥 Media-like Experience:** An interactive platform where users can follow each other and stay updated.
+- **🌟 Featured Events:** Showcase premium events with enhanced visibility
+- **💬 Interactive Comments:** Engage with attendees through a robust comment system
+- **📱 Responsive Design:** Fully responsive interface across all devices
+- **🔐 User Authentication:** Secure authentication powered by Clerk
+- **🎨 Theme Support:** Light/dark mode with customizable UI
+- **📍 Location Integration:** Map integration for event locations
 
-## Tech Stack
+## 👩‍💻 Tech Stack
 
-### Frontend
+- **Next.js 14:** Server-side rendering and modern React features
+- **TypeScript:** Type-safe development environment
+- **Prisma:** Type-safe database access and management
+- **Clerk:** Authentication and user management
+- **Tailwind CSS:** Utility-first styling
+- **Radix UI:** Accessible component primitives
+- **React Hook Form:** Form validation and handling
+- **Zod:** Schema validation
+- **Supabase:** File storage and database
 
-- <b>Next.js:</b> For building a responsive and dynamic user interface.
+## 📦 Getting Started
 
-### Backend
+### 🚀 Prerequisites
 
-- <b>Node.js:</b> To handle server-side logic and API endpoints.
+- Node.js (v18.x or higher)
+- npm or yarn
+- PostgreSQL database
 
-### Authentication
+### 🛠️ Installation
 
-- <b>Clerk:</b> Manages user authentication and profile management.
+1. **Clone the repository:**
 
-### Database
+   ```bash
+   git clone [your-repo-url]
+   cd event-management-platform
+   ```
 
-- <b>Supabase:</b> Provides database services and storage for event images and videos.
+2. **Install dependencies:**
 
-### Payment Processing
+   ```bash
+   npm install
+   ```
 
-- <b>Stripe:</b> Handles secure payment transactions for event listings.
+3. **Set up environment variables:**
+   Create a `.env` file with:
 
-### Hosting
+   ```env
+    CLERK_ADMIN_ID =  ""
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY= ""
+    CLERK_SECRET_KEY= ""
+    STRIPE_SECRET_KEY = ""
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = ""
+    DATABASE_URL =  ""
+    DIRECT_URL =  ""
+    SUPABASE_URL =  ""
+    SUPABASE_KEY =  ""
+    CLERK_WEBHOOK_SECRET = ""
+   ```
 
-- <b>Vercel:</b> For seamless deployment and hosting of the Next.js application.
+4. **Run database migrations:**
 
-## Features
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-1. Event Management
-2. Comments & Ratings
-3. Administration
-4. Event Display
-5. Authentication
-6. Payments
-7. User Notifications
-8. Profile Management
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
-## Contributing
+## 📖 Usage
 
-We welcome contributions to enhance the Event Advertisement Website project. Please contact [phamthen.hun060907@yahoo.com]
+Visit `http://localhost:3000` to access the application. Create an account to:
+
+- Browse and search events
+- Create and manage your own events
+- Interact with other users through comments
+- Follow event organizers
+- Book tickets for events
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🚀 Future Roadmap
+
+- **📊 Enhanced Analytics Dashboard**
+
+  - Real-time event performance metrics
+  - Attendee engagement tracking
+  - Custom reporting tools
+
+- **🎯 Smart Event Advertisement**
+
+  - AI-powered targeting recommendations
+  - Automated promotional campaigns
+  - Multi-channel marketing integration
+
+- **🔍 Advanced Search & Discovery**
+
+  - Vector-based similarity search
+  - Personalized event recommendations
+  - Interest-based event matching
+
+- **🤖 AI-Powered Features**
+
+  - Smart event categorization
+  - Automated content moderation
+  - Intelligent pricing suggestions
+
+- **📱 Enhanced User Experience**
+  - Improved mobile experience
+  - Real-time notifications
+  - Social media integration
