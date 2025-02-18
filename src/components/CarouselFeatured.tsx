@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/carousel";
 import { Event } from "@prisma/client";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, LinkIcon } from "lucide-react";
 import DatePrinter from "./DatePrinter";
 import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
+import { EventDescriptionDialog } from "./EventDescriptionDialog";
 
 export function CarouselFeatured({
   featuredEvents,
@@ -29,8 +30,8 @@ export function CarouselFeatured({
       <CarouselContent>
         {featuredEvents.map((el, index) => (
           <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 p-2">
-            <Link href={`/events/${el.id}`} className="block h-full">
-              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <article className="block h-full">
+              <Card className="h-full  ">
                 <CardContent className="flex flex-col h-full justify-between p-6">
                   <div>
                     <p className="text-sm text-primary flex items-center mb-2">
@@ -40,9 +41,15 @@ export function CarouselFeatured({
                         dateStart={el.dateStart}
                       />
                     </p>
-                    <h3 className="mb-2 text-xl font-semibold line-clamp-2">
-                      {el.eventName}
-                    </h3>
+                    <Link
+                      className="mb-2  inline-flex items-center gap-2"
+                      href={`/events/${el.id}`}
+                    >
+                      <h3 className="text-xl font-semibold line-clamp-2">
+                        {el.eventName}
+                      </h3>
+                      <LinkIcon size={16} className="text-blue-600" />
+                    </Link>
                     <p className="mb-4 text-sm text-muted-foreground">
                       Host: {el.hostName} - Genre:{" "}
                       {el.type
@@ -65,14 +72,14 @@ export function CarouselFeatured({
                       </span>
                     </p>
                     <p className="text-sm text-muted-foreground line-clamp-3">
-                      {el.eventDescription.length > maxLength
-                        ? el.eventDescription.substring(0, maxLength) + "..."
-                        : el.eventDescription}
+                      <EventDescriptionDialog
+                        description={el.eventDescription}
+                      />
                     </p>
                   </div>
                 </CardContent>
               </Card>
-            </Link>
+            </article>
           </CarouselItem>
         ))}
       </CarouselContent>

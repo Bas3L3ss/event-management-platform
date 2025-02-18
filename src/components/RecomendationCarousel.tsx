@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Calendar, MapPin, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { EventDescriptionDialog } from "./EventDescriptionDialog";
 
 const RecommendationCarousel = ({
   className,
@@ -92,9 +93,9 @@ const RecommendationCarousel = ({
 
       <Slider {...settings} className="relative -mx-2">
         {events.map((event) => (
-          <div key={event.id} className="px-2">
-            <Card className="h-full flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-              <CardHeader className="p-0">
+          <div key={event.id} className="px-2 h-full">
+            <Card className="h-[30rem] flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-lg">
+              <CardHeader className="p-0 flex-shrink-0">
                 <div className="relative aspect-video">
                   <MediaRenderer
                     featured={event.featured}
@@ -117,32 +118,40 @@ const RecommendationCarousel = ({
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="flex-grow p-4">
+              <CardContent className="flex-1 p-4 flex flex-col">
                 <CardTitle className="text-xl font-semibold mb-2 line-clamp-1">
                   {event.eventName}
                 </CardTitle>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {event.eventDescription}
-                </p>
-                <div className="space-y-2 text-sm">
+                <div className="mb-4 flex-shrink-0">
+                  <EventDescriptionDialog
+                    description={event.eventDescription}
+                    className="text-sm text-muted-foreground line-clamp-2"
+                  />
+                </div>
+                <div className="space-y-2 text-sm mt-auto">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>
+                    <Calendar className="w-4 h-4 mr-2 text-muted-foreground flex-shrink-0" />
+                    <span className="line-clamp-1">
                       {format(new Date(event.dateStart), "MMM d, yyyy")} -{" "}
                       {format(new Date(event.dateEnd), "MMM d, yyyy")}
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <MapPin className="w-4 h-4 mr-2 text-muted-foreground flex-shrink-0" />
                     <span className="line-clamp-1">{event.eventLocation}</span>
                   </div>
                   <div className="flex items-center">
-                    <Tag className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>{event.type}</span>
+                    <Tag className="w-4 h-4 mr-2 text-muted-foreground flex-shrink-0" />
+                    <span className="line-clamp-1">
+                      {event.type
+                        .toLowerCase()
+                        .replace(/_/g, " ")
+                        .replace(/^\w/, (c: string) => c.toUpperCase())}
+                    </span>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="p-4 pt-0">
+              <CardFooter className="p-4 pt-0 flex-shrink-0">
                 <Button asChild className="w-full" variant="outline">
                   <Link href={`/events/${event.id}`}>View Event</Link>
                 </Button>

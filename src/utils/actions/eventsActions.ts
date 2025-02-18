@@ -28,6 +28,7 @@ import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
 import { revalidatePath } from "next/cache";
+import { LIMIT } from "@/constants/values";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({

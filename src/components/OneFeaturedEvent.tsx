@@ -5,6 +5,7 @@ import DatePrinter from "./DatePrinter";
 import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { Calendar, Star, Ticket, MessageSquare } from "lucide-react";
+import EventDescriptionParser from "./EventDescriptionParser";
 
 export default function OneFeaturedEvent({
   featuredEvent,
@@ -16,31 +17,41 @@ export default function OneFeaturedEvent({
   return (
     <div className="container px-4 py-8 md:py-12 lg:py-16">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <p className="text-sm text-primary flex items-center">
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <p className="text-sm text-primary/90 bg-primary/10 inline-flex items-center px-3 py-1 rounded-full">
               <Calendar className="w-4 h-4 mr-2" />
               <DatePrinter
                 dateEnd={featuredEvent.dateEnd}
                 dateStart={featuredEvent.dateStart}
               />
             </p>
-            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
               {featuredEvent.eventName}
             </h1>
-            <p className="text-lg text-muted-foreground capitalize">
-              Host: {featuredEvent.hostName} - Genre:{" "}
+            <p className="text-lg  text-muted-foreground/90 capitalize flex items-center gap-2">
+              <span className="font-semibold text-foreground">Host:</span>{" "}
+              {featuredEvent.hostName}
+            </p>
+            <p className="text-lg  text-muted-foreground/90 capitalize flex items-center gap-2">
+              <span className="font-semibold text-foreground">Genre:</span>{" "}
               {featuredEvent.type
                 .toLowerCase()
                 .replace(/_/g, " ")
                 .replace(/^\w/, (c: string) => c.toUpperCase())}
             </p>
           </div>
-          <p className="text-xl text-muted-foreground leading-relaxed">
-            {featuredEvent.eventDescription}
-          </p>
+          <div className="text-xl text-muted-foreground/90 leading-relaxed backdrop-blur-sm bg-background/50 p-6 rounded-lg border">
+            <EventDescriptionParser
+              description={featuredEvent.eventDescription}
+            />
+          </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild size="lg" className="w-full sm:w-auto">
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto hover:scale-105 transition-transform"
+            >
               <Link
                 href={featuredEvent.reservationTicketLink}
                 className="flex gap-1 flex-nowrap"
@@ -49,7 +60,11 @@ export default function OneFeaturedEvent({
                 Book Ticket
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto hover:bg-primary/10 hover:text-primary transition-colors"
+            >
               <Link
                 href={`/events/${featuredEvent.id}`}
                 className="flex gap-1 flex-nowrap"
@@ -60,16 +75,20 @@ export default function OneFeaturedEvent({
             </Button>
           </div>
           <div className="flex items-center space-x-6 pt-4 border-t">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 bg-primary/10 px-4 py-2 rounded-full">
               <ReviewsStarDisplay rating={featuredEvent.rating} />
-              <span className="text-muted-foreground">/ 5.0</span>
+              <span className="text-primary font-medium">/ 5.0</span>
             </div>
-            <div className="text-muted-foreground">
-              from {commentsLength} reviews
+            <div className="text-muted-foreground/90">
+              from{" "}
+              <span className="font-semibold text-foreground">
+                {commentsLength}
+              </span>{" "}
+              reviews
             </div>
           </div>
         </div>
-        <div className="relative rounded-lg overflow-hidden shadow-xl">
+        <div className="relative rounded-xl overflow-hidden shadow-xl ring-1 ring-primary/20 transition-transform hover:scale-[1.02] duration-300">
           <MediaRenderer
             featured={featuredEvent.featured}
             url={featuredEvent.eventImgOrVideoFirstDisplay as string}

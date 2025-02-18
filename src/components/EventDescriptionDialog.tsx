@@ -28,7 +28,7 @@ export function EventDescriptionDialog({
           variant="ghost"
           className="p-0 h-auto font-normal text-muted-foreground hover:text-primary transition-colors"
         >
-          View full description
+          View full event's description
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </DialogTrigger>

@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { CrownIcon } from "lucide-react";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-} from "@/components/ui/dialog";
+import "react-medium-image-zoom/dist/styles.css";
+import Zoom from "react-medium-image-zoom";
 
 const MediaRenderer = ({
   url,
@@ -48,7 +44,7 @@ const MediaRenderer = ({
   if (fileExtension === "mp4") {
     return (
       <video
-        className="w-full aspect-video object-cover rounded-md"
+        className="w-full aspect-video object-cover rounded-md h-[200px]"
         width={500}
         height={500}
         controls
@@ -77,30 +73,18 @@ const MediaRenderer = ({
         )}
 
         {/* Trigger the dialog to open on image click */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="relative cursor-zoom-in">
-              <Image
-                className="w-full aspect-video object-cover rounded-md transition-transform duration-300"
-                src={url}
-                alt={alt}
-                width={500}
-                height={500}
-              />
-            </div>
-          </DialogTrigger>
-
-          {/* Dialog content (zoomed image view) */}
-          <DialogContent className=" z-[99999999999999] bg-black/50 rounded-md p-4 max-w-full max-h-full flex justify-center items-center">
+        <article className="  overflow-hidden   max-h-64 rounded-lg my-2 w-full cursor-zoom-in">
+          <Zoom>
             <Image
-              className="object-contain max-w-full max-h-screen"
               src={url}
-              alt={alt}
-              width={1000}
-              height={1000}
+              alt="Message Image"
+              width={500}
+              height={500}
+              className="rounded-md   object-cover w-full h-[200px]"
+              loading="lazy"
             />
-          </DialogContent>
-        </Dialog>
+          </Zoom>
+        </article>
       </div>
     );
   }

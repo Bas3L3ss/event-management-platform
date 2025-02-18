@@ -206,8 +206,6 @@ const EventsDisplay = ({ eventsData }: { eventsData: Event[] }) => {
 };
 
 const IndividualEvent = ({ event }: { event: Event }) => {
-  const maxLength = 100;
-
   return (
     <Card className="h-full flex flex-col">
       <CardContent className="flex flex-col h-full p-6">
