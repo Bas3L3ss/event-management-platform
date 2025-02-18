@@ -1,50 +1,19 @@
+import React, { Suspense } from "react";
+import MainPage from "./_component/ServerSideSuspsense";
+import SkeletonLoading from "@/components/SkeletonLoading";
+import { LoadingVariant } from "@/constants/values";
 import Container from "@/components/Container";
-import Title from "@/components/Title";
 
-import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
-import { Event } from "@prisma/client";
-import { redirect } from "next/navigation";
-import React from "react";
-import RecommendationCarousel from "@/components/RecomendationCarousel";
-import { getUserByClerkId } from "@/utils/actions/usersActions";
-import { auth } from "@clerk/nextjs/server";
-import OneEventDisplay from "@/components/OneEventDisplay";
-import CommentSection from "@/components/comments/CommentSection";
-
-async function OneEventPage({ params: { id } }: { params: { id: string } }) {
-  const oneEvent: Event | null = await getEventById(id);
-
-  if (oneEvent === null) redirect("/");
-  const oneEventsCommentsLength = getCommentsLength(oneEvent.id);
-  const author = await getUserByClerkId(oneEvent.clerkId);
-  const { userId } = auth();
-
-  if (oneEvent.status == "NOT_CONFIRMED" && author?.clerkId != userId)
-    redirect("/events");
-
+const OneEventPage = ({ params: { id } }: { params: { id: string } }) => {
   return (
     <Container className="py-10 space-y-12">
-      <div className="space-y-10">
-        <OneEventDisplay
-          commentsLength={oneEventsCommentsLength}
-          oneEvent={oneEvent}
-          author={author}
-        />
-
-        {oneEvent.status != "NOT_CONFIRMED" && (
-          <div className="space-y-4">
-            <Title
-              title="Comments"
-              className="text-2xl font-bold text-primary"
-            />
-            <CommentSection eventId={oneEvent.id} />
-          </div>
-        )}
-      </div>
-
-      <RecommendationCarousel className="mt-16" id={oneEvent.id} />
+      <Suspense
+        fallback={<SkeletonLoading variant={LoadingVariant.EVENTPAGE} />}
+      >
+        <MainPage params={{ id }} />
+      </Suspense>
     </Container>
   );
-}
+};
 
 export default OneEventPage;

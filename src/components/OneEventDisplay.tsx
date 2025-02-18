@@ -38,7 +38,7 @@ function OneEventDisplay({
   author,
 }: {
   oneEvent: Event;
-  commentsLength: Promise<number>;
+  commentsLength: number;
   author?: UserType | null;
 }) {
   const [isMapView, setIsMapView] = useState(false);
