@@ -429,6 +429,7 @@ export async function createComment({
     });
 
     await updateEventRating(eventId);
+    revalidatePath(`/events/${eventId}`);
 
     return comment;
   } catch (error) {

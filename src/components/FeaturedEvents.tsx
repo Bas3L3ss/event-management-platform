@@ -20,16 +20,71 @@ import { Calendar } from "lucide-react";
 import MediaRenderer from "./MediaFileRender";
 import OneFeaturedEvent from "./OneFeaturedEvent";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
+import { Suspense } from "react";
+import { CarouselFeatured } from "./CarouselFeatured";
+import { Skeleton } from "./ui/skeleton";
 
-export default async function FeaturedEventsPage() {
-  const featuredEvents: Event[] = await getLatestFeaturedEvent(8);
-  if (!featuredEvents || featuredEvents.length === 0) return null;
+// Loading components
+const LoadingCarousel = () => (
+  <div className="w-full h-[400px] animate-pulse bg-muted rounded-lg" />
+);
 
+const LoadingFeaturedEvent = () => (
+  <div className="grid lg:grid-cols-2 gap-8 mb-16">
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-4 w-32" />
+      </div>
+      <Skeleton className="h-8 w-3/4" />
+      <Skeleton className="h-4 w-48" />
+      <Skeleton className="h-32 w-full" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-16" />
+      </div>
+    </div>
+    <Skeleton className="h-[400px] w-full rounded-lg" />
+  </div>
+);
+
+// Split into separate async components
+async function MainFeaturedEvent() {
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
   if (!oneFeaturedEvent) return null;
 
   const oneEventsCommentsLength = await getCommentsLength(oneFeaturedEvent.id);
 
+  return (
+    <>
+      <Title
+        title="Most Recent Featured Event"
+        className="text-4xl font-bold mb-8 text-center"
+      />
+      <OneFeaturedEvent
+        commentsLength={oneEventsCommentsLength}
+        featuredEvent={oneFeaturedEvent}
+      />
+    </>
+  );
+}
+
+async function OtherFeaturedEvents() {
+  const featuredEvents = await getLatestFeaturedEvent(8);
+  if (!featuredEvents || featuredEvents.length === 0) return null;
+
+  return (
+    <>
+      <Title
+        title={`Other Featured Events - ${featuredEvents.length} events`}
+        className="text-3xl font-semibold mt-16 mb-8 text-center"
+      />
+      <CarouselFeatured featuredEvents={featuredEvents} />
+    </>
+  );
+}
+
+export default function FeaturedEventsPage() {
   return (
     <div
       id="featured-events"
@@ -56,19 +111,12 @@ export default async function FeaturedEventsPage() {
         </svg>
       </div>
       <Container className="relative z-10">
-        <Title
-          title="Most Recent Featured Event"
-          className="text-4xl font-bold mb-8 text-center"
-        />
-        <OneFeaturedEvent
-          commentsLength={oneEventsCommentsLength}
-          featuredEvent={oneFeaturedEvent}
-        />
-        <Title
-          title={`Other Featured Events - ${featuredEvents.length} events`}
-          className="text-3xl font-semibold mt-16 mb-8 text-center"
-        />
-        <CarouselFeatured featuredEvents={featuredEvents} />
+        <Suspense fallback={<LoadingFeaturedEvent />}>
+          <MainFeaturedEvent />
+        </Suspense>
+        <Suspense fallback={<LoadingCarousel />}>
+          <OtherFeaturedEvents />
+        </Suspense>
       </Container>
 
       {/* Wave transition */}
@@ -87,74 +135,5 @@ export default async function FeaturedEventsPage() {
         </svg>
       </div>
     </div>
-  );
-}
-
-export function CarouselFeatured({
-  featuredEvents,
-}: {
-  featuredEvents: Event[];
-}) {
-  const maxLength = 100;
-  return (
-    <Carousel
-      opts={{
-        align: "start",
-      }}
-      className="w-full"
-    >
-      <CarouselContent>
-        {featuredEvents.map((el, index) => (
-          <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 p-2">
-            <Link href={`/events/${el.id}`} className="block h-full">
-              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <CardContent className="flex flex-col h-full justify-between p-6">
-                  <div>
-                    <p className="text-sm text-primary flex items-center mb-2">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <DatePrinter
-                        dateEnd={el.dateEnd}
-                        dateStart={el.dateStart}
-                      />
-                    </p>
-                    <h3 className="mb-2 text-xl font-semibold line-clamp-2">
-                      {el.eventName}
-                    </h3>
-                    <p className="mb-4 text-sm text-muted-foreground">
-                      Host: {el.hostName} - Genre:{" "}
-                      {el.type
-                        .toLowerCase()
-                        .replace(/_/g, " ")
-                        .replace(/^\w/, (c: string) => c.toUpperCase())}
-                    </p>
-                  </div>
-                  <div className="relative w-full h-40 mb-4 overflow-hidden rounded-md">
-                    <MediaRenderer
-                      url={el.eventImgOrVideoFirstDisplay as string}
-                      alt={el.eventName}
-                    />
-                  </div>
-                  <div>
-                    <p className="flex items-center mb-2">
-                      <ReviewsStarDisplay rating={el.rating} />
-                      <span className="text-sm text-muted-foreground ml-2">
-                        / 5.0
-                      </span>
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {el.eventDescription.length > maxLength
-                        ? el.eventDescription.substring(0, maxLength) + "..."
-                        : el.eventDescription}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="hidden lg:flex -left-12" />
-      <CarouselNext className="hidden lg:flex -right-12" />
-    </Carousel>
   );
 }
