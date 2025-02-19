@@ -19,7 +19,7 @@ import {
 } from "@/utils/actions/usersActions";
 import { EventType } from "@prisma/client";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,7 +62,7 @@ async function ProfilePage() {
   );
 
   if (!userFromDataBase) {
-    redirect("/");
+    return notFound();
   }
   const eventUserSubmitted = await getEventByClerkId(userClerkId);
 

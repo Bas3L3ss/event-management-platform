@@ -153,18 +153,20 @@ export default function Home() {
   }, [dateFrom, dateTo]);
   return (
     <Container className="mt-10">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Events</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <section className="space-y-4 mt-5">
+      <nav aria-label="Breadcrumb navigation">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Events</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+      <section className="space-y-4 mt-5" aria-label="Event filters">
         <div className="flex gap-3">
           <Input
             type="search"
@@ -173,37 +175,44 @@ export default function Home() {
             onChange={(e) => {
               updateFilters({ search: e.target.value });
             }}
+            aria-label="Search events"
           />
         </div>
 
         <div className="flex flex-wrap gap-3 justify-between">
-          <div className="flex gap-3 flex-wrap">
+          <div
+            className="flex gap-3 flex-wrap"
+            role="group"
+            aria-label="Date and rating filters"
+          >
             <div>
-              <Label htmlFor="minDate">Date from</Label>
+              <Label htmlFor="dateFrom">Date from</Label>
               <div>
                 <DatetimePickerPlaceholder
                   date={dateFrom}
                   className="w-64"
                   setDate={setDateFrom}
                   placeholder="Date start"
+                  aria-label="Filter by start date"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="maxDate">Date to</Label>
+              <Label htmlFor="dateTo">Date to</Label>
               <div>
                 <DatetimePickerPlaceholder
                   date={dateTo}
                   className="w-64"
                   placeholder="Date end"
                   setDate={setDateTo}
+                  aria-label="Filter by end date"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="Ratings">Rating from</Label>
+              <Label htmlFor="ratings">Rating from</Label>
               <Input
-                id="Ratings"
+                id="ratings"
                 className="w-auto"
                 min={0}
                 max={5}
@@ -217,19 +226,22 @@ export default function Home() {
                   }
                   updateFilters({ ratingFrom: e.target.value });
                 }}
+                aria-label="Filter by minimum rating"
               />
             </div>
           </div>
+
           <div className="ml-auto mt-auto gap-2 flex">
             {isEditPage && (
               <TooltipProvider disableHoverableContent>
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
                     <Link
-                      className=" hover:text-blue-400"
-                      href={"/events/myevents/addevents"}
+                      className="hover:text-blue-400"
+                      href="/events/myevents/addevents"
+                      aria-label="Add new event"
                     >
-                      <PlusIcon />
+                      <PlusIcon aria-hidden="true" />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right" align="start" alignOffset={2}>
@@ -239,9 +251,13 @@ export default function Home() {
               </TooltipProvider>
             )}
             <DropdownMenu>
-              <DropdownMenuTrigger className="">
-                <span className="font-normal  text-xs   hover:text-blue-400">
-                  {hasQueryParams ? <FilterXIcon /> : <FilterIcon />}
+              <DropdownMenuTrigger className="" aria-label="Filter options">
+                <span className="font-normal text-xs hover:text-blue-400">
+                  {hasQueryParams ? (
+                    <FilterXIcon aria-hidden="true" />
+                  ) : (
+                    <FilterIcon aria-hidden="true" />
+                  )}
                 </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 ">
@@ -344,30 +360,42 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <Title
-        title={`Events`}
-        className="my-6 text-2xl font-bold text-primary"
-      />
+
+      <h1 className="my-6 text-2xl font-bold text-primary">
+        <Title title="Events" />
+      </h1>
 
       {isError || data?.events.length == 0 ? (
-        <p className="text-center text-gray-500">No events found.</p>
+        <p className="text-center text-gray-500" role="alert">
+          No events found.
+        </p>
       ) : null}
 
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mb-10 ">
+      <section
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+        aria-label="Events list"
+      >
         {data?.events.map((event: Event) => (
           <IndividualEvent key={event.id} event={event} />
         ))}
       </section>
 
       {isFetchingNextPage || isLoading ? (
-        <SkeletonLoading variant={LoadingVariant.CARD} />
+        <div role="status" aria-label="Loading more events">
+          <SkeletonLoading variant={LoadingVariant.CARD} />
+        </div>
       ) : null}
 
       {!hasNextPage ? (
-        <p className="text-center text-gray-500">End of the list.</p>
+        <p className="text-center text-gray-500" role="status">
+          End of the list.
+        </p>
       ) : null}
+
       <Separator ref={ref} className="mt-5" />
-      <RecommendationCarousel className="mt-5" />
+      <aside aria-label="Recommended events">
+        <RecommendationCarousel className="mt-5" />
+      </aside>
     </Container>
   );
 }
