@@ -9,7 +9,7 @@ import {
   getUserFromDataBase,
 } from "@/utils/actions/usersActions";
 import { EventType } from "@prisma/client";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 import {
   Breadcrumb,
@@ -19,6 +19,38 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params: { id },
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const userFromDataBase = await getUserFromDataBase(id);
+
+  if (!userFromDataBase) {
+    return {
+      title: "User Profile Not Found | Event Management platform",
+      description: "The requested user profile could not be found.",
+    };
+  }
+
+  return {
+    title: `${userFromDataBase.userName}'s Profile | Event Management platform`,
+    description: `View ${userFromDataBase.userName}'s profile and events`,
+    openGraph: {
+      title: `${userFromDataBase.userName}'s Profile`,
+      description: `Check out ${userFromDataBase.userName}'s profile and events`,
+      images: [{ url: userFromDataBase.userAvatar }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${userFromDataBase.userName}'s Profile`,
+      description: `Check out ${userFromDataBase.userName}'s profile and events`,
+      images: [userFromDataBase.userAvatar],
+    },
+  };
+}
 
 async function SomeoneProfilePage({
   params: { id },
@@ -27,7 +59,7 @@ async function SomeoneProfilePage({
 }) {
   const userFromDataBase = await getUserFromDataBase(id);
   if (!userFromDataBase) {
-    redirect("/");
+    return notFound();
   }
   const eventLength = await getUserLengthByClerkId(id);
 

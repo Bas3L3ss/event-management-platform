@@ -18,8 +18,37 @@ import {
   getUserFromDataBase,
 } from "@/utils/actions/usersActions";
 import { EventType } from "@prisma/client";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import React from "react";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const userClerkId = authenticateAndRedirect();
+  const userFromDataBase = await getUserFromDataBase(userClerkId);
+
+  if (!userFromDataBase) {
+    return {
+      title: "User Profile Not Found | Event Management platform",
+      description: "The requested user profile could not be found.",
+    };
+  }
+
+  return {
+    title: `${userFromDataBase.userName}'s Profile | Event Management platform`,
+    description: `View ${userFromDataBase.userName}'s profile and events`,
+    openGraph: {
+      title: `${userFromDataBase.userName}'s Profile`,
+      description: `Check out ${userFromDataBase.userName}'s profile and events`,
+      images: [{ url: userFromDataBase.userAvatar }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${userFromDataBase.userName}'s Profile`,
+      description: `Check out ${userFromDataBase.userName}'s profile and events`,
+      images: [userFromDataBase.userAvatar],
+    },
+  };
+}
 
 async function ProfilePage() {
   const userClerkId = authenticateAndRedirect();
