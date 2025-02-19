@@ -20,6 +20,7 @@
 ![](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![](https://img.shields.io/badge/Clerk-6B46C1?style=for-the-badge&logo=clerk&logoColor=white)
 ![](https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radix-ui&logoColor=white)
+![](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
 
 <img src="[Your Screenshot Path]" width="80%">
 
@@ -48,6 +49,7 @@ A modern event management platform built with Next.js, designed to connect event
 - **Clerk:** Authentication and user management
 - **Tailwind CSS:** Utility-first styling
 - **Radix UI:** Accessible component primitives
+- **React query:** Modern fetching pattern
 - **React Hook Form:** Form validation and handling
 - **Zod:** Schema validation
 - **Supabase:** File storage and database
