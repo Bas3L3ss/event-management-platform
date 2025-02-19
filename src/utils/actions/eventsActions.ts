@@ -144,63 +144,6 @@ export async function hasNext(
   }
 }
 
-export async function getEventsPaginated(
-  offset: number,
-  limit: number,
-  searchTerm: string = "",
-  filter?: {
-    eventType?: EventType;
-    status?: EventStatus;
-    isFeatured?: boolean;
-    minDate?: string;
-    maxDate?: string;
-    minRating?: number;
-  },
-  clerkId: string | undefined = undefined
-) {
-  try {
-    if (filter) {
-      return await searchAndFilterEvents(
-        searchTerm,
-        filter,
-        offset,
-        limit,
-        clerkId
-      );
-    }
-
-    const events = await prisma.event.findMany({
-      where: {
-        ...(clerkId && { clerkId }),
-        eventName: {
-          contains: searchTerm,
-          mode: "insensitive",
-        },
-        ...(clerkId
-          ? {}
-          : {
-              NOT: {
-                status: {
-                  in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
-                },
-              },
-            }),
-      },
-      orderBy: {
-        dateStart: "desc",
-      },
-      skip: offset,
-      take: limit,
-    });
-    return events;
-  } catch (error) {
-    console.error("Error fetching all events:", error);
-    throw new Error("Unable to fetch all events");
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
 export async function getAllInAdminPageEvents(): Promise<Event[]> {
   try {
     const events = await prisma.event.findMany({
@@ -265,68 +208,6 @@ const getCachedEventById = (id: string) => {
 
 export async function getEventById(id: string): Promise<Event | null> {
   return await getCachedEventById(id);
-}
-
-export async function searchAndFilterEvents(
-  searchTerm: string,
-  filters: {
-    eventType?: EventType;
-    status?: EventStatus;
-    isFeatured?: boolean;
-    minDate?: string;
-    maxDate?: string;
-    minRating?: number;
-  },
-  offset: number,
-  limit: number,
-  clerkId?: string
-) {
-  try {
-    const events = await prisma.event.findMany({
-      where: {
-        ...(clerkId && { clerkId }),
-        eventName: {
-          contains: searchTerm,
-          mode: "insensitive",
-        },
-        ...(clerkId
-          ? {}
-          : {
-              NOT: {
-                status: {
-                  in: [EventStatus.NOT_CONFIRMED, EventStatus.ENDED],
-                },
-              },
-            }),
-        type: filters.eventType ? filters.eventType : undefined,
-        status: filters.status ? filters.status : undefined,
-
-        featured: filters.isFeatured ? filters.isFeatured : undefined,
-        dateStart: filters.minDate
-          ? {
-              gte: new Date(filters.minDate),
-            }
-          : undefined,
-        dateEnd: filters.maxDate
-          ? {
-              lte: new Date(filters.maxDate),
-            }
-          : undefined,
-        rating: {
-          gte: filters.minRating || 0,
-        },
-      },
-      orderBy: {
-        dateStart: "desc",
-      },
-      skip: offset,
-      take: limit,
-    });
-    return events;
-  } catch (error) {
-    console.error("Error searching and filtering events:", error);
-    throw new Error("Unable to fetch events");
-  }
 }
 
 export const getUserLengthByClerkId = async (clerkId: string) => {

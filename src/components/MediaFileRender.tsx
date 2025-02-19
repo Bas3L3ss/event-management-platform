@@ -6,6 +6,7 @@ import { Badge } from "./ui/badge";
 import { CrownIcon } from "lucide-react";
 import "react-medium-image-zoom/dist/styles.css";
 import Zoom from "react-medium-image-zoom";
+import { cn } from "@/lib/utils";
 
 const MediaRenderer = ({
   url,
@@ -14,6 +15,7 @@ const MediaRenderer = ({
   onPause,
   onEnded,
   featured,
+  className,
 }: {
   url: string;
   alt: string;
@@ -21,6 +23,7 @@ const MediaRenderer = ({
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
+  className?: string;
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -44,7 +47,10 @@ const MediaRenderer = ({
   if (fileExtension === "mp4") {
     return (
       <video
-        className="w-full aspect-video object-cover rounded-md h-[200px]"
+        className={cn(
+          "w-full aspect-video object-cover rounded-md h-auto",
+          className
+        )}
         width={500}
         height={500}
         controls
@@ -73,14 +79,17 @@ const MediaRenderer = ({
         )}
 
         {/* Trigger the dialog to open on image click */}
-        <article className="  overflow-hidden   max-h-64 rounded-lg my-2 w-full cursor-zoom-in">
+        <article className="  overflow-hidden  rounded-lg my-2 w-full cursor-zoom-in">
           <Zoom>
             <Image
               src={url}
               alt="Message Image"
               width={500}
               height={500}
-              className="rounded-md   object-cover w-full h-[200px]"
+              className={cn(
+                "rounded-md   object-cover w-full h-auto",
+                className
+              )}
               loading="lazy"
             />
           </Zoom>

@@ -19,6 +19,7 @@ import { Calendar, MapPin, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
+import Title from "./Title";
 
 const RecommendationCarousel = ({
   className,
@@ -86,10 +87,8 @@ const RecommendationCarousel = ({
   };
 
   return (
-    <div className={cn(`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 `, className)}>
-      <h2 className="text-3xl font-bold text-center mb-8 text-primary">
-        Recommended Events
-      </h2>
+    <div className={cn(`mx-auto max-w-7xl px-4 sm:px-6     `, className)}>
+      <Title title="Recommended Events" className="text-primary" />
 
       <Slider {...settings} className="relative -mx-2">
         {events.map((event) => (
@@ -99,6 +98,7 @@ const RecommendationCarousel = ({
                 <div className="relative aspect-video">
                   <MediaRenderer
                     featured={event.featured}
+                    className="h-[200px]"
                     url={event.eventImgOrVideoFirstDisplay || ""}
                     alt={event.eventName}
                   />

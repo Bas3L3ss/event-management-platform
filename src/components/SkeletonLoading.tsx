@@ -9,7 +9,7 @@ function SkeletonLoading({ variant }: { variant?: LoadingVariant }) {
     case LoadingVariant.CARD:
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(LIMIT)].map((_, i) => (
+          {[...Array(3)].map((_, i) => (
             <div key={i} className="flex flex-col h-full">
               <div className="p-6 space-y-4">
                 <Skeleton className="h-48 w-full" />

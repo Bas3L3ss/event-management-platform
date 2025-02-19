@@ -1,51 +1,86 @@
-import { getEventsPaginated } from "@/utils/actions/eventsActions";
 import { NextResponse } from "next/server";
-import { EventType, EventStatus } from "@prisma/client";
+import { EventStatus, Prisma } from "@prisma/client";
 import { NextRequest } from "next/server";
 import { LIMIT } from "@/constants/values";
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/utils/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const url = request.nextUrl;
-    const searchTerm = url.searchParams.get("searchTerm") || "";
-    const offset = url.searchParams.get("offset") || "";
-    const isNonFilter = url.searchParams.get("isNonFilter") || "";
-    const eventType = url.searchParams.get("eventType") as
-      | EventType
-      | undefined;
-    const status = url.searchParams.get("status") as EventStatus | undefined;
+    const user = auth();
+    const searchParams = request.nextUrl.searchParams;
+    const cursor = searchParams.get("cursor");
+    const search = searchParams.get("search") ?? "";
+    const type = searchParams.get("type") ?? "";
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
+    const ratingFrom = searchParams.get("ratingFrom");
+    const status = searchParams.get("status") as EventStatus | undefined;
+    const isFeatured = searchParams.get("isFeatured") === "true";
+    const clerkId = searchParams.get("clerkId");
 
-    const isFeatured = url.searchParams.get("isFeatured") === "true";
-    const minDate = url.searchParams.get("minDate");
-    const maxDate = url.searchParams.get("maxDate");
-    const minRating = url.searchParams.get("minRating")
-      ? Number(url.searchParams.get("minRating"))
-      : 0;
+    let where: Prisma.EventWhereInput = {};
 
-    const filters = {
-      eventType: eventType || undefined,
-      status: status || undefined,
-      isFeatured: isFeatured || undefined,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
-      minRating: minRating || undefined,
-    };
+    if (search) where.eventName = { contains: search, mode: "insensitive" };
+    if (type) where.type = type as Prisma.EnumEventTypeFilter<"Event">;
+    if (minPrice) where.eventTicketPrice = { gte: parseFloat(minPrice) };
+    if (maxPrice) {
+      where.eventTicketPrice = {
+        // @ts-ignore
+        ...where.eventTicketPrice,
+        lte: parseFloat(maxPrice),
+      };
+    }
+    if (dateFrom) {
+      where.dateStart = { gte: new Date(dateFrom) };
+    }
+    if (dateTo) {
+      where.dateEnd = { lte: new Date(dateTo) };
+    }
+    if (isFeatured) {
+      where.featured = true;
+    }
+    if (status) {
+      where.status = status;
+    }
+    if (ratingFrom) {
+      where.rating = { gte: parseInt(ratingFrom) };
+    }
 
-    // Fetch events with the filters
-    const events = await getEventsPaginated(
-      parseInt(offset),
-      LIMIT,
-      searchTerm,
-      isNonFilter == "false" ? filters : undefined
-    );
+    if (clerkId && clerkId === user.userId) {
+      where.clerkId = clerkId;
+    } else if (!clerkId) {
+      where = {
+        ...where,
+        NOT: {
+          ...where.NOT, // Preserve existing NOT conditions
+          status: { in: ["NOT_CONFIRMED", "ENDED"] },
+        },
+      };
+    } else if (clerkId && clerkId !== user.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
 
-    return NextResponse.json(events, { status: 200 });
+    const events = await prisma.event.findMany({
+      where,
+      take: LIMIT,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      orderBy: { dateStart: "desc" },
+    });
+
+    return NextResponse.json({
+      events,
+      nextId: events.length === LIMIT ? events[events.length - 1].id : null,
+    });
   } catch (error) {
-    console.error("Error filtering events:", error);
+    console.error("Error fetching events:", error);
     return NextResponse.json(
-      { error: "Failed to filter events" },
+      { error: "Failed to fetch events" },
       { status: 500 }
     );
   }

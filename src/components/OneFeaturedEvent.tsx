@@ -88,8 +88,9 @@ export default function OneFeaturedEvent({
             </div>
           </div>
         </div>
-        <div className="relative rounded-xl overflow-hidden shadow-xl ring-1 ring-primary/20 transition-transform hover:scale-[1.02] duration-300">
+        <div className="relative rounded-xl overflow-hidden shadow-xl ring-1 ring-primary/20  ">
           <MediaRenderer
+            className="h-[500px]"
             featured={featuredEvent.featured}
             url={featuredEvent.eventImgOrVideoFirstDisplay as string}
             alt={featuredEvent.eventName}

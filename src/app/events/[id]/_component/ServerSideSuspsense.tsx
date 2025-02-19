@@ -1,7 +1,7 @@
 import Title from "@/components/Title";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
 import { Event } from "@prisma/client";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
 import { getUserByClerkId } from "@/utils/actions/usersActions";
@@ -21,8 +21,9 @@ async function MainPage({ params: { id } }: { params: { id: string } }) {
     getUserByClerkId(oneEvent.clerkId),
   ]);
 
-  if (oneEvent.status == "NOT_CONFIRMED" && author?.clerkId != userId)
-    redirect("/events");
+  if (oneEvent.status == "NOT_CONFIRMED" && author?.clerkId != userId) {
+    return notFound();
+  }
 
   return (
     <>
