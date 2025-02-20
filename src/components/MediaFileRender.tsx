@@ -45,6 +45,7 @@ const MediaRenderer = ({
 
   // Render based on file extension
   if (fileExtension === "mp4") {
+    console.log(url);
     return (
       <video
         className={cn(
