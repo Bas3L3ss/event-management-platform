@@ -361,9 +361,7 @@ export default function Home() {
         </div>
       </section>
 
-      <h1 className="my-6 text-2xl font-bold text-primary">
-        <Title title="Events" />
-      </h1>
+      <Title title="Events" className="my-6 text-2xl font-bold text-primary" />
 
       {isError || data?.events.length == 0 ? (
         <p className="text-center text-gray-500" role="alert">

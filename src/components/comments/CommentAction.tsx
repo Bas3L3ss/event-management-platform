@@ -13,8 +13,11 @@ import { toggleLikeDislike } from "@/utils/actions/eventsActions";
 import { toast } from "@/hooks/use-toast";
 import { SignInButton } from "@clerk/nextjs";
 import { debounce } from "lodash";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toastPrint } from "@/utils/toast action/action";
 
-interface CommentActionsProps {
+// types.ts
+interface CommentActionProps {
   date?: string;
   isReplying: boolean;
   comment: Comment;
@@ -22,21 +25,86 @@ interface CommentActionsProps {
   setReplyText: (value: string) => void;
   likes: number;
   dislikes: number;
-  setLikes: Dispatch<SetStateAction<number>>;
-  setDislikes: Dispatch<SetStateAction<number>>;
   currentUser?: User | null;
   curUserLike?: CommentLike;
-  setCurUserLike: Dispatch<CommentLike | undefined>;
+  setCurUserLike: Dispatch<SetStateAction<CommentLike | undefined>>;
 }
 
-const CommentActions: React.FC<CommentActionsProps> = ({
+export const useCommentLike = (
+  action: "like" | "dislike",
+  comment: Comment,
+  currentUser: User
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      toggleLikeDislike({
+        action,
+        eventId: comment.eventId,
+        clerkId: currentUser?.clerkId,
+        commentId: comment.id,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["commentLikes", comment.id],
+      });
+    },
+    onError: (error: Error) => {
+      toastPrint("Error", error.message, "destructive");
+    },
+  });
+};
+
+// components/CommentActionButton.tsx
+interface ActionButtonProps {
+  onClick: () => void;
+  isActive: boolean;
+  disabled: boolean;
+  count?: number;
+  icon: React.ReactNode;
+  tooltipText: string;
+  activeClass: string;
+}
+
+const CommentActionButton: React.FC<ActionButtonProps> = ({
+  onClick,
+  isActive,
+  disabled,
+  count,
+  icon,
+  tooltipText,
+  activeClass,
+}) => (
+  <TooltipProvider delayDuration={200}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={`${isActive ? activeClass : "variant-outline"} ${
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          variant="outline"
+          disabled={disabled}
+        >
+          {icon}
+          <span className="ml-1">{count}</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltipText}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+);
+
+// components/CommentActions.tsx
+const CommentActions: React.FC<CommentActionProps> = ({
   date,
   isReplying,
   comment,
   dislikes,
   likes,
-  setDislikes,
-  setLikes,
   setIsReplying,
   setReplyText,
   setCurUserLike,
@@ -45,17 +113,15 @@ const CommentActions: React.FC<CommentActionsProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const showAuthToast = () => {
+  const likeMutation = useCommentLike("like", comment, currentUser!);
+  const dislikeMutation = useCommentLike("dislike", comment, currentUser!);
+
+  const showAuthToast = useCallback(() => {
     toast({
       title: "Authentication Required",
       description: "You need to be signed in to interact with comments",
       action: (
-        <SignInButton
-          fallbackRedirectUrl={
-            new URLSearchParams(window.location.search).get("redirectUrl") ||
-            "/"
-          }
-        >
+        <SignInButton fallbackRedirectUrl={window.location.pathname}>
           <Button variant="outline" size="default">
             Sign in
           </Button>
@@ -64,9 +130,9 @@ const CommentActions: React.FC<CommentActionsProps> = ({
       className: "bg-background border-border",
       duration: 5000,
     });
-  };
+  }, []);
 
-  const debouncedLike = useCallback(
+  const handleLike = useCallback(
     debounce(async () => {
       if (!currentUser?.clerkId) {
         showAuthToast();
@@ -75,51 +141,26 @@ const CommentActions: React.FC<CommentActionsProps> = ({
 
       try {
         setIsProcessing(true);
+        const result = await likeMutation.mutateAsync();
 
         if (!curUserLike) {
-          const newCommentLike = await toggleLikeDislike({
-            action: "like",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
-          setCurUserLike(newCommentLike!);
-          setLikes((prev) => prev + 1);
+          setCurUserLike(result!);
         } else if (curUserLike.disLike) {
-          const updatedLike = await toggleLikeDislike({
-            action: "like",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
-          setCurUserLike(updatedLike!);
-          setDislikes((prev) => prev - 1);
-          setLikes((prev) => prev + 1);
-        } else if (!curUserLike.disLike) {
-          await toggleLikeDislike({
-            action: "like",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
+          setCurUserLike(result!);
+        } else {
           setCurUserLike(undefined);
-          setLikes((prev) => prev - 1);
         }
       } catch (error) {
         console.error("Error handling like action:", error);
-        toast({
-          title: "Error",
-          description: "Failed to process like action",
-          variant: "destructive",
-        });
+        toastPrint("Error", "Failed to process like action", "destructive");
       } finally {
         setIsProcessing(false);
       }
     }, 300),
-    [currentUser, curUserLike, comment]
+    [currentUser, curUserLike, likeMutation]
   );
 
-  const debouncedDislike = useCallback(
+  const handleDislike = useCallback(
     debounce(async () => {
       if (!currentUser?.clerkId) {
         showAuthToast();
@@ -128,150 +169,77 @@ const CommentActions: React.FC<CommentActionsProps> = ({
 
       try {
         setIsProcessing(true);
+        const result = await dislikeMutation.mutateAsync();
 
         if (!curUserLike) {
-          const newCommentDislike = await toggleLikeDislike({
-            action: "dislike",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
-          setCurUserLike(newCommentDislike!);
-          setDislikes((prev) => prev + 1);
+          setCurUserLike(result!);
         } else if (!curUserLike.disLike) {
-          const updatedDislike = await toggleLikeDislike({
-            action: "dislike",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
-          setCurUserLike(updatedDislike!);
-          setLikes((prev) => prev - 1);
-          setDislikes((prev) => prev + 1);
-        } else if (curUserLike.disLike) {
-          await toggleLikeDislike({
-            action: "dislike",
-            eventId: comment.eventId,
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
+          setCurUserLike(result!);
+        } else {
           setCurUserLike(undefined);
-          setDislikes((prev) => prev - 1);
         }
       } catch (error) {
         console.error("Error handling dislike action:", error);
-        toast({
-          title: "Error",
-          description: "Failed to process dislike action",
-          variant: "destructive",
-        });
+        toastPrint("Error", "Failed to process dislike action", "destructive");
       } finally {
         setIsProcessing(false);
       }
     }, 300),
-    [currentUser, curUserLike, comment]
+    [currentUser, curUserLike, dislikeMutation]
   );
+
+  const handleReply = useCallback(() => {
+    if (!currentUser?.clerkId) {
+      showAuthToast();
+      return;
+    }
+    setIsReplying(!isReplying);
+    if (isReplying) {
+      setReplyText("");
+    }
+  }, [currentUser, isReplying, setIsReplying, setReplyText, showAuthToast]);
 
   return (
     <div className="text-sm text-muted-foreground">
-      <div className="flex items-center">
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => !isProcessing && debouncedLike()}
-                className={`mr-2 ${
-                  curUserLike && !curUserLike.disLike
-                    ? "bg-blue-500 text-white hover:text-white hover:bg-blue-400"
-                    : "variant-outline"
-                } ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
-                variant="outline"
-                disabled={isProcessing}
-              >
-                <ThumbsUp size={16} /> <span className="ml-1">{likes}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                {curUserLike && !curUserLike.disLike
-                  ? "You liked this comment"
-                  : "Like this comment"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="flex items-center gap-2">
+        <CommentActionButton
+          onClick={() => !isProcessing && handleLike()}
+          isActive={Boolean(curUserLike && !curUserLike.disLike)}
+          disabled={isProcessing}
+          count={likes}
+          icon={<ThumbsUp size={16} />}
+          tooltipText={
+            curUserLike && !curUserLike.disLike
+              ? "You liked this comment"
+              : "Like this comment"
+          }
+          activeClass="bg-blue-500 text-white hover:text-white hover:bg-blue-400"
+        />
 
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => !isProcessing && debouncedDislike()}
-                className={`${
-                  curUserLike && curUserLike.disLike
-                    ? "bg-red-500 text-white hover:text-white hover:bg-red-400"
-                    : "variant-outline"
-                } ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
-                variant="outline"
-                disabled={isProcessing}
-              >
-                <ThumbsDown size={16} />{" "}
-                <span className="ml-1">{dislikes}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                {curUserLike && curUserLike.disLike
-                  ? "You disliked this comment"
-                  : "Dislike this comment"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => {
-                  if (!currentUser?.clerkId) {
-                    toast({
-                      title: "Authentication Required",
-                      description: "You need to be signed in to reply comments",
-                      action: (
-                        <SignInButton
-                          fallbackRedirectUrl={
-                            new URLSearchParams(window.location.search).get(
-                              "redirectUrl"
-                            ) || "/"
-                          }
-                        >
-                          <Button variant={"outline"} size={"default"}>
-                            Sign in
-                          </Button>
-                        </SignInButton>
-                      ),
-                      className: "bg-background border-border",
-                      duration: 5000,
-                    });
-                    return;
-                  }
-                  setIsReplying(!isReplying);
-                  if (isReplying) {
-                    setReplyText("");
-                  }
-                }}
-                className="ml-2"
-                variant="outline"
-              >
-                <Reply size={16} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Reply to this comment</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <CommentActionButton
+          onClick={() => !isProcessing && handleDislike()}
+          isActive={Boolean(curUserLike?.disLike)}
+          disabled={isProcessing}
+          count={dislikes}
+          icon={<ThumbsDown size={16} />}
+          tooltipText={
+            curUserLike?.disLike
+              ? "You disliked this comment"
+              : "Dislike this comment"
+          }
+          activeClass="bg-red-500 text-white hover:text-white hover:bg-red-400"
+        />
 
-        <p className="ml-4">{date}</p>
+        <CommentActionButton
+          onClick={handleReply}
+          isActive={isReplying}
+          disabled={false}
+          icon={<Reply size={16} />}
+          tooltipText="Reply to this comment"
+          activeClass=""
+        />
+
+        {date && <p className="ml-4">{date}</p>}
       </div>
     </div>
   );

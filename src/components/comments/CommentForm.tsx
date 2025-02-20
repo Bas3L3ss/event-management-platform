@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { toastPrint } from "@/utils/toast action/action";
@@ -25,8 +26,50 @@ const CommentForm = ({
   const [rating, setRating] = useState(0);
   const [commentText, setCommentText] = useState("");
   const [maxLength] = useState<number>(500);
-  const [pending, setPending] = useState<boolean>(false);
-  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const createComment = async (commentData: {
+    authorImageUrl: string | undefined;
+    clerkId: string | null;
+    commentText: string;
+    rating: number;
+    eventId: string;
+    authorName: string;
+  }) => {
+    const response = await fetch("/api/comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commentData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    return response.json();
+  };
+
+  const mutation = useMutation({
+    mutationFn: createComment,
+    onSuccess: () => {
+      toastPrint("Comment Sent!", "Your comment has been posted.", "default");
+      setCommentText("");
+      setRating(0);
+      queryClient.invalidateQueries({ queryKey: ["comments", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["commentsLength", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["event", eventId] });
+    },
+    onError: (error) => {
+      console.error("Error creating comment:", error);
+      toastPrint(
+        "Error",
+        "Unable to post your comment. Please try again later.",
+        "destructive"
+      );
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,42 +97,14 @@ const CommentForm = ({
       return;
     }
 
-    setPending(true);
-    try {
-      const response = await fetch("/api/comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          authorImageUrl: user?.imageUrl,
-          clerkId: userId,
-          commentText,
-          rating,
-          eventId: eventId,
-          authorName: user?.username,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      await response.json();
-      toastPrint("Comment Sent!", "Your comment has been posted.", "default");
-      setCommentText("");
-      setRating(0);
-      router.refresh();
-    } catch (error) {
-      console.error("Error creating comment:", error);
-      toastPrint(
-        "Error",
-        "Unable to post your comment. Please try again later.",
-        "destructive"
-      );
-    } finally {
-      setPending(false);
-    }
+    mutation.mutate({
+      authorImageUrl: user?.imageUrl,
+      clerkId: userId,
+      commentText,
+      rating,
+      eventId: eventId,
+      authorName: user!.username as string,
+    });
   };
 
   return (
@@ -154,9 +169,9 @@ const CommentForm = ({
           <Button
             type="submit"
             className="w-full"
-            disabled={pending || !isAuthenticated}
+            disabled={mutation.isPending || !isAuthenticated}
           >
-            {pending ? "Sending..." : "Submit Comment"}
+            {mutation.isPending ? "Sending..." : "Submit Comment"}
           </Button>
         </form>
       </CardContent>

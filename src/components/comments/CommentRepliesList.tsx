@@ -37,6 +37,7 @@ import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "../ui/toast";
 import { Textarea } from "../ui/textarea";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const CommentRepliesList = ({
   parentCommentId,
@@ -45,25 +46,24 @@ const CommentRepliesList = ({
   parentCommentId: string;
   currentUser: User | null | undefined;
 }) => {
-  const [replies, setReplies] = useState<Comment[]>([]);
   const [showReplies, setShowReplies] = useState(false);
-  useEffect(() => {
-    const commentReplies = async () => {
-      try {
-        const result = await getRepliesToComment({ parentCommentId });
-        const sortedComments = [...result].sort((a, b) => {
-          if (a.clerkId === currentUser?.clerkId) return -1;
-          if (b.clerkId === currentUser?.clerkId) return 1;
-          return 0;
-        });
-        setReplies(sortedComments);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    commentReplies();
-  }, []);
-  const repliesAmount = replies.length;
+  const { data: replies } = useQuery({
+    queryKey: ["comment-replies", parentCommentId],
+    queryFn: async () => {
+      const res = await getRepliesToComment({ parentCommentId });
+      const sortedComments = [...res].sort((a, b) => {
+        if (a.clerkId === currentUser?.clerkId) return -1;
+        if (b.clerkId === currentUser?.clerkId) return 1;
+        return 0;
+      });
+      return sortedComments;
+    },
+  });
+
+  const repliesAmount = replies?.length ? replies.length : 0;
+  if (!replies) {
+    return null;
+  }
   return (
     <div>
       {repliesAmount > 0 && (
@@ -82,6 +82,7 @@ const CommentRepliesList = ({
             return (
               <CommentListItem
                 comment={reply}
+                key={reply.id}
                 currentUserId={currentUser?.clerkId}
               />
             );
@@ -184,8 +185,48 @@ function CommentListItem({
   comment: Comment;
   currentUserId?: string;
 }) {
+  const queryClient = useQueryClient();
+  const { mutate: deleteReplyMutate } = useMutation({
+    mutationFn: async ({
+      commentId,
+      eventId,
+    }: {
+      commentId: string;
+      eventId: string;
+    }) => {
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ eventId }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comment-replies", comment.parentCommentId],
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
+    onError: (error: Error) => {
+      toastPrint(
+        "Error",
+        error.message || "Something went wrong",
+        "destructive"
+      );
+    },
+  });
+
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
   const [editedText, setEditedText] = useState(comment.commentText);
@@ -214,8 +255,10 @@ function CommentListItem({
         commentText: editedText,
       });
       setIsEditing(false);
-      router.refresh();
       toastPrint("Success", "Comment updated successfully", "default");
+      queryClient.invalidateQueries({
+        queryKey: ["comment-replies", comment.parentCommentId],
+      });
     } catch (error) {
       console.error("Error updating comment:", error);
       toastPrint("Error", "Failed to update comment", "destructive");
@@ -230,30 +273,9 @@ function CommentListItem({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/comments/${commentId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventId: comment.eventId,
-        }),
-      });
+    setIsLoading(true);
 
-      if (response.ok) {
-        router.refresh();
-      } else {
-        const error = await response.json();
-        toastPrint("Error", error.error, "destructive");
-      }
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      toastPrint("Error", "Something went wrong", "destructive");
-    } finally {
-      setIsLoading(false);
-    }
+    deleteReplyMutate({ commentId, eventId: comment.eventId });
   };
 
   useEffect(() => {

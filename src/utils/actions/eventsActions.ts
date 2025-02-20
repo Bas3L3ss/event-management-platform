@@ -28,7 +28,6 @@ import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
 import { revalidatePath } from "next/cache";
-import { LIMIT } from "@/constants/values";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -51,8 +50,6 @@ async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   } catch (error) {
     console.error("Error fetching the latest featured event:", error);
     throw new Error("Unable to fetch the latest featured event");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 const getCachedLatestFeaturedEvent = (amount: number = 2) => {
@@ -82,8 +79,6 @@ async function cachedGetOneLatestFeaturedEvent() {
   } catch (error) {
     console.error("Error fetching the latest featured event:", error);
     throw new Error("Unable to fetch the latest featured event");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -99,7 +94,8 @@ export async function getOneLatestFeaturedEvent() {
   return await getCachedGetOneLatestFeaturedEvent();
 }
 
-export async function getCommentsLength(eventId: string): Promise<number> {
+export async function getCommentsLength(eventId: string) {
+  if (!eventId) return;
   try {
     const commentsCount = await prisma.comment.count({
       where: {
@@ -139,8 +135,6 @@ export async function hasNext(
   } catch (error) {
     console.error("Error checking for next events batch:", error);
     throw new Error("Unable to check for next events batch");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -155,8 +149,6 @@ export async function getAllInAdminPageEvents(): Promise<Event[]> {
   } catch (error) {
     console.error("Error fetching all events:", error);
     throw new Error("Unable to fetch all events");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -178,12 +170,12 @@ export async function getUserIdByClerkId(
   } catch (error) {
     console.error("Error fetching user ID by clerkId:", error);
     throw new Error("Unable to fetch user ID by clerkId");
-  } finally {
-    await prisma.$disconnect();
   }
 }
-//getEventById
-async function cachedGetEventById(id: string) {
+
+export async function getEventById(id: string): Promise<Event | null> {
+  console.log("hi", id);
+
   try {
     const event = await prisma.event.findUnique({
       where: {
@@ -194,20 +186,7 @@ async function cachedGetEventById(id: string) {
   } catch (error) {
     console.error(`Error fetching event with id ${id}:`, error);
     throw new Error("Unable to fetch event by ID");
-  } finally {
-    await prisma.$disconnect();
   }
-}
-
-// Wrap the fetchEventById function with caching logic
-const getCachedEventById = (id: string) => {
-  return cache(cachedGetEventById, ["event", id], {
-    revalidate: 20,
-  })(id);
-};
-
-export async function getEventById(id: string): Promise<Event | null> {
-  return await getCachedEventById(id);
 }
 
 export const getUserLengthByClerkId = async (clerkId: string) => {
@@ -230,7 +209,9 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
   }
 };
 
-async function cachedGetCommentsByEventId(eventId: string) {
+export async function getCommentsByEventId(
+  eventId: string
+): Promise<Comment[]> {
   try {
     const comments = await prisma.comment.findMany({
       where: { eventId, parentCommentId: null },
@@ -243,23 +224,7 @@ async function cachedGetCommentsByEventId(eventId: string) {
       error
     );
     throw new Error("Unable to fetch comments for the event");
-  } finally {
-    await prisma.$disconnect();
   }
-}
-
-// Wrap the fetchCommentsByEventId function with caching logic
-const getCachedCommentsByEventId = (eventId: string) => {
-  return cache(cachedGetCommentsByEventId, ["comments", eventId], {
-    revalidate: 60, // Revalidate cache every 60 seconds
-  })(eventId); // Call the caching function with eventId
-};
-
-export async function getCommentsByEventId(
-  eventId: string
-): Promise<Comment[]> {
-  // Call the cached version of the fetchCommentsByEventId function, passing the eventId
-  return await getCachedCommentsByEventId(eventId);
 }
 // Function to calculate and update the average rating for the event
 export async function updateEventRating(eventId: string): Promise<void> {
@@ -278,8 +243,6 @@ export async function updateEventRating(eventId: string): Promise<void> {
   } catch (error) {
     console.error(`Error updating rating for event with id ${eventId}:`, error);
     throw new Error("Unable to update event rating");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 type CommentType = {
@@ -311,14 +274,11 @@ export async function createComment({
     });
 
     await updateEventRating(eventId);
-    revalidatePath(`/events/${eventId}`);
 
     return comment;
   } catch (error) {
     console.error("Error creating comment:", error);
     throw new Error("Unable to create comment");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -345,8 +305,6 @@ export async function deleteComment(
   } catch (error) {
     console.error("Error deleting comment and its replies:", error);
     throw new Error("Unable to delete comment and its replies");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -429,8 +387,6 @@ export const createEventAction = async (
     throw new Error(
       error instanceof Error ? error.message : "An error occurred."
     );
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
@@ -449,7 +405,6 @@ export const updateEventAction = async (
     }
 
     const rawData = Object.fromEntries(formData);
-    console.log(rawData);
     if (rawData.latitude) {
       rawData.latitude = parseFloat(rawData.latitude);
     } else {
@@ -573,8 +528,6 @@ export const updateEventAction = async (
     };
   } catch (error) {
     return renderError(error);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 export const getOrderByEventId = async (id: string) => {
@@ -584,7 +537,6 @@ export const getOrderByEventId = async (id: string) => {
         eventId: id,
       },
     });
-    console.log(order);
 
     return order;
   } catch (error) {
@@ -593,28 +545,22 @@ export const getOrderByEventId = async (id: string) => {
   }
 };
 
-// getRandomEvents
-
-async function cachedGetRandomEvents(eventId?: string): Promise<Event[]> {
+export async function getRandomEvents(eventId?: string): Promise<Event[]> {
   try {
-    // Construct the base SQL query with status filtering
     let query = `
       SELECT * FROM "Event"
       WHERE "status" IN ('UPCOMING', 'STARTED') -- Only include public events
     `;
 
-    // Exclude specific eventId if provided
     if (eventId) {
-      query += ` AND "id" != $1`; // Use parameterized query
+      query += ` AND "id" != $1`;
     }
 
-    // Order the results randomly and limit to 10
     query += `
       ORDER BY RANDOM()
       LIMIT 10;
     `;
 
-    // Execute the query with the eventId parameter if provided
     let randomEvents: Event[];
     if (eventId) {
       randomEvents = await prisma.$queryRawUnsafe(query, eventId);
@@ -627,22 +573,6 @@ async function cachedGetRandomEvents(eventId?: string): Promise<Event[]> {
     console.error("Error fetching random events:", error);
     throw new Error("Failed to fetch random events");
   }
-}
-
-// Caching wrapper function to manage revalidation and key generation
-const getCachedRandomEvents = (eventId?: string) => {
-  return cache(
-    cachedGetRandomEvents,
-    ["random-events", eventId ? eventId : ""],
-    {
-      revalidate: 60, // Revalidate cache every 60 seconds
-    }
-  )(eventId);
-};
-
-// Exported function to fetch random events with caching
-export async function getRandomEvents(eventId?: string): Promise<Event[]> {
-  return await getCachedRandomEvents(eventId);
 }
 
 export async function getEventByClerkId(clerkId: string) {
@@ -680,7 +610,6 @@ export async function deleteEventWithRelations(eventId: string) {
         where: { id: eventId },
       }),
     ]);
-    console.log("Event and all related data successfully deleted.");
   } catch (error) {
     console.error("Error deleting event and related data:", error);
   }
@@ -713,13 +642,10 @@ export async function replyToComment({
       },
     });
 
-    revalidatePath(`/events/${eventId}`);
     return reply;
   } catch (error) {
     console.error("Error replying to comment:", error);
     throw new Error("Unable to reply to comment");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -840,8 +766,6 @@ export async function updateComment({
   } catch (error) {
     console.error("Error updating comment:", error);
     throw new Error("Unable to update comment");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -865,8 +789,6 @@ export async function cachedGetRepliesToComment(
       error
     );
     throw new Error("Unable to fetch replies");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -911,8 +833,6 @@ export async function getLikesAndDislikes({
   } catch (error) {
     console.error("Error counting likes and dislikes:", error);
     throw new Error("Unable to count likes and dislikes");
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

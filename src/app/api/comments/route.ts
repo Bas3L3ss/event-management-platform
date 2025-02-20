@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       authorName,
       authorImageUrl,
     });
+    revalidatePath(`/events/${eventId}`);
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {
     console.error("Error creating comment:", error);

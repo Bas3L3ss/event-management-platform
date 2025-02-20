@@ -1,9 +1,7 @@
-"use client";
 import { Comment, CommentLike, User } from "@prisma/client";
 import Image from "next/image";
 import { Card, CardTitle } from "../ui/card";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toastPrint } from "@/utils/toast action/action";
 import {
@@ -25,6 +23,8 @@ import {
 } from "../ui/tooltip";
 import CommentActions from "./CommentAction";
 import CommentDropdownMenu from "./CommentDropDown";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@clerk/nextjs";
 
 interface CommentListItemProps {
   comment: Comment;
@@ -37,7 +37,6 @@ const CommentListItem: React.FC<CommentListItemProps> = ({
   currentUserId,
   currentUser,
 }) => {
-  const router = useRouter();
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -61,56 +60,96 @@ const CommentListItem: React.FC<CommentListItemProps> = ({
     ? comment.commentText.substring(0, maxLength) + " ... "
     : comment.commentText;
 
-  const handleDeleteComment = async (commentId: string) => {
-    try {
-      setIsDeleting(true);
+  const queryClient = useQueryClient();
+  const { user } = useUser();
+  const clerkId = user?.id;
+
+  const { data: likeData } = useQuery({
+    queryKey: ["commentLikes", comment.id],
+    queryFn: async () => {
+      const counts = await countLikesAndDislikes({ commentId: comment.id });
+      const userLike = clerkId
+        ? await getUserCommentLike({
+            clerkId: clerkId,
+            commentId: comment.id,
+          })
+        : undefined;
+
+      return { ...counts, userLike };
+    },
+  });
+
+  useEffect(() => {
+    if (likeData) {
+      setLikes(likeData.likeCount);
+      setDislikes(likeData.dislikeCount);
+      setCurUserLike(likeData.userLike ? likeData.userLike : undefined);
+    }
+  }, [likeData]);
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
       const response = await fetch(`/api/comments/${commentId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventId: comment.eventId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId: comment.eventId }),
       });
+      if (!response.ok) throw new Error("Failed to delete comment");
+      return response.json();
+    },
+    onMutate: () => {
+      setIsDeleting(true);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", comment.eventId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["event", comment.eventId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["commentsLength", comment.eventId],
+      });
+    },
+    onError: (error) => {
+      toastPrint("Error", error.message, "destructive");
+    },
+    onSettled: () => {
+      setIsDeleting(false);
+    },
+  });
 
-      if (response.ok) {
-        router.refresh();
-      } else {
-        const error = await response.json();
-        toastPrint("Error", error.error, "destructive");
-      }
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      toastPrint("Error", "Something went wrong", "destructive");
-    }
-  };
-
-  const handleEdit = async () => {
-    if (!currentUserId) return;
-    try {
-      setIsMutating(true);
-      await updateComment({
+  const updateCommentMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUserId) throw new Error("Not authenticated");
+      return updateComment({
         clerkId: currentUserId,
         commentId: comment.id,
         commentText: editedText,
       });
+    },
+    onMutate: () => {
+      setIsMutating(true);
+    },
+    onSuccess: () => {
       setIsEditing(false);
-      router.refresh();
+      queryClient.invalidateQueries({
+        queryKey: ["comments", comment.eventId],
+      });
       toastPrint("Success", "Comment updated successfully", "default");
-    } catch (error) {
-      console.error("Error updating comment:", error);
+    },
+    onError: () => {
       toastPrint("Error", "Failed to update comment", "destructive");
-    } finally {
+    },
+    onSettled: () => {
       setIsMutating(false);
-    }
-  };
+    },
+  });
 
-  const handleReply = async () => {
-    if (!currentUserId || !currentUser) return;
-    try {
-      setIsSendingReply(true);
-      await replyToComment({
+  const replyCommentMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUserId || !currentUser) throw new Error("Not authenticated");
+      return replyToComment({
         clerkId: currentUserId,
         authorImageUrl: currentUser.userAvatar,
         authorName: currentUser.userName,
@@ -118,43 +157,42 @@ const CommentListItem: React.FC<CommentListItemProps> = ({
         eventId: comment.eventId,
         parentCommentId: comment.id,
       });
+    },
+    onMutate: () => {
+      setIsSendingReply(true);
+    },
+    onSuccess: () => {
       setIsReplying(false);
       setReplyText("");
-      router.refresh();
-      toastPrint("Success", "Reply successfully", "default");
-    } catch (error) {
-      console.error("Error updating comment:", error);
-      toastPrint("Error", "Failed to update comment", "destructive");
-    } finally {
+
+      queryClient.invalidateQueries({
+        queryKey: ["comment-replies", comment.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["comments", comment.eventId],
+      });
+      toastPrint("Success", "Reply added successfully", "default");
+    },
+    onError: () => {
+      toastPrint("Error", "Failed to add reply", "destructive");
+    },
+    onSettled: () => {
       setIsSendingReply(false);
-    }
+    },
+  });
+
+  // Update the handlers to use mutations
+  const handleDeleteComment = (commentId: string) => {
+    deleteCommentMutation.mutate(commentId);
   };
 
-  useEffect(() => {
-    const setUpUserCommentLikeAndDisLike = async () => {
-      try {
-        const { dislikeCount, likeCount } = await countLikesAndDislikes({
-          commentId: comment.id,
-        });
-        setLikes(likeCount);
-        setDislikes(dislikeCount);
+  const handleEdit = () => {
+    updateCommentMutation.mutate();
+  };
 
-        if (currentUser?.clerkId) {
-          const userComment = await getUserCommentLike({
-            clerkId: currentUser.clerkId,
-            commentId: comment.id,
-          });
-          if (userComment) setCurUserLike(userComment);
-        }
-      } catch (error) {
-        console.error("Error setting up user comment like/dislike:", error);
-      }
-    };
-
-    if (comment.id) {
-      setUpUserCommentLikeAndDisLike();
-    }
-  }, [comment.id, currentUser]);
+  const handleReply = () => {
+    replyCommentMutation.mutate();
+  };
 
   useEffect(() => {
     setDate(new Date(comment.createdAt).toLocaleString());
@@ -255,8 +293,6 @@ const CommentListItem: React.FC<CommentListItemProps> = ({
           setIsReplying={setIsReplying}
           dislikes={dislikes}
           likes={likes}
-          setDislikes={setDislikes}
-          setLikes={setLikes}
           setReplyText={setReplyText}
           setCurUserLike={setCurUserLike}
           curUserLike={curUserLike}

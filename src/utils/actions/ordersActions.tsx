@@ -1,3 +1,4 @@
+"use server";
 import { redirect } from "next/navigation";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Slider, { Settings } from "react-slick";
 import MediaRenderer from "./MediaFileRender";
 import { getRandomEvents } from "@/utils/actions/eventsActions";
@@ -20,6 +20,9 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import Title from "./Title";
+import SkeletonLoading from "./SkeletonLoading";
+import { LoadingVariant } from "@/constants/values";
+import { Skeleton } from "./ui/skeleton";
 
 const RecommendationCarousel = ({
   className,
@@ -28,21 +31,20 @@ const RecommendationCarousel = ({
   id?: string;
   className?: string;
 }) => {
-  const [events, setEvents] = useState<Event[]>([]);
+  const {
+    data: events = [],
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["randomEvents", id],
+    queryFn: () => getRandomEvents(id),
+  });
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        let randomEvents: Event[] = await getRandomEvents(id);
-        setEvents(randomEvents);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    };
-    fetchEvents();
-  }, [id]);
+  if (isLoading) {
+    return <CarouselSkeleton />;
+  }
 
-  if (!events || events.length < 4) {
+  if ((!events || events.length < 4) && isError) {
     return null;
   }
 
@@ -165,3 +167,59 @@ const RecommendationCarousel = ({
 };
 
 export default RecommendationCarousel;
+
+const CarouselSkeleton = () => {
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      {/* Title Skeleton */}
+      <div className="mb-6">
+        <Skeleton className="h-8 w-64" />
+      </div>
+
+      {/* Cards Container */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((item) => (
+          <Card key={item} className="h-[30rem] flex flex-col overflow-hidden">
+            <CardHeader className="p-0 flex-shrink-0">
+              {/* Image Skeleton */}
+              <Skeleton className="h-[200px] w-full" />
+              {/* Status Badge Skeleton */}
+              <Skeleton className="h-5 w-20 absolute top-2 right-2 rounded-full" />
+            </CardHeader>
+
+            <CardContent className="flex-1 p-4 flex flex-col">
+              {/* Title Skeleton */}
+              <Skeleton className="h-7 w-3/4 mb-2" />
+
+              {/* Description Skeleton */}
+              <div className="mb-4 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+              </div>
+
+              {/* Details Skeleton */}
+              <div className="space-y-3 mt-auto">
+                <div className="flex items-center">
+                  <Skeleton className="h-4 w-4 mr-2" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="flex items-center">
+                  <Skeleton className="h-4 w-4 mr-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <div className="flex items-center">
+                  <Skeleton className="h-4 w-4 mr-2" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter className="p-4 pt-0 flex-shrink-0">
+              <Skeleton className="h-10 w-full" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};

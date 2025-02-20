@@ -22,7 +22,7 @@ interface CommentDropdownMenuProps {
   commentText: string;
   isRightUser: boolean;
   commentId: string;
-  handleDeleteComment: (commentId: string) => Promise<void>;
+  handleDeleteComment: (commentId: string) => void;
 }
 
 const CommentDropdownMenu: React.FC<CommentDropdownMenuProps> = ({

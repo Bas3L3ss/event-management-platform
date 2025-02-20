@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-import MainPage from "./_component/ServerSideSuspsense";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { LoadingVariant } from "@/constants/values";
 import Container from "@/components/Container";
@@ -7,6 +6,9 @@ import Container from "@/components/Container";
 import { Metadata } from "next";
 import { getEventById } from "@/utils/actions/eventsActions";
 import { formatDate } from "@/components/DatePrinter";
+import MainPage from "./_component/MainPage";
+import { auth } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 
 export async function generateMetadata({
   params: { id },
@@ -64,11 +66,7 @@ export async function generateMetadata({
 const OneEventPage = ({ params: { id } }: { params: { id: string } }) => {
   return (
     <Container className="py-10 space-y-12">
-      <Suspense
-        fallback={<SkeletonLoading variant={LoadingVariant.EVENTPAGE} />}
-      >
-        <MainPage params={{ id }} />
-      </Suspense>
+      <MainPage params={{ id }} />
     </Container>
   );
 };

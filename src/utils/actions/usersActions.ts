@@ -1,6 +1,5 @@
-import { revalidatePath } from "next/cache";
+"use server";
 import prisma from "../db";
-import { redirect } from "next/dist/server/api-utils";
 import { authenticateAndRedirect } from "./clerkFunc";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { User } from "@prisma/client";
