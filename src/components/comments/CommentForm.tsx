@@ -73,7 +73,6 @@ const CommentForm = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!isAuthenticated) {
       toastPrint(
         "Authentication Required",

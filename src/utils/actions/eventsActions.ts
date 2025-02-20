@@ -174,8 +174,6 @@ export async function getUserIdByClerkId(
 }
 
 export async function getEventById(id: string): Promise<Event | null> {
-  console.log("hi", id);
-
   try {
     const event = await prisma.event.findUnique({
       where: {

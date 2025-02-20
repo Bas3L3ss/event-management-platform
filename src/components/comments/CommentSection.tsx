@@ -25,7 +25,7 @@ export default function CommentSection({
     enabled: !!currentUserId,
   });
 
-  const isAuthenticated = currentUserId !== null;
+  const isAuthenticated = currentUserId !== undefined;
   const userComment = comments.find(
     (comment) => comment.clerkId === currentUserId
   );
