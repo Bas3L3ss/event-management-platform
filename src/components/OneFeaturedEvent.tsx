@@ -6,6 +6,7 @@ import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { Calendar, Star, Ticket, MessageSquare } from "lucide-react";
 import EventDescriptionParser from "./EventDescriptionParser";
+import OneFeaturedEventPrefetchLink from "./prefetching-client-components/OneFeaturedEventPrefetchLink";
 
 export default function OneFeaturedEvent({
   featuredEvent,
@@ -65,13 +66,7 @@ export default function OneFeaturedEvent({
               size="lg"
               className="w-full sm:w-auto hover:bg-primary/10 hover:text-primary transition-colors"
             >
-              <Link
-                href={`/events/${featuredEvent.id}`}
-                className="flex gap-1 flex-nowrap"
-              >
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Review Event
-              </Link>
+              <OneFeaturedEventPrefetchLink eventId={featuredEvent.id} />
             </Button>
           </div>
           <div className="flex items-center space-x-6 pt-4 border-t">

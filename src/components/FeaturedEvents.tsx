@@ -1,30 +1,15 @@
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import {
   getCommentsLength,
   getLatestFeaturedEvent,
   getOneLatestFeaturedEvent,
 } from "@/utils/actions/eventsActions";
-import { Event } from "@prisma/client";
 import Container from "./Container";
 import Title from "./Title";
-import Link from "next/link";
-import DatePrinter from "./DatePrinter";
-import { Calendar } from "lucide-react";
-import MediaRenderer from "./MediaFileRender";
 import OneFeaturedEvent from "./OneFeaturedEvent";
-import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { Suspense } from "react";
 import { CarouselFeatured } from "./CarouselFeatured";
 import { Skeleton } from "./ui/skeleton";
 
-// Loading components
 const LoadingCarousel = () => (
   <div className="w-full h-[400px] animate-pulse bg-muted rounded-lg" />
 );
@@ -48,7 +33,6 @@ const LoadingFeaturedEvent = () => (
   </div>
 );
 
-// Split into separate async components
 async function MainFeaturedEvent() {
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
   if (!oneFeaturedEvent) return null;
@@ -62,7 +46,7 @@ async function MainFeaturedEvent() {
         className="text-4xl font-bold mb-8 text-center"
       />
       <OneFeaturedEvent
-        commentsLength={oneEventsCommentsLength}
+        commentsLength={oneEventsCommentsLength ? oneEventsCommentsLength : 0}
         featuredEvent={oneFeaturedEvent}
       />
     </>

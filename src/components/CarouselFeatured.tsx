@@ -13,13 +13,13 @@ import DatePrinter from "./DatePrinter";
 import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
+import CarouselFeaturedPrefetchLink from "./prefetching-client-components/CarouselFeaturedPrefetchLink";
 
 export function CarouselFeatured({
   featuredEvents,
 }: {
   featuredEvents: Event[];
 }) {
-  const maxLength = 100;
   return (
     <Carousel
       opts={{
@@ -41,15 +41,7 @@ export function CarouselFeatured({
                         dateStart={el.dateStart}
                       />
                     </p>
-                    <Link
-                      className="mb-2  inline-flex items-center gap-2"
-                      href={`/events/${el.id}`}
-                    >
-                      <h3 className="text-xl font-semibold line-clamp-2">
-                        {el.eventName}
-                      </h3>
-                      <LinkIcon size={16} className="text-blue-600" />
-                    </Link>
+                    <CarouselFeaturedPrefetchLink el={el} />
                     <p className="mb-4 text-sm text-muted-foreground">
                       Host: {el.hostName} - Genre:{" "}
                       {el.type

@@ -11,15 +11,13 @@ import SkeletonLoading from "@/components/SkeletonLoading";
 import { LoadingVariant } from "@/constants/values";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
-import { isError } from "lodash";
 
-// Create custom hooks for data fetching
 function useEvent(id: string) {
   return useQuery({
     queryKey: ["event", id],
     queryFn: () => getEventById(id),
     enabled: !!id,
-    staleTime: 1000 * 20, // 20 seconds, matching server cache
+    staleTime: 1000 * 20,
   });
 }
 
@@ -38,26 +36,31 @@ function useEventAuthor(clerkId: string | undefined) {
     queryKey: ["author", clerkId],
     queryFn: () => getUserByClerkId(clerkId || ""),
     enabled: !!clerkId,
-    staleTime: 1000 * 60, // Cache author data longer
+    staleTime: 1000 * 60,
   });
 }
 
 function MainPage({ params: { id } }: { params: { id: string } }) {
   const { user } = useUser();
-  const { data: oneEvent, isError } = useEvent(id);
-  const userId = user?.id;
+  const { data: oneEvent, isError, isLoading: isLoadingEvent } = useEvent(id);
+  const { data: author, isLoading: isLoadingAuthor } = useEventAuthor(
+    oneEvent?.clerkId
+  );
 
   const { data: commentsLength = 0 } = useCommentsLength(oneEvent?.id);
-  const { data: author } = useEventAuthor(oneEvent?.clerkId);
-  if (!oneEvent) return <SkeletonLoading variant={LoadingVariant.EVENTPAGE} />;
+  const userId = user?.id;
+
+  if (isLoadingEvent || isLoadingAuthor)
+    return <SkeletonLoading variant={LoadingVariant.EVENTPAGE} />;
   if (!isError && !oneEvent) {
     return notFound();
   }
 
-  if (oneEvent.status === "NOT_CONFIRMED" && author?.clerkId !== userId) {
+  if (oneEvent?.status === "NOT_CONFIRMED" && author?.clerkId !== userId) {
     return notFound();
   }
 
+  if (!oneEvent) return notFound();
   return (
     <>
       <div className="space-y-10">

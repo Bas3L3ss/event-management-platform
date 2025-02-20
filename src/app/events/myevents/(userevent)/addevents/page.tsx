@@ -187,9 +187,6 @@ function AddEventsPage() {
       if (validatedFiles && validatedFiles.video) {
         formData.append("video", validatedFiles.video);
       }
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
 
       const { order } = await createEventAction(null, formData);
       setOrder(order);

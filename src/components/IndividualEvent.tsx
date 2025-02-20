@@ -6,6 +6,8 @@ import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import PrefetchLink from "@/react-query/prefetch";
+import { getEventById } from "@/utils/actions/eventsActions";
 
 export const IndividualEvent = ({ event }: { event: Event }) => {
   return (
@@ -47,7 +49,13 @@ export const IndividualEvent = ({ event }: { event: Event }) => {
             <Link href={event.reservationTicketLink}>Book Ticket</Link>
           </Button>
           <Button variant="outline" asChild className="flex-1">
-            <Link href={`/events/${event.id}`}>Review Event</Link>
+            <PrefetchLink
+              queryFn={() => getEventById(event.id)}
+              queryKey={["event", event.id]}
+              href={`/events/${event.id}`}
+            >
+              Review Event
+            </PrefetchLink>
           </Button>
         </div>
       </CardContent>

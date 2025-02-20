@@ -3,6 +3,7 @@ import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { User } from "@prisma/client";
+import { use } from "react";
 
 export async function createUser({
   clerkId,

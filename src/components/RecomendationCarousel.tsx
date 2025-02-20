@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Slider, { Settings } from "react-slick";
 import MediaRenderer from "./MediaFileRender";
-import { getRandomEvents } from "@/utils/actions/eventsActions";
+import { getEventById, getRandomEvents } from "@/utils/actions/eventsActions";
 import { Event, EventStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +20,8 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import Title from "./Title";
-import SkeletonLoading from "./SkeletonLoading";
-import { LoadingVariant } from "@/constants/values";
 import { Skeleton } from "./ui/skeleton";
+import PrefetchLink from "@/react-query/prefetch";
 
 const RecommendationCarousel = ({
   className,
@@ -155,7 +154,13 @@ const RecommendationCarousel = ({
               </CardContent>
               <CardFooter className="p-4 pt-0 flex-shrink-0">
                 <Button asChild className="w-full" variant="outline">
-                  <Link href={`/events/${event.id}`}>View Event</Link>
+                  <PrefetchLink
+                    queryKey={["event", event.id]}
+                    queryFn={() => getEventById(event.id)}
+                    href={`/events/${event.id}`}
+                  >
+                    View Event
+                  </PrefetchLink>
                 </Button>
               </CardFooter>
             </Card>
