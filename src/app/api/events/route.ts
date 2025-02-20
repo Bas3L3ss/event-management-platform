@@ -73,10 +73,18 @@ export async function GET(request: NextRequest) {
       orderBy: { dateStart: "desc" },
     });
 
-    return NextResponse.json({
-      events,
-      nextId: events.length === LIMIT ? events[events.length - 1].id : null,
-    });
+    return NextResponse.json(
+      {
+        events,
+        nextId: events.length === LIMIT ? events[events.length - 1].id : null,
+      },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(

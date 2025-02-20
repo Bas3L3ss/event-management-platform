@@ -45,7 +45,6 @@ const MediaRenderer = ({
 
   // Render based on file extension
   if (fileExtension === "mp4") {
-    console.log(url);
     return (
       <video
         className={cn(
@@ -86,11 +85,12 @@ const MediaRenderer = ({
               src={url}
               alt="Message Image"
               width={500}
-              height={500}
+              height={300}
               className={cn(
                 "rounded-md   object-cover w-full h-auto",
                 className
               )}
+              sizes="(max-width: 760px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
             />
           </Zoom>
