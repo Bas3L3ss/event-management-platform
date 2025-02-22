@@ -11,7 +11,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
   await prefetchEvents(query, {});
   return (
     <HydrationBoundary state={dehydrate(query)}>
-      <main>{children}</main>;
+      <div>{children}</div>
     </HydrationBoundary>
   );
 };
