@@ -11,11 +11,17 @@ import SkeletonLoading from "@/components/SkeletonLoading";
 import { LoadingVariant } from "@/constants/values";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
+import axios from "axios";
+
+async function fetchEventById(id: string) {
+  const response = await axios.get(`/api/events/${id}`);
+  return response.data.data;
+}
 
 function useEvent(id: string) {
   return useQuery({
     queryKey: ["event", id],
-    queryFn: () => getEventById(id),
+    queryFn: () => fetchEventById(id),
     enabled: !!id,
     staleTime: 1000 * 20,
   });

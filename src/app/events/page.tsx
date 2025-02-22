@@ -1,22 +1,34 @@
-import { prefetchEvents } from "@/react-query/prefetch-evevnt";
 import React from "react";
 import EventPage from "./_component/EventPage";
-import { QueryClient } from "@tanstack/react-query";
-
-export const generateMetadata = async () => {
-  const queryClient = new QueryClient();
-
-  await prefetchEvents(queryClient, {
-    // Default filters if any
-  });
-
-  return {
-    title: "Events",
-  };
-};
+import Container from "@/components/Container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const Page = () => {
-  return <EventPage />;
+  return (
+    <Container className="mt-10">
+      <nav aria-label="Breadcrumb navigation">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Events</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </nav>
+      <EventPage />
+    </Container>
+  );
 };
 
 export default Page;

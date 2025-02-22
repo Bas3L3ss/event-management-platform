@@ -9,7 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import React, { useEffect, useState } from "react";
-import { QueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { Event, EventStatus, EventType } from "@prisma/client";
@@ -150,21 +150,8 @@ export default function EventPage() {
     }
   }, [dateFrom, dateTo]);
   return (
-    <Container className="mt-10">
-      <nav aria-label="Breadcrumb navigation">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Events</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </nav>
-      <section className="space-y-4 mt-5" aria-label="Event filters">
+    <section className="mt-10">
+      <div className="space-y-4 mt-5" aria-label="Event filters">
         <div className="flex gap-3">
           <Input
             type="search"
@@ -357,7 +344,7 @@ export default function EventPage() {
             </DropdownMenu>
           </div>
         </div>
-      </section>
+      </div>
 
       <Title title="Events" className="my-6 text-2xl font-bold text-primary" />
 
@@ -392,6 +379,6 @@ export default function EventPage() {
       <aside aria-label="Recommended events">
         <RecommendationCarousel className="mt-5" />
       </aside>
-    </Container>
+    </section>
   );
 }
