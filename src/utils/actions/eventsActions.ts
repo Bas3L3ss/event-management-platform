@@ -24,7 +24,11 @@ import {
   uploadVideo,
 } from "../supabase";
 import { createOrderAction } from "./ordersActions";
-import { EventSchemaType, FullEventSchemaType } from "../types/EventTypes";
+import {
+  CommentType,
+  EventSchemaType,
+  FullEventSchemaType,
+} from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
 import { revalidatePath } from "next/cache";
@@ -173,7 +177,17 @@ export async function getUserIdByClerkId(
   }
 }
 
+const getCachedEventById = (id: string) => {
+  return cache(cachedGetEventById, ["event", id], {
+    revalidate: 20,
+  })(id);
+};
+
 export async function getEventById(id: string): Promise<Event | null> {
+  return await getCachedEventById(id);
+}
+
+async function cachedGetEventById(id: string): Promise<Event | null> {
   try {
     const event = await prisma.event.findUnique({
       where: {
@@ -224,7 +238,7 @@ export async function getCommentsByEventId(
     throw new Error("Unable to fetch comments for the event");
   }
 }
-// Function to calculate and update the average rating for the event
+
 export async function updateEventRating(eventId: string): Promise<void> {
   try {
     const { _avg } = await prisma.comment.aggregate({
@@ -243,14 +257,7 @@ export async function updateEventRating(eventId: string): Promise<void> {
     throw new Error("Unable to update event rating");
   }
 }
-type CommentType = {
-  authorImageUrl: string;
-  clerkId: string;
-  commentText: string;
-  rating: number;
-  eventId: string;
-  authorName: string;
-};
+
 export async function createComment({
   authorImageUrl,
   clerkId,

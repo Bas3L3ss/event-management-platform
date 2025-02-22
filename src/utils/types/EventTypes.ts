@@ -19,3 +19,11 @@ export type FullEventSchemaType = EventSchemaType & {
 };
 
 export type FilterStatus = "all" | "seen" | "unseen";
+export type CommentType = {
+  authorImageUrl: string;
+  clerkId: string;
+  commentText: string;
+  rating: number;
+  eventId: string;
+  authorName: string;
+};
