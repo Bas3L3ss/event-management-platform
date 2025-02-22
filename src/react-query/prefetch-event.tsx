@@ -22,6 +22,7 @@ export async function prefetchEvents(
   const fetchPage = async (cursor: string) => {
     try {
       const events = await prisma.event.findMany({
+        where: { NOT: { status: { in: ["NOT_CONFIRMED", "ENDED"] } } },
         take: LIMIT,
         skip: cursor ? 1 : 0,
         cursor: cursor ? { id: cursor } : undefined,
