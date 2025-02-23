@@ -288,7 +288,7 @@ function CommentListItem({
         isLoading && "animate-pulse pointer-events-none"
       }`}
     >
-      <Link href={`/profile/`}>
+      <Link href={`/profile/${comment.clerkId}`}>
         <Image
           src={comment.authorImageUrl}
           width={200}
