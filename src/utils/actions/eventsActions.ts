@@ -7,6 +7,7 @@ import {
   EventStatus,
   EventType,
   Order,
+  User,
 } from "@prisma/client";
 import prisma from "../db";
 import { authenticateAndRedirect } from "./clerkFunc";
@@ -31,7 +32,7 @@ import {
 } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -183,18 +184,24 @@ const getCachedEventById = (id: string) => {
   })(id);
 };
 
-export async function getEventById(id: string): Promise<Event | null> {
+export async function getEventById(
+  id: string
+): Promise<{ event: Event; author: User | null }> {
   return await getCachedEventById(id);
 }
 
-async function cachedGetEventById(id: string): Promise<Event | null> {
+async function cachedGetEventById(id: string) {
   try {
     const event = await prisma.event.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
-    return event;
+    if (!event) {
+      throw new Error("Unable to fetch event by ID");
+    }
+    const author = await prisma.user.findUnique({
+      where: { clerkId: event.clerkId },
+    });
+    return { event, author };
   } catch (error) {
     console.error(`Error fetching event with id ${id}:`, error);
     throw new Error("Unable to fetch event by ID");
@@ -646,6 +653,7 @@ export async function replyToComment({
         parentCommentId,
       },
     });
+    revalidatePath(`/events/${reply.eventId}`);
 
     return reply;
   } catch (error) {
@@ -799,7 +807,7 @@ export async function cachedGetRepliesToComment(
 
 // Wrap the fetchRepliesToComment function with caching logic
 const getCachedRepliesToComment = (parentCommentId: string) => {
-  return cache(cachedGetRepliesToComment, ["replies", parentCommentId], {
+  return cache(cachedGetRepliesToComment, [`replies:${parentCommentId}`], {
     revalidate: 20, // Adjust the revalidation time as needed
   })(parentCommentId);
 };

@@ -6,7 +6,7 @@ import Title from "../Title";
 import { getUserByClerkId } from "@/utils/actions/usersActions";
 import { User } from "@prisma/client";
 import CommentsList from "./CommentLists";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 type CommentProps = { eventId: string; currentUserId: string | null };
 
@@ -14,7 +14,7 @@ export default function CommentSection({
   eventId,
   currentUserId,
 }: CommentProps) {
-  const { data: comments = [], isError } = useQuery({
+  const { data: comments = [], isError } = useSuspenseQuery({
     queryKey: ["comments", eventId],
     queryFn: () => getCommentsByEventId(eventId),
   });

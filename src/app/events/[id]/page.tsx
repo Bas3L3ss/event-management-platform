@@ -11,8 +11,7 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const event = await getEventById(id);
-
+  const { event } = await getEventById(id);
   if (!event) {
     return {
       title: "Event Not Found | Event Management platform",

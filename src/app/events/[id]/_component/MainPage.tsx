@@ -1,10 +1,8 @@
 "use client";
 import Title from "@/components/Title";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
-import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
-import { getUserByClerkId } from "@/utils/actions/usersActions";
 import OneEventDisplay from "@/components/OneEventDisplay";
 import CommentSection from "@/components/comments/CommentSection";
 import SkeletonLoading from "@/components/SkeletonLoading";
@@ -12,6 +10,7 @@ import { LoadingVariant } from "@/constants/values";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
+import { notFound } from "next/navigation";
 
 async function fetchEventById(id: string) {
   const response = await axios.get(`/api/events/${id}`);
@@ -37,36 +36,27 @@ function useCommentsLength(eventId: string | undefined) {
   });
 }
 
-function useEventAuthor(clerkId: string | undefined) {
-  return useQuery({
-    queryKey: ["author", clerkId],
-    queryFn: () => getUserByClerkId(clerkId || ""),
-    enabled: !!clerkId,
-    staleTime: 1000 * 60,
-  });
-}
-
 function MainPage({ params: { id } }: { params: { id: string } }) {
   const { user } = useUser();
-  const { data: oneEvent, isError, isLoading: isLoadingEvent } = useEvent(id);
-  const { data: author, isLoading: isLoadingAuthor } = useEventAuthor(
-    oneEvent?.clerkId
-  );
+  const { data: event, isError, isLoading: isLoadingEvent } = useEvent(id);
+
+  const author = event?.author;
+  const oneEvent = event?.event;
 
   const { data: commentsLength = 0 } = useCommentsLength(oneEvent?.id);
   const userId = user?.id;
 
-  if (isLoadingEvent || isLoadingAuthor)
+  if (isLoadingEvent)
     return <SkeletonLoading variant={LoadingVariant.EVENTPAGE} />;
   if (!isError && !oneEvent) {
     return notFound();
   }
 
+  if (!oneEvent) return notFound();
   if (oneEvent?.status === "NOT_CONFIRMED" && author?.clerkId !== userId) {
     return notFound();
   }
 
-  if (!oneEvent) return notFound();
   return (
     <>
       <div className="space-y-10">
@@ -91,11 +81,8 @@ function MainPage({ params: { id } }: { params: { id: string } }) {
           </div>
         )}
       </div>
-      <Suspense
-        fallback={<SkeletonLoading variant={LoadingVariant.EVENTPAGE} />}
-      >
-        <RecommendationCarousel className="mt-16" id={oneEvent.id} />
-      </Suspense>
+
+      <RecommendationCarousel className="mt-16" id={oneEvent.id} />
     </>
   );
 }

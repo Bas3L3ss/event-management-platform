@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getEventById } from "@/utils/actions/eventsActions";
-import { Event } from "@prisma/client";
 // import { unstable_cache } from "next/cache";
 
 export async function GET(
@@ -9,7 +8,6 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-
     if (!id) {
       return NextResponse.json(
         { error: "Event ID is required" },
@@ -17,7 +15,7 @@ export async function GET(
       );
     }
 
-    const event: Event | null = await getEventById(id);
+    const event = await getEventById(id);
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
