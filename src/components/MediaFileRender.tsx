@@ -94,7 +94,7 @@ const MediaRenderer = ({
                 className
               )}
               sizes="(max-width: 760px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              loading={isEagerLoad ? "eager" : "lazy"}
+              loading={"lazy"}
             />
           </Zoom>
         </article>
