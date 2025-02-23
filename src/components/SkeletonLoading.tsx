@@ -254,7 +254,7 @@ function SkeletonLoading({ variant }: { variant?: LoadingVariant }) {
               </div>
             </div>
           </article>
-          <div className="w-full h-[400px] animate-pulse bg-muted rounded-lg m-10" />
+          <div className="w-full h-[400px] animate-pulse bg-muted rounded-lg mt-10" />
         </div>
       );
     case LoadingVariant.FORM:

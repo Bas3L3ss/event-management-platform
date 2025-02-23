@@ -13,7 +13,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { Event, EventStatus, EventType } from "@prisma/client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 import Container from "@/components/Container";
 import Title from "@/components/Title";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
@@ -46,7 +46,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUser } from "@clerk/nextjs";
+import { SignIn, SignInButton, useUser } from "@clerk/nextjs";
 
 export default function MyEventsPage() {
   const { ref, inView } = useInView({ threshold: 0.5 });
@@ -54,7 +54,7 @@ export default function MyEventsPage() {
   const searchParams = useSearchParams();
   const hasQueryParams = searchParams.toString().length > 0;
   const isEditPage = true;
-  const { user: clerkuser } = useUser();
+  const { user: clerkuser, isLoaded } = useUser();
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(
     searchParams.get("dateFrom")
@@ -66,6 +66,7 @@ export default function MyEventsPage() {
       ? new Date(searchParams.get("dateTo") || "")
       : undefined
   );
+
   // Get filters from URL params instead of state
   const search = searchParams.get("search") ?? "";
   const type = searchParams.get("type") ?? "";
@@ -98,10 +99,10 @@ export default function MyEventsPage() {
     if (dateTo) params.append("dateTo", dateTo.toISOString());
     if (status) params.append("status", status);
     if (isFeatured) params.append("isFeatured", isFeatured);
-    if (clerkuser) {
-      params.append("clerkId", clerkuser.id);
+    if (clerkuser?.id) {
+      params.append("clerkId", clerkuser?.id);
     } else {
-      return;
+      params.append("clerkId", "unauthorized");
     }
     const res = await axios.get(`/api/events?${params.toString()}`);
     return res.data;
@@ -128,7 +129,7 @@ export default function MyEventsPage() {
         status,
         isFeatured,
         ratingFrom,
-        userid: clerkuser?.id,
+        userid: clerkuser?.id ?? "Unauthorized",
       },
     ],
     queryFn: fetchEvents,
@@ -158,6 +159,32 @@ export default function MyEventsPage() {
       updateFilters({ dateTo: dateTo.toISOString() });
     }
   }, [dateFrom, dateTo]);
+  if (!clerkuser?.id && isLoaded) {
+    return (
+      <Container className="mt-10">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Events</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <Title
+          title={`Events`}
+          className="my-6 text-2xl font-bold text-primary"
+        />
+        <SignInButton>
+          <p className="text-center text-gray-500 cursor-pointer">
+            You've not been logged in :) please log in to proceed. click me
+          </p>
+        </SignInButton>
+      </Container>
+    );
+  }
   return (
     <Container className="mt-10">
       <Breadcrumb>

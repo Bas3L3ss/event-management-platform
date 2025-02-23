@@ -51,20 +51,20 @@ export async function GET(request: NextRequest) {
       where.rating = { gte: parseInt(ratingFrom) };
     }
 
+    console.log(user.userId, clerkId, "user?");
     if (clerkId && clerkId === user.userId) {
       where.clerkId = clerkId;
     } else if (!clerkId) {
       where = {
         ...where,
         NOT: {
-          ...where.NOT, // Preserve existing NOT conditions
+          ...where.NOT,
           status: { in: ["NOT_CONFIRMED", "ENDED"] },
         },
       };
     } else if (clerkId && clerkId !== user.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     const events = await prisma.event.findMany({
       where,
       take: LIMIT,
