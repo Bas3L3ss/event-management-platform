@@ -16,6 +16,7 @@ const MediaRenderer = ({
   onEnded,
   featured,
   className,
+  isEagerLoad,
 }: {
   url: string;
   alt: string;
@@ -23,6 +24,8 @@ const MediaRenderer = ({
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
+  isEagerLoad?: boolean;
+
   className?: string;
 }) => {
   const [isClient, setIsClient] = useState(false);
@@ -83,7 +86,7 @@ const MediaRenderer = ({
           <Zoom>
             <Image
               src={url}
-              alt="Message Image"
+              alt={alt}
               width={500}
               height={300}
               className={cn(
@@ -91,7 +94,7 @@ const MediaRenderer = ({
                 className
               )}
               sizes="(max-width: 760px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              loading="lazy"
+              loading={isEagerLoad ? "eager" : "lazy"}
             />
           </Zoom>
         </article>

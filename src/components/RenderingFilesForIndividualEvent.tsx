@@ -32,8 +32,8 @@ const RenderingFilesForIndividualEvent = ({
       <video
         about={alt}
         className="w-full aspect-square object-cover rounded-md"
-        width={250}
-        height={250}
+        width={100}
+        height={100}
       >
         <source src={url} about={alt} type="video/mp4" />
         Your browser does not support the video tag.
@@ -54,8 +54,8 @@ const RenderingFilesForIndividualEvent = ({
         draggable={false}
         alt={alt}
         about={alt}
-        width={250}
-        height={250}
+        width={100}
+        height={100}
       />
     );
   }

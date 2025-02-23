@@ -19,7 +19,7 @@ function EventRecordsDisplay({
   images,
   eventName,
 }: EventRecordsDisplayProps) {
-  const [imagesArr, setImagesArr] = useState<string[]>(
+  const [imagesArr, _] = useState<string[]>(
     removeDuplicates([eventImgOrVideoFirstDisplay, video, ...images])
   );
   const [showIndex, setShowIndex] = useState<number>(0);
@@ -77,6 +77,7 @@ function EventRecordsDisplay({
       >
         <MediaRenderer
           alt={eventName}
+          isEagerLoad
           url={imagesArr[showIndex]}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
