@@ -8,6 +8,8 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/events/:id",
   "/profile/:id",
+  "/profile/following/:id",
+  "/profile/followers/:id",
   "/events",
 ]);
 
