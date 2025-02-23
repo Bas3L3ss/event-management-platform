@@ -2,7 +2,6 @@
 import Title from "@/components/Title";
 import { getCommentsLength, getEventById } from "@/utils/actions/eventsActions";
 import React, { Suspense } from "react";
-import RecommendationCarousel from "@/components/RecomendationCarousel";
 import OneEventDisplay from "@/components/OneEventDisplay";
 import CommentSection from "@/components/comments/CommentSection";
 import SkeletonLoading from "@/components/SkeletonLoading";
@@ -81,8 +80,6 @@ function MainPage({ params: { id } }: { params: { id: string } }) {
           </div>
         )}
       </div>
-
-      <RecommendationCarousel className="mt-16" id={oneEvent.id} />
     </>
   );
 }

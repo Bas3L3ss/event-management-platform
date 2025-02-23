@@ -5,7 +5,11 @@ import { Metadata } from "next";
 import { getEventById } from "@/utils/actions/eventsActions";
 import { formatDate } from "@/components/DatePrinter";
 import MainPage from "./_component/MainPage";
+import dynamic from "next/dynamic";
 
+const RecommendationCarousel = dynamic(
+  () => import("@/components/RecomendationCarousel")
+);
 export async function generateMetadata({
   params: { id },
 }: {
@@ -62,6 +66,7 @@ const OneEventPage = ({ params: { id } }: { params: { id: string } }) => {
   return (
     <Container className="py-10 space-y-12">
       <MainPage params={{ id }} />
+      <RecommendationCarousel className="mt-16" id={id} />
     </Container>
   );
 };
