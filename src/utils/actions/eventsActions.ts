@@ -32,7 +32,7 @@ import {
 } from "../types/EventTypes";
 import { renderError } from "../utils";
 import { cache } from "../cache";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 async function cachedGetLatestFeaturedEvent(amount: number = 2) {
   try {
     const latestEvent = await prisma.event.findMany({
@@ -105,6 +105,7 @@ export async function getCommentsLength(eventId: string) {
     const commentsCount = await prisma.comment.count({
       where: {
         eventId: eventId,
+        parentCommentId: null,
       },
     });
     return commentsCount;
@@ -228,7 +229,17 @@ export const getUserLengthByClerkId = async (clerkId: string) => {
   }
 };
 
-export async function getCommentsByEventId(
+const getCachedCommentsByEventId = (eventId: string) => {
+  return cache(cachedCommentsByEventId, ["comments", eventId], {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  })(eventId);
+};
+export async function getCommentsByEventId(eventId: string) {
+  // Call the cached version of the fetchEvents function
+  return await getCachedCommentsByEventId(eventId);
+}
+
+export async function cachedCommentsByEventId(
   eventId: string
 ): Promise<Comment[]> {
   try {
@@ -286,7 +297,7 @@ export async function createComment({
     });
 
     await updateEventRating(eventId);
-
+    revalidatePath(`events/${eventId}`);
     return comment;
   } catch (error) {
     console.error("Error creating comment:", error);

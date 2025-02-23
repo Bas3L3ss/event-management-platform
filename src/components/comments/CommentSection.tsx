@@ -4,7 +4,6 @@ import React from "react";
 import CommentForm from "./CommentForm";
 import Title from "../Title";
 import { getUserByClerkId } from "@/utils/actions/usersActions";
-import { User } from "@prisma/client";
 import CommentsList from "./CommentLists";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 

@@ -59,7 +59,6 @@ const CommentForm = ({
       setRating(0);
       queryClient.invalidateQueries({ queryKey: ["comments", eventId] });
       queryClient.invalidateQueries({ queryKey: ["commentsLength", eventId] });
-      queryClient.invalidateQueries({ queryKey: ["event", eventId] });
     },
     onError: (error) => {
       console.error("Error creating comment:", error);

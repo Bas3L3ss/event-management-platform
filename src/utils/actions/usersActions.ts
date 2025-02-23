@@ -4,6 +4,7 @@ import { authenticateAndRedirect } from "./clerkFunc";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { User } from "@prisma/client";
 import { use } from "react";
+import { cache } from "../cache";
 
 export async function createUser({
   clerkId,
@@ -387,7 +388,7 @@ export const changeSeenStateNotification = async (
   }
 };
 
-export const getUserByClerkId = async (
+export const cachedUserByClerkId = async (
   clerkId: string
 ): Promise<User | undefined | null> => {
   try {
@@ -401,3 +402,13 @@ export const getUserByClerkId = async (
     console.log(error);
   }
 };
+
+const getCachedUserByClerkId = (clerkId: string) => {
+  return cache(cachedUserByClerkId, ["featured-events"], {
+    revalidate: 60, // Revalidate cache every 60 seconds
+  })(clerkId);
+};
+export async function getUserByClerkId(clerkId: string) {
+  // Call the cached version of the fetchEvents function
+  return await getCachedUserByClerkId(clerkId);
+}

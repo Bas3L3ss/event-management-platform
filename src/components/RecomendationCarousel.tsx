@@ -154,13 +154,7 @@ const RecommendationCarousel = ({
               </CardContent>
               <CardFooter className="p-4 pt-0 flex-shrink-0">
                 <Button asChild className="w-full" variant="outline">
-                  <PrefetchLink
-                    queryKey={["event", event.id]}
-                    queryFn={() => getEventById(event.id)}
-                    href={`/events/${event.id}`}
-                  >
-                    View Event
-                  </PrefetchLink>
+                  <Link href={`/events/${event.id}`}>View Event</Link>
                 </Button>
               </CardFooter>
             </Card>

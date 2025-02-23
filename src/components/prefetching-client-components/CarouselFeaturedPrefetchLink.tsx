@@ -1,6 +1,6 @@
 "use client";
 import PrefetchLink from "@/react-query/prefetch";
-import { getEventById } from "@/utils/actions/eventsActions";
+import { getCommentsByEventId } from "@/utils/actions/eventsActions";
 import { Event } from "@prisma/client";
 import { LinkIcon } from "lucide-react";
 import React from "react";
@@ -8,8 +8,8 @@ import React from "react";
 const CarouselFeaturedPrefetchLink = ({ el }: { el: Event }) => {
   return (
     <PrefetchLink
-      queryKey={["event", el.id]}
-      queryFn={() => getEventById(el.id)}
+      queryKey={["comments", el.id]}
+      queryFn={async () => await getCommentsByEventId(el.id)}
       className="mb-2  inline-flex items-center gap-2"
       href={`/events/${el.id}`}
     >
