@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { cn } from "@/lib/utils";
 import QueryProvider from "./provider/QueryClientProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
+import { SpeedInsights } from "@vercel/speed-insights/next";
 export const metadata: Metadata = {
   title: "Event Management platform",
   description: "A place for everyone to manage and advertise their events",
@@ -38,6 +38,7 @@ export default function RootLayout({
             </Providers>
           </ClerkProviderWithTheme>
           <ReactQueryDevtools initialIsOpen={false} />
+          <SpeedInsights />
         </body>
       </html>
     </QueryProvider>

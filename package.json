@@ -40,6 +40,7 @@
     "@types/lodash": "^4.17.13",
     "@types/react-slick": "^0.23.13",
     "@types/sanitize-html": "^2.13.0",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.7.7",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",
