@@ -40,7 +40,7 @@ const RecommendationCarousel = ({
   });
 
   if (isLoading) {
-    return <CarouselSkeleton />;
+    return <CarouselSkeleton className={className} />;
   }
 
   if ((!events || events.length < 4) && isError) {
@@ -173,20 +173,19 @@ const RecommendationCarousel = ({
 
 export default RecommendationCarousel;
 
-const CarouselSkeleton = () => {
+const CarouselSkeleton = ({ className }: { className?: string }) => {
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <div className={cn("mx-auto max-w-7xl px-4 sm:px-6", className)}>
       {/* Title Skeleton */}
       <div className="mb-6">
         <Skeleton className="h-8 w-64" />
       </div>
 
-      {/* Cards Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* Cards Container - Hidden on small screens */}
+      <div className="flex gap-4 overflow-x-hidden">
         {[1, 2, 3, 4].map((item) => (
-          <Card key={item} className="h-[30rem] flex flex-col overflow-hidden">
-            <CardHeader className="p-0 flex-shrink-0">
-              {/* Image Skeleton */}
+          <Card key={item} className="h-[30rem] w-[300px] flex flex-col ">
+            <CardHeader className="p-0 flex-shrink-0 relative">
               <Skeleton className="h-[200px] w-full" />
               {/* Status Badge Skeleton */}
               <Skeleton className="h-5 w-20 absolute top-2 right-2 rounded-full" />

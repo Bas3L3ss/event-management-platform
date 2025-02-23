@@ -14,6 +14,8 @@ import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import CarouselFeaturedPrefetchLink from "./prefetching-client-components/CarouselFeaturedPrefetchLink";
+import { Skeleton } from "./ui/skeleton";
+import Title from "./Title";
 
 export function CarouselFeatured({
   featuredEvents,
@@ -78,5 +80,36 @@ export function CarouselFeatured({
       <CarouselPrevious className="hidden lg:flex -left-12" />
       <CarouselNext className="hidden lg:flex -right-12" />
     </Carousel>
+  );
+}
+
+export function CarouselFeaturedSkeleton() {
+  return (
+    <>
+      <Title
+        title={`Other Featured Events - 0 events`}
+        className="text-3xl font-semibold mt-16 mb-8 text-center"
+      />
+      <Carousel className="w-full">
+        <CarouselContent>
+          {[...Array(3)].map((_, index) => (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 p-2">
+              <article className="block h-full">
+                <Card className="h-full">
+                  <CardContent className="flex flex-col h-full justify-between p-6">
+                    <Skeleton className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+                    <Skeleton className="h-6 w-48 bg-gray-300 dark:bg-gray-700 rounded mb-4" />
+                    <Skeleton className="h-4 w-40 bg-gray-300 dark:bg-gray-700 rounded mb-4" />
+                    <Skeleton className="relative w-full h-40 mb-4 overflow-hidden rounded-md bg-gray-300 dark:bg-gray-700" />
+                    <Skeleton className="h-4 w-24 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+                    <Skeleton className="h-12 w-full bg-gray-300 dark:bg-gray-700 rounded" />
+                  </CardContent>
+                </Card>
+              </article>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </>
   );
 }

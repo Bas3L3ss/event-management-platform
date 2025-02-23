@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Event } from "@prisma/client";
 import Link from "next/link";
@@ -90,6 +91,40 @@ export default function OneFeaturedEvent({
             url={featuredEvent.eventImgOrVideoFirstDisplay as string}
             alt={featuredEvent.eventName}
           />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function OneFeaturedEventSkeleton() {
+  return (
+    <div className="container px-4 py-8 md:py-12 lg:py-16">
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+        {/* Left Section */}
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 w-32">
+              <Calendar className="w-4 h-4 mr-2 text-primary" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+            <Skeleton className="h-6 w-1/3" />
+          </div>
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Skeleton className="h-12 w-40 rounded-lg" />
+            <Skeleton className="h-12 w-40 rounded-lg" />
+          </div>
+          <div className="flex items-center space-x-6 pt-4 border-t">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-6 w-32" />
+          </div>
+        </div>
+        {/* Right Section */}
+        <div className="relative rounded-xl overflow-hidden shadow-xl ring-1 ring-primary/20">
+          <Skeleton className="h-[500px] w-full" />
         </div>
       </div>
     </div>

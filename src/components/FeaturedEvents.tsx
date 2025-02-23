@@ -5,33 +5,10 @@ import {
 } from "@/utils/actions/eventsActions";
 import Container from "./Container";
 import Title from "./Title";
-import OneFeaturedEvent from "./OneFeaturedEvent";
+import OneFeaturedEvent, { OneFeaturedEventSkeleton } from "./OneFeaturedEvent";
 import { Suspense } from "react";
-import { CarouselFeatured } from "./CarouselFeatured";
+import { CarouselFeatured, CarouselFeaturedSkeleton } from "./CarouselFeatured";
 import { Skeleton } from "./ui/skeleton";
-
-const LoadingCarousel = () => (
-  <div className="w-full h-[400px] animate-pulse bg-muted rounded-lg" />
-);
-
-const LoadingFeaturedEvent = () => (
-  <div className="grid lg:grid-cols-2 gap-8 mb-16">
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-32" />
-      </div>
-      <Skeleton className="h-8 w-3/4" />
-      <Skeleton className="h-4 w-48" />
-      <Skeleton className="h-32 w-full" />
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-16" />
-      </div>
-    </div>
-    <Skeleton className="h-[400px] w-full rounded-lg" />
-  </div>
-);
 
 async function MainFeaturedEvent() {
   const oneFeaturedEvent = await getOneLatestFeaturedEvent();
@@ -41,10 +18,6 @@ async function MainFeaturedEvent() {
 
   return (
     <>
-      <Title
-        title="Most Recent Featured Event"
-        className="text-4xl font-bold mb-8 text-center"
-      />
       <OneFeaturedEvent
         commentsLength={oneEventsCommentsLength ? oneEventsCommentsLength : 0}
         featuredEvent={oneFeaturedEvent}
@@ -95,24 +68,28 @@ export default function FeaturedEventsPage() {
         </svg>
       </div>
       <Container className="relative z-10">
-        <Suspense fallback={<LoadingFeaturedEvent />}>
+        <Title
+          title="Most Recent Featured Event"
+          className="text-4xl font-bold mb-8 text-center"
+        />
+        <Suspense fallback={<OneFeaturedEventSkeleton />}>
           <MainFeaturedEvent />
         </Suspense>
-        <Suspense fallback={<LoadingCarousel />}>
+
+        <Suspense fallback={<CarouselFeaturedSkeleton />}>
           <OtherFeaturedEvents />
         </Suspense>
       </Container>
 
-      {/* Wave transition */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg
           className="w-full h-auto"
-          viewBox="0 0 1440 120"
+          viewBox="0 0 1440 60"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M0 0L48 8.96551C96 17.931 192 35.8621 288 44.8276C384 53.7931 480 53.7931 576 53.7931C672 53.7931 768 53.7931 864 62.7586C960 71.7241 1056 89.6552 1152 98.6207C1248 107.586 1344 107.586 1392 107.586L1440 107.586V120H1392C1344 120 1248 120 1152 120C1056 120 960 120 864 120C768 120 672 120 576 120C480 120 384 120 288 120C192 120 96 120 48 120H0V0Z"
+            d="M0 30C120 40 240 50 360 50C480 50 600 40 720 35C840 30 960 30 1080 35C1200 40 1320 50 1440 45V60H0V30Z"
             fill="currentColor"
             className="text-background"
           />
