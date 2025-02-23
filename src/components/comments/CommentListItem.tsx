@@ -205,7 +205,7 @@ const CommentListItem: React.FC<CommentListItemProps> = ({
       }`}
       aria-disabled={isDeleting}
     >
-      <Link href={`/profile/`}>
+      <Link href={`/profile/${comment.clerkId}`}>
         <Image
           src={comment.authorImageUrl}
           width={200}
