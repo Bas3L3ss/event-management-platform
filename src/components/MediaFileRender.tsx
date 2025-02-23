@@ -47,7 +47,14 @@ const MediaRenderer = ({
   }
 
   // Render based on file extension
-  if (fileExtension === "mp4") {
+  if (
+    fileExtension === "mp4" ||
+    fileExtension === "webm" ||
+    fileExtension === "ogg" ||
+    fileExtension === "mov" ||
+    fileExtension === "avi" ||
+    fileExtension === "mkv"
+  ) {
     return (
       <video
         className={cn(
@@ -101,7 +108,6 @@ const MediaRenderer = ({
       </div>
     );
   }
-
   return <p>Unsupported media format</p>;
 };
 
