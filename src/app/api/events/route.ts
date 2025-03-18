@@ -51,7 +51,6 @@ export async function GET(request: NextRequest) {
       where.rating = { gte: parseInt(ratingFrom) };
     }
 
-    console.log(user.userId, clerkId, "user?");
     if (clerkId && clerkId === user.userId) {
       where.clerkId = clerkId;
     } else if (!clerkId) {

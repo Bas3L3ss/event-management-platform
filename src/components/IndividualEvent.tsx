@@ -1,16 +1,13 @@
 import { Event } from "@prisma/client";
 import DatePrinter from "./DatePrinter";
 import { Card, CardContent } from "./ui/card";
-import MediaRenderer from "./MediaFileRender";
+import MediaRenderer from "@/components/MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import PrefetchLink from "@/react-query/prefetch";
-import {
-  getCommentsByEventId,
-  getEventById,
-} from "@/utils/actions/eventsActions";
+import { getCommentsByEventId } from "@/utils/actions/eventsActions";
 
 export const IndividualEvent = ({ event }: { event: Event }) => {
   return (

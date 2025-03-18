@@ -3,6 +3,7 @@ import "@testing-library/jest-dom";
 import { TextEncoder, TextDecoder } from "util";
 
 global.TextEncoder = TextEncoder;
+// @ts-expect-error: no prob
 global.TextDecoder = TextDecoder;
 
 // Mock Clerk modules
@@ -64,6 +65,7 @@ global.Request = jest.fn().mockImplementation((url, options = {}) => ({
   json: async () => JSON.parse(options.body),
 }));
 
+// @ts-expect-error: no prob
 global.Response = jest.fn().mockImplementation((body, init = {}) => ({
   status: init.status || 200,
   headers: new Headers(init.headers || {}),

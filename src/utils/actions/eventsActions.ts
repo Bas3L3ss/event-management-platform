@@ -1,11 +1,9 @@
 "use server";
-
 import {
   Comment,
   CommentLike,
   Event,
   EventStatus,
-  EventType,
   Order,
   User,
 } from "@prisma/client";

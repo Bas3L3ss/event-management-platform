@@ -11,7 +11,7 @@ import RecommendationCarousel from "@/components/RecomendationCarousel";
 import SkeletonLoading from "@/components/SkeletonLoading";
 import { LoadingVariant } from "@/constants/values";
 import { IndividualEvent } from "@/components/IndividualEvent";
-import { FilterIcon, FilterXIcon, Loader2, PlusIcon } from "lucide-react";
+import { FilterIcon, FilterXIcon, PlusIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -339,7 +339,7 @@ export default function EventPage() {
 
       <Title title="Events" className="my-6 text-2xl font-bold text-primary" />
 
-      {isError || data?.events.length == 0 ? (
+      {isError || data?.events?.length == 0 ? (
         <p className="text-center text-gray-500" role="alert">
           No events found.
         </p>
@@ -349,7 +349,7 @@ export default function EventPage() {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
         aria-label="Events list"
       >
-        {data?.events.map((event: Event) => (
+        {data?.events?.map((event: Event) => (
           <IndividualEvent key={event.id} event={event} />
         ))}
       </section>
