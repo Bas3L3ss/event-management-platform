@@ -13,7 +13,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: "npm"
 
       - name: Install Dependencies
@@ -24,6 +24,9 @@ jobs:
 
       # - name: Run ESLint
       #   run: npm run lint
+
+      - name: Build Next.js App
+        run: npm run build
 
       - name: Run Jest Tests
         run: npm test
