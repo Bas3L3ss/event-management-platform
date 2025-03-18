@@ -1,14 +1,6 @@
 name: CI Pipeline
 
-on:
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
+on: [push]
 
 jobs:
   test:
