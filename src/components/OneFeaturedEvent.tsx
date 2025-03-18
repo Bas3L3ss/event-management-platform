@@ -5,7 +5,7 @@ import Link from "next/link";
 import DatePrinter from "./DatePrinter";
 import MediaRenderer from "./MediaFileRender";
 import ReviewsStarDisplay from "./ReviewsStarDisplay";
-import { Calendar, Star, Ticket, MessageSquare } from "lucide-react";
+import { Calendar, Ticket } from "lucide-react";
 import EventDescriptionParser from "./EventDescriptionParser";
 import OneFeaturedEventPrefetchLink from "./prefetching-client-components/OneFeaturedEventPrefetchLink";
 

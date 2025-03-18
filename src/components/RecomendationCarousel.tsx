@@ -2,9 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Slider, { Settings } from "react-slick";
-import MediaRenderer from "./MediaFileRender";
-import { getEventById, getRandomEvents } from "@/utils/actions/eventsActions";
-import { Event, EventStatus } from "@prisma/client";
+import MediaRenderer from "@/components/MediaFileRender";
+import { getRandomEvents } from "@/utils/actions/eventsActions";
+import { EventStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { EventDescriptionDialog } from "./EventDescriptionDialog";
 import Title from "./Title";
 import { Skeleton } from "./ui/skeleton";
-import PrefetchLink from "@/react-query/prefetch";
 
 const RecommendationCarousel = ({
   className,
@@ -170,6 +169,7 @@ export default RecommendationCarousel;
 const CarouselSkeleton = ({ className }: { className?: string }) => {
   return (
     <div className={cn("mx-auto max-w-7xl px-4 sm:px-6", className)}>
+      <span className="sr-only">Loading</span>
       {/* Title Skeleton */}
       <div className="mb-6">
         <Skeleton className="h-8 w-64" />

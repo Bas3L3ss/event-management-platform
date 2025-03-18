@@ -1,20 +1,11 @@
 "use client";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import React, { useEffect, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { Event, EventStatus, EventType } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import Container from "@/components/Container";
 import Title from "@/components/Title";
 import RecommendationCarousel from "@/components/RecomendationCarousel";
 import SkeletonLoading from "@/components/SkeletonLoading";

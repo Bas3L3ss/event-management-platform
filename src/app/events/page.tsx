@@ -10,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const Page = () => {
+const EventPageServer = () => {
   return (
     <Container className="mt-10">
       <nav aria-label="Breadcrumb navigation">
@@ -31,4 +31,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default EventPageServer;
