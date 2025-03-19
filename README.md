@@ -48,11 +48,11 @@ A modern event management platform built with Next.js, designed to connect event
 - **Easy to deploy advertisement**
 
   ![deploy-ads](assets/add-event-ezgif.com-video-to-gif-converter.gif)
-  ![publish-ads](assets/add-event-ezgif.com-video-to-gif-converter.gif)
+  ![publish-ads](assets/publish-event-ads-ezgif.com-video-to-gif-converter.gif)
 
 - **Following and keeping track with your followeres!**
 
-  ![ ](assets/)
+  ![social-app-like](assets/social-app-like-ezgif.com-video-to-gif-converter.gif)
 
 ## ✨ Features
 
