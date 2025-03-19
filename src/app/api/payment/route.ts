@@ -2,7 +2,7 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 import { type NextRequest } from "next/server";
 import prisma from "@/utils/db";
-import { calculateEventPrice, limitWords, sanitizeText } from "@/utils/utils";
+import { calculateEventPrice, sanitizeText } from "@/utils/utils";
 
 export const POST = async (req: NextRequest) => {
   const requestHeaders = new Headers(req.headers);
@@ -32,6 +32,7 @@ export const POST = async (req: NextRequest) => {
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded",
       metadata: { orderId, eventId },
+      customer_email: order.email,
       line_items: [
         {
           quantity: 1, // Single event payment

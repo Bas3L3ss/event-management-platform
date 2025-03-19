@@ -7,8 +7,8 @@
 </div>
 
 <div align="center">
-<a href="[Your Repository URL]" target="blank">
-<img src="[Your Logo Path]" width="90" alt="Logo" />
+<a href="https://github.com/Bas3L3ss/event-management-platform" target="blank">
+<img src="assets/favicon.ico" width="90" alt="Logo" />
 </a>
 
 <h2>Event Management & Advertisement Platform</h2>
@@ -22,13 +22,37 @@
 ![](https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radix-ui&logoColor=white)
 ![](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
 
-<img src="[Your Screenshot Path]" width="80%">
+![landing-page](assets/landing-page-ezgif.com-video-to-gif-converter.gif)
 
 </div>
 
 ## 💡 Overview
 
 A modern event management platform built with Next.js, designed to connect event organizers with attendees. This platform offers a seamless experience for discovering, creating, and managing events with features focused on user engagement and event promotion.
+
+## 🎬 Demo
+
+**🔐 Seamless User Authentication**
+
+- **Register and login users effortlessly with Clerk Auth**
+
+  ![user-onboard](assets/user-onboarding-ezgif.com-video-to-gif-converter.gif)
+  ![user-login](assets/authentication-with-clerk-ezgif.com-video-to-gif-converter.gif)
+
+**📨 Social App-Like User Experience**
+
+- **Seamless user navigation (sub 0.5s latency)**
+
+  ![fast-navigation](assets/fast-navigation-ezgif.com-video-to-gif-converter.gif)
+
+- **Easy to deploy advertisement**
+
+  ![deploy-ads](assets/add-event-ezgif.com-video-to-gif-converter.gif)
+  ![publish-ads](assets/add-event-ezgif.com-video-to-gif-converter.gif)
+
+- **Following and keeping track with your followeres!**
+
+  ![ ](assets/)
 
 ## ✨ Features
 

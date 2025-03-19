@@ -9,6 +9,7 @@ import {
   createNotification,
   getUsersWhoFollow,
 } from "@/utils/actions/usersActions";
+import { revalidatePath } from "next/cache";
 
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
