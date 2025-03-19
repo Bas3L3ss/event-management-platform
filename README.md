@@ -41,7 +41,7 @@ A modern event management platform built with Next.js, designed to connect event
 
 **📨 Social App-Like User Experience**
 
-- **Seamless user navigation (sub 0.5s latency)**
+- **Seamless user navigation (sub 0.1s latency)**
 
   ![fast-navigation](assets/fast-navigation-ezgif.com-video-to-gif-converter.gif)
 
@@ -91,7 +91,7 @@ A modern event management platform built with Next.js, designed to connect event
 1. **Clone the repository:**
 
    ```bash
-   git clone [your-repo-url]
+   git clone https://github.com/Bas3L3ss/event-management-platform
    cd event-management-platform
    ```
 
