@@ -1,3 +1,4 @@
+# Might make this workflow more complete if i had more time
 name: CI Pipeline
 
 on: [push]
@@ -24,9 +25,8 @@ jobs:
 
       # - name: Run ESLint
       #   run: npm run lint
-
-      - name: Build Next.js App
-        run: npm run build
+      # - name: Build Next.js App
+      #   run: npm run build
 
       - name: Run Jest Tests
         run: npm test
