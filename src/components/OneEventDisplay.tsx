@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import SkeletonLoading from "./SkeletonLoading";
 import EventDescriptionParser from "./EventDescriptionParser";
+import ShareEventButton from "./ShareEventButton";
 
 const EventLocationMap = dynamic(
   () => import("@/components/EventLocationMap"),
@@ -90,6 +91,12 @@ function OneEventDisplay({
                 <UserButton user={author} />
                 <span className="text-sm font-bold ">{author.userName}</span>
               </div>
+            )}
+            {oneEvent.status !== "NOT_CONFIRMED" && (
+              <ShareEventButton
+                eventId={oneEvent.id}
+                eventName={oneEvent.eventName}
+              />
             )}
           </div>
           <Card>
