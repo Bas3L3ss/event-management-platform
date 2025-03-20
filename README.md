@@ -41,7 +41,7 @@ A modern event management platform built with Next.js, designed to connect event
 
 **📨 Social App-Like User Experience**
 
-- **Seamless user navigation (sub 0.1s latency)**
+- **Seamless user navigation and interaction (sub 0.1s latency)**
 
   ![fast-navigation](assets/fast-navigation-ezgif.com-video-to-gif-converter.gif)
 
@@ -50,9 +50,10 @@ A modern event management platform built with Next.js, designed to connect event
   ![deploy-ads](assets/add-event-ezgif.com-video-to-gif-converter.gif)
   ![publish-ads](assets/publish-event-ads-ezgif.com-video-to-gif-converter.gif)
 
-- **Following and keeping track with your followeres!**
+- **Social app like experience!**
 
   ![social-app-like](assets/social-app-like-ezgif.com-video-to-gif-converter.gif)
+  ![sharing](assets/sharing-ezgif.com-video-to-gif-converter.gif)
 
 ## ✨ Features
 
