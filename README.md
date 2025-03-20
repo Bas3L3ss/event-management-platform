@@ -90,6 +90,8 @@ A modern event management platform built with Next.js, designed to connect event
 | Payment Processing  | < 2.5s     |
 | Core Web Vitals     | All "Good" |
 
+  <img src="assets/speed-insight.png" alt="speed-insight" style="width: 50%; height: auto;" />
+
 ## 🚀 Technical Summary
 
 - **Optimized data fetching** with React Query and Next.js unstable_cache for improved performance
